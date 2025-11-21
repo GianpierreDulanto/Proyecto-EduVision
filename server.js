@@ -1857,12 +1857,15 @@ app.use((err, req, res, next) => {
 });
 
 // Catch-all para rutas del SPA (debe ir al final, después de todas las rutas API)
-app.get('*', (req, res) => {
-  // Si no es una ruta de API, servir index.html para el SPA
-  if (!req.path.startsWith('/api')) {
+// Usar app.use() sin ruta para compatibilidad con Express 5.x
+app.use((req, res) => {
+  // Si no es una ruta de API y no es un archivo estático, servir index.html para el SPA
+  if (!req.path.startsWith('/api') && !req.path.startsWith('/uploads') && !req.path.match(/\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot)$/)) {
     res.sendFile(path.join(__dirname, 'index.html'));
-  } else {
+  } else if (req.path.startsWith('/api')) {
     res.status(404).json({ error: 'Endpoint no encontrado' });
+  } else {
+    res.status(404).send('Recurso no encontrado');
   }
 });
 
