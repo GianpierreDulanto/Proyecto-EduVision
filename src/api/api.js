@@ -20,15 +20,35 @@ async function apiRequest(endpoint, options = {}) {
     };
 
     const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
-    const data = await response.json();
+    
+    // Intentar parsear JSON, pero si falla, usar texto
+    let data;
+    try {
+      data = await response.json();
+    } catch (parseError) {
+      const text = await response.text();
+      throw new Error(text || `Error ${response.status}: ${response.statusText}`);
+    }
 
     if (!response.ok) {
-      throw new Error(data.error || 'Error en la petición');
+      const errorMessage = data.error || data.message || `Error ${response.status}: ${response.statusText}`;
+      const error = new Error(errorMessage);
+      error.status = response.status;
+      error.details = data.details || data;
+      throw error;
     }
 
     return data;
   } catch (error) {
-    console.error(`Error en ${endpoint}:`, error);
+    // Si ya tiene status, no hacer nada más
+    if (error.status) {
+      console.error(`❌ Error ${error.status} en ${endpoint}:`, error.message);
+      if (error.details) {
+        console.error('Detalles:', error.details);
+      }
+    } else {
+      console.error(`❌ Error de red en ${endpoint}:`, error.message);
+    }
     throw error;
   }
 }

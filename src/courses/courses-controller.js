@@ -17,16 +17,28 @@ export class CoursesController {
 
   async initialize() {
     try {
-      // Cargar categorías y grados
-      this.categorias = await getCategorias();
-      this.grados = await getGrados();
+      // Cargar categorías y grados (con manejo de errores)
+      try {
+        this.categorias = await getCategorias();
+        this.grados = await getGrados();
+        console.log('✓ Categorías y grados cargados');
+      } catch (error) {
+        console.warn('⚠️ No se pudieron cargar categorías y grados. La aplicación continuará con datos limitados.');
+        this.categorias = [];
+        this.grados = [];
+      }
       
       // Cargar ID de alumno si hay sesión
       this.loadAlumnoId();
       
       // Cargar cursos inscritos si hay alumno
       if (this.alumnoId) {
-        await this.loadCursosInscritos();
+        try {
+          await this.loadCursosInscritos();
+        } catch (error) {
+          console.warn('⚠️ No se pudieron cargar los cursos inscritos:', error.message);
+          this.cursosInscritos = [];
+        }
       }
       
       // Verificar si hay sesión activa
@@ -37,7 +49,11 @@ export class CoursesController {
       
       console.log('✓ Controlador de cursos inicializado');
     } catch (error) {
-      console.error('Error al inicializar controlador de cursos:', error);
+      console.error('❌ Error crítico al inicializar controlador de cursos:', error);
+      // Aún así, intentar renderizar con datos vacíos
+      this.categorias = this.categorias || [];
+      this.grados = this.grados || [];
+      this.checkSessionAndRender();
     }
   }
 
@@ -242,7 +258,12 @@ export class CoursesController {
       if (!container) return;
 
       if (this.categorias.length === 0) {
-        this.categorias = await getCategorias();
+        try {
+          this.categorias = await getCategorias();
+        } catch (error) {
+          console.warn('⚠️ No se pudieron cargar categorías:', error.message);
+          this.categorias = [];
+        }
       }
 
       if (this.categorias.length > 0) {
@@ -252,9 +273,15 @@ export class CoursesController {
             <div class="text-sm font-semibold text-slate-900 dark:text-white">${this.escapeHtml(cat.nombre)}</div>
           </div>
         `).join('');
+      } else {
+        container.innerHTML = '<p class="text-center text-slate-500 dark:text-slate-400">No hay categorías disponibles</p>';
       }
     } catch (error) {
       console.error('Error al cargar categorías preview:', error);
+      const container = document.getElementById('categoriasCursosCatalogo');
+      if (container) {
+        container.innerHTML = '<p class="text-center text-slate-500 dark:text-slate-400">Error al cargar categorías</p>';
+      }
     }
   }
 
@@ -264,7 +291,13 @@ export class CoursesController {
       if (!container) return;
 
       // Cargar algunos cursos públicos
-      const cursos = await getCursos({});
+      let cursos = [];
+      try {
+        cursos = await getCursos({});
+      } catch (error) {
+        console.warn('⚠️ No se pudieron cargar cursos:', error.message);
+        cursos = [];
+      }
       const cursosPreview = cursos.slice(0, 3);
 
       if (cursosPreview.length > 0) {
@@ -321,7 +354,12 @@ export class CoursesController {
       if (!container) return;
 
       if (this.categorias.length === 0) {
-        this.categorias = await getCategorias();
+        try {
+          this.categorias = await getCategorias();
+        } catch (error) {
+          console.warn('⚠️ No se pudieron cargar categorías:', error.message);
+          this.categorias = [];
+        }
       }
 
       if (this.categorias.length > 0) {
@@ -331,9 +369,15 @@ export class CoursesController {
             <div class="text-sm font-semibold text-slate-900 dark:text-white">${this.escapeHtml(cat.nombre)}</div>
           </div>
         `).join('');
+      } else {
+        container.innerHTML = '<p class="text-center text-slate-500 dark:text-slate-400">No hay categorías disponibles</p>';
       }
     } catch (error) {
       console.error('Error al cargar categorías preview:', error);
+      const container = document.getElementById('categoriasCursos');
+      if (container) {
+        container.innerHTML = '<p class="text-center text-slate-500 dark:text-slate-400">Error al cargar categorías</p>';
+      }
     }
   }
 
@@ -343,7 +387,13 @@ export class CoursesController {
       if (!container) return;
 
       // Cargar cursos públicos (sin filtro de estado, el backend devuelve aprobados/publicados por defecto)
-      const cursos = await getCursos();
+      let cursos = [];
+      try {
+        cursos = await getCursos();
+      } catch (error) {
+        console.warn('⚠️ No se pudieron cargar cursos:', error.message);
+        cursos = [];
+      }
       
       if (cursos.length > 0) {
         container.innerHTML = cursos.slice(0, 6).map(curso => `

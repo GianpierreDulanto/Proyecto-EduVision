@@ -39,10 +39,18 @@ class App {
       
       // Probar conexión con la base de datos
       try {
-        await testDatabase();
-        console.log('✓ Conexión con base de datos exitosa');
+        const dbTest = await testDatabase();
+        if (dbTest && dbTest.ok) {
+          console.log('✓ Conexión con base de datos exitosa');
+        } else {
+          console.warn('⚠️ La base de datos respondió pero con advertencias');
+        }
       } catch (error) {
         console.warn('⚠️ No se pudo conectar con la base de datos. Algunas funciones pueden no estar disponibles.');
+        console.warn('💡 Verifica que las variables de entorno estén configuradas en Railway.');
+        if (error.details) {
+          console.warn('Detalles del error:', error.details);
+        }
       }
       
       // Inicializar módulos principales
