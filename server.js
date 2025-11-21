@@ -26,16 +26,29 @@ app.use((req, res, next) => {
 });
 
 // Configuración de base de datos
+// IMPORTANTE: En Railway con proyectos separados, NO uses mysql.railway.internal
+// Usa el MYSQLHOST real del proyecto MySQL (ej: containers-us-east-XXX.railway.app)
 const dbConfig = {
   host: process.env.MYSQLHOST || 'localhost',
   user: process.env.MYSQLUSER || 'root',
   password: process.env.MYSQLPASSWORD || '',
   database: process.env.MYSQLDATABASE || 'sistema_cursos',
-  port: process.env.MYSQLPORT || 3306,
+  port: process.env.MYSQLPORT ? parseInt(process.env.MYSQLPORT) : 3306,
   waitForConnections: true,
   connectionLimit: 10,
-  queueLimit: 0
+  queueLimit: 0,
+  // Configuración SSL para Railway (si el host es de Railway)
+  ssl: process.env.MYSQLHOST && process.env.MYSQLHOST.includes('railway.app') ? {
+    rejectUnauthorized: false
+  } : false
 };
+
+// Validación y advertencias al iniciar
+if (process.env.MYSQLHOST && process.env.MYSQLHOST.includes('railway.internal')) {
+  console.error('❌ ERROR: mysql.railway.internal solo funciona cuando MySQL está en el mismo proyecto');
+  console.error('❌ Como tienes proyectos separados, usa el MYSQLHOST real del proyecto MySQL');
+  console.error('❌ Ejemplo: containers-us-east-XXX.railway.app');
+}
 
 // Pool de conexiones
 const pool = mysql.createPool(dbConfig);
@@ -1935,7 +1948,31 @@ app.use((req, res) => {
 
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Servidor EduVision corriendo en puerto ${PORT}`);
-  console.log(`📊 Base de datos: ${dbConfig.database}`);
+  console.log(`📊 Configuración de Base de Datos:`);
+  console.log(`   Host: ${dbConfig.host}`);
+  console.log(`   Database: ${dbConfig.database}`);
+  console.log(`   Port: ${dbConfig.port}`);
+  console.log(`   User: ${dbConfig.user}`);
+  console.log(`   Password: ${dbConfig.password ? '***configurada***' : '❌ NO CONFIGURADA'}`);
+  
+  // Validar que las variables estén configuradas
+  if (!process.env.MYSQLHOST || process.env.MYSQLHOST === 'localhost') {
+    console.warn('⚠️  ADVERTENCIA: MYSQLHOST no está configurado o está en localhost');
+    console.warn('⚠️  En Railway, asegúrate de configurar las variables de entorno:');
+    console.warn('⚠️  - MYSQLHOST');
+    console.warn('⚠️  - MYSQLUSER');
+    console.warn('⚠️  - MYSQLPASSWORD');
+    console.warn('⚠️  - MYSQLDATABASE');
+    console.warn('⚠️  - MYSQLPORT');
+  }
+  
+  if (dbConfig.host && dbConfig.host.includes('railway.internal')) {
+    console.error('❌ ERROR: Se está usando mysql.railway.internal');
+    console.error('❌ Esto solo funciona cuando MySQL está en el mismo proyecto');
+    console.error('❌ Como tienes proyectos separados, usa el MYSQLHOST real');
+    console.error('❌ Ejemplo: containers-us-east-XXX.railway.app');
+  }
+  
   console.log(`📡 API disponible en http://0.0.0.0:${PORT}/api`);
 });
 
