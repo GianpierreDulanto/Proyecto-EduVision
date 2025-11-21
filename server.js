@@ -3,6 +3,7 @@ const mysql = require('mysql2/promise');
 const path = require('path');
 const multer = require('multer');
 const fs = require('fs');
+const bcrypt = require('bcrypt');
 require('dotenv').config();
 
 const app = express();
@@ -46,6 +47,14 @@ async function query(sql, params = []) {
     return rows;
   } catch (error) {
     console.error('Error en query:', error);
+    console.error('SQL:', sql);
+    console.error('Params:', params);
+    console.error('Error completo:', {
+      code: error.code,
+      errno: error.errno,
+      sqlState: error.sqlState,
+      sqlMessage: error.sqlMessage
+    });
     throw error;
   }
 }
@@ -110,28 +119,47 @@ app.post('/api/login', async (req, res) => {
       return res.status(400).json({ error: 'Correo y contraseña son requeridos' });
     }
 
+    // Buscar usuario por correo
     const usuarios = await query(
-      `SELECT u.id_usuario, u.nombre, u.apellido, u.correo, u.rol, u.estado,
+      `SELECT u.id_usuario, u.nombre, u.apellido, u.correo, u.contraseña, u.rol, u.estado,
               d.id_docente, d.especialidad,
               a.id_alumno
        FROM usuario u
        LEFT JOIN docente d ON u.id_usuario = d.usuario_id
        LEFT JOIN alumno a ON u.id_usuario = a.usuario_id
-       WHERE u.correo = ? AND u.contraseña = ? AND u.estado = 'activo'`,
-      [correo, contraseña]
+       WHERE u.correo = ? AND u.estado = 'activo'`,
+      [correo]
     );
 
-    if (usuarios.length > 0) {
-      const user = usuarios[0];
-      // No enviar contraseña al cliente
-      delete user.contraseña;
-      res.json({ success: true, user });
-    } else {
-      res.status(401).json({ error: 'Credenciales inválidas o usuario inactivo' });
+    if (usuarios.length === 0) {
+      return res.status(401).json({ error: 'Credenciales inválidas o usuario inactivo' });
     }
+
+    const user = usuarios[0];
+    
+    // Verificar contraseña (puede estar hasheada o en texto plano para compatibilidad)
+    let passwordMatch = false;
+    
+    // Intentar comparar con bcrypt primero
+    if (user.contraseña && user.contraseña.startsWith('$2')) {
+      // Contraseña hasheada
+      passwordMatch = await bcrypt.compare(contraseña, user.contraseña);
+    } else {
+      // Contraseña en texto plano (para compatibilidad con datos existentes)
+      passwordMatch = user.contraseña === contraseña;
+    }
+
+    if (!passwordMatch) {
+      return res.status(401).json({ error: 'Credenciales inválidas' });
+    }
+
+    // No enviar contraseña al cliente
+    delete user.contraseña;
+    res.json({ success: true, user });
   } catch (error) {
-    console.error('Error en login:', error);
-    res.status(500).json({ error: 'Error en el servidor' });
+    console.error('❌ Error en login:', error.message);
+    console.error('Stack:', error.stack);
+    res.status(500).json({ error: error.message || 'Error en el servidor' });
   }
 });
 
@@ -311,8 +339,17 @@ app.get('/api/categorias', async (req, res) => {
     const categorias = await query('SELECT * FROM categoria ORDER BY nombre');
     res.json(categorias);
   } catch (error) {
-    console.error('Error al obtener categorías:', error);
-    res.status(500).json({ error: 'Error al obtener categorías' });
+    console.error('❌ Error al obtener categorías:', error.message);
+    console.error('Detalles:', {
+      code: error.code,
+      errno: error.errno,
+      sqlState: error.sqlState
+    });
+    res.status(500).json({ 
+      error: 'Error al obtener categorías',
+      details: error.message,
+      code: error.code
+    });
   }
 });
 
@@ -1115,11 +1152,34 @@ app.post('/api/upload-multiple', upload.array('files', 10), async (req, res) => 
 // GET /api/test-db - Probar conexión a base de datos
 app.get('/api/test-db', async (req, res) => {
   try {
+    console.log('🔍 Probando conexión a base de datos...');
+    console.log('📊 Configuración DB:', {
+      host: dbConfig.host,
+      database: dbConfig.database,
+      port: dbConfig.port,
+      user: dbConfig.user,
+      hasPassword: !!dbConfig.password
+    });
+    
     const result = await query('SELECT 1 AS test');
+    console.log('✅ Conexión exitosa');
     res.json({ ok: true, message: 'Conexión exitosa', result });
   } catch (error) {
-    console.error('Error en test-db:', error);
-    res.status(500).json({ ok: false, error: error.message });
+    console.error('❌ Error en test-db:', error.message);
+    console.error('Detalles:', {
+      code: error.code,
+      errno: error.errno,
+      sqlState: error.sqlState
+    });
+    res.status(500).json({ 
+      ok: false, 
+      error: error.message,
+      details: {
+        code: error.code,
+        errno: error.errno,
+        sqlState: error.sqlState
+      }
+    });
   }
 });
 
