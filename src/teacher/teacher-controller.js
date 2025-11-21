@@ -1,7 +1,7 @@
 // src/teacher/teacher-controller.js
 // Controlador para funcionalidades de docentes
 
-import API from '../api/API.js';
+import API from '../api/api.js';
 
 export class TeacherController {
   constructor() {

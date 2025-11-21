@@ -1845,23 +1845,24 @@ app.put('/api/aprobaciones/:id', async (req, res) => {
 // Actualizar el endpoint PUT de cursos para incluir id_cuestionario
 // (Ya existe, solo necesito verificar que incluya id_cuestionario)
 
-// Ruta principal
+// Ruta principal y catch-all para SPA
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// Error handler global
+// Error handler global (debe ir antes del catch-all)
 app.use((err, req, res, next) => {
   console.error('Error no manejado:', err);
   res.status(500).json({ error: 'Error interno del servidor' });
 });
 
-// 404 handler general (debe estar al final)
-app.use((req, res) => {
-  if (req.path.startsWith('/api')) {
-    res.status(404).json({ error: 'Endpoint no encontrado' });
+// Catch-all para rutas del SPA (debe ir al final, después de todas las rutas API)
+app.get('*', (req, res) => {
+  // Si no es una ruta de API, servir index.html para el SPA
+  if (!req.path.startsWith('/api')) {
+    res.sendFile(path.join(__dirname, 'index.html'));
   } else {
-    res.status(404).send('Página no encontrada');
+    res.status(404).json({ error: 'Endpoint no encontrado' });
   }
 });
 
