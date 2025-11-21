@@ -1,0 +1,1433 @@
+/* styles/theme-light.css */
+/* Estilos para el tema claro */
+
+/* ============================================
+   TEMA CLARO PRINCIPAL
+   ============================================ */
+html.light,
+body.light {
+  background-color: #FFFFFF !important;
+  color: #0F172A !important;
+}
+
+/* ============================================
+   FONDO Y COLORES BASE
+   ============================================ */
+.light body {
+  background-color: #F8FAFC !important;
+  color: #0F172A !important;
+}
+
+.light .bg-background {
+  background-color: #FFFFFF !important;
+}
+
+.light .text-slate-200,
+.light .text-slate-300,
+.light .text-slate-400 {
+  color: #475569 !important;
+}
+
+.light .text-white {
+  color: #0F172A !important;
+}
+
+.light .bg-slate-800 {
+  background-color: #F8FAFC !important;
+  border-color: #E2E8F0 !important;
+}
+
+.light .bg-slate-900\/50,
+.light .bg-slate-900 {
+  background-color: #FFFFFF !important;
+  border-color: #E2E8F0 !important;
+}
+
+/* ============================================
+   HEADER Y NAVEGACIÓN
+   ============================================ */
+.light header {
+  background-color: #FFFFFF !important;
+  border-bottom-color: #E2E8F0 !important;
+}
+
+.light header .text-white {
+  color: #0F172A !important;
+}
+
+.light header nav a {
+  color: #475569 !important;
+}
+
+.light header nav a:hover {
+  color: #0d59f2 !important;
+}
+
+/* ============================================
+   BOTONES
+   ============================================ */
+.light .bg-button {
+  background-color: #F1F5F9 !important;
+  color: #0F172A !important;
+  border-color: #E2E8F0 !important;
+}
+
+.light button:not(.bg-primary):not([class*="bg-"]) {
+  background-color: #F1F5F9 !important;
+  color: #0F172A !important;
+  border-color: #E2E8F0 !important;
+}
+
+.light button:not(.bg-primary):hover {
+  background-color: #E2E8F0 !important;
+}
+
+/* Botón de Login específico */
+.light #btnLoginLogout {
+  background-color: #FFFFFF !important;
+  color: #0F172A !important;
+  border: 1px solid #E2E8F0 !important;
+}
+
+.light #btnLoginLogout:hover {
+  background-color: #F1F5F9 !important;
+}
+
+/* Botón de Tema - Mejor contraste en modo claro */
+.light #btnTema {
+  background-color: #CBD5E1 !important;
+  color: #0F172A !important;
+  border: 1px solid #94A3B8 !important;
+}
+
+.light #btnTema:hover {
+  background-color: #94A3B8 !important;
+  color: #FFFFFF !important;
+}
+
+.light #btnTema .material-symbols-outlined {
+  color: inherit !important;
+}
+
+/* Botones con bg-slate-200 en modo claro - Mejor contraste */
+.light button.bg-slate-200,
+.light .bg-slate-200 {
+  background-color: #CBD5E1 !important;
+  color: #0F172A !important;
+  border-color: #94A3B8 !important;
+}
+
+.light button.bg-slate-200:hover,
+.light .bg-slate-200:hover {
+  background-color: #94A3B8 !important;
+  color: #FFFFFF !important;
+}
+
+.light button.text-slate-800,
+.light .text-slate-800 {
+  color: #0F172A !important;
+}
+
+/* ============================================
+   INPUTS Y FORMS
+   ============================================ */
+.light input,
+.light select,
+.light textarea {
+  background-color: #FFFFFF !important;
+  color: #0F172A !important;
+  border-color: #CBD5E1 !important;
+}
+
+.light input::placeholder {
+  color: #94A3B8 !important;
+}
+
+/* ============================================
+   TARJETAS Y CONTENEDORES
+   ============================================ */
+.light .bg-slate-700,
+.light .bg-slate-600 {
+  background-color: #F1F5F9 !important;
+  color: #0F172A !important;
+}
+
+.light .border-slate-700,
+.light .border-slate-800 {
+  border-color: #E2E8F0 !important;
+}
+
+/* Tarjetas de cursos */
+.light .bg-slate-800 {
+  background-color: #FFFFFF !important;
+  color: #0F172A !important;
+  border: 1px solid #E2E8F0 !important;
+}
+
+.light .bg-slate-800:hover {
+  background-color: #F8FAFC !important;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1) !important;
+}
+
+/* Panel de filtros */
+.light .bg-slate-700 {
+  background-color: #F8FAFC !important;
+  border: 1px solid #E2E8F0 !important;
+}
+
+/* Badges y etiquetas */
+.light .bg-primary\/10,
+.light .bg-green-500\/10 {
+  background-color: #EFF6FF !important;
+  color: #1E40AF !important;
+}
+
+.light .text-primary {
+  color: #0d59f2 !important;
+}
+
+.light .text-green-400 {
+  color: #16a34a !important;
+}
+
+/* ============================================
+   TEXTO
+   ============================================ */
+.light h1,
+.light h2,
+.light h3,
+.light h4,
+.light h5,
+.light h6 {
+  color: #0F172A !important;
+}
+
+.light p {
+  color: #475569 !important;
+}
+
+.light .text-slate-900 {
+  color: #0F172A !important;
+}
+
+.light .text-slate-600 {
+  color: #64748B !important;
+}
+
+.light .text-slate-500 {
+  color: #94A3B8 !important;
+}
+
+/* ============================================
+   SWITCHES (TOGGLES)
+   ============================================ */
+.light .bg-slate-300 {
+  background-color: #CBD5E1 !important;
+}
+
+.light input[type="range"] {
+  background-color: #E2E8F0 !important;
+}
+
+/* ============================================
+   MODALES Y OVERLAYS
+   ============================================ */
+.light [role="dialog"],
+.light .modal {
+  background-color: #FFFFFF !important;
+  color: #0F172A !important;
+  border-color: #E2E8F0 !important;
+}
+
+/* ============================================
+   SECCIÓN DE ACCESIBILIDAD
+   ============================================ */
+.light #ajustesAccesibilidad .bg-white {
+  background-color: #FFFFFF !important;
+}
+
+.light #ajustesAccesibilidad .bg-slate-50 {
+  background-color: #F8FAFC !important;
+}
+
+.light #ajustesAccesibilidad .bg-slate-700 {
+  background-color: #F1F5F9 !important;
+}
+
+/* ============================================
+   MIGAS DE PAN
+   ============================================ */
+.light #migasDePan {
+  background-color: #F1F5F9 !important;
+  color: #0F172A !important;
+}
+
+/* ============================================
+   ENLACES
+   ============================================ */
+.light a {
+  color: #0d59f2 !important;
+}
+
+.light a:hover {
+  color: #0a47c1 !important;
+}
+
+/* ============================================
+   SCROLLBAR PERSONALIZADO (WEBKIT)
+   ============================================ */
+.light ::-webkit-scrollbar {
+  background-color: #F1F5F9;
+}
+
+.light ::-webkit-scrollbar-thumb {
+  background-color: #CBD5E1;
+}
+
+.light ::-webkit-scrollbar-thumb:hover {
+  background-color: #94A3B8;
+}
+
+/* ============================================
+   FOCUS STATES
+   ============================================ */
+.light *:focus-visible {
+  outline-color: #0d59f2 !important;
+}
+
+/* ============================================
+   GRADIENTES
+   ============================================ */
+.light .bg-gradient-to-r {
+  background-image: linear-gradient(to right, #EFF6FF, #E0E7FF) !important;
+}
+
+/* ============================================
+   SOMBRAS
+   ============================================ */
+.light .shadow-lg {
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.05) !important;
+}
+
+/* ============================================
+   ESTADOS HOVER
+   ============================================ */
+.light .hover\:bg-slate-300:hover {
+  background-color: #CBD5E1 !important;
+}
+
+.light .hover\:bg-slate-600:hover {
+  background-color: #E2E8F0 !important;
+}
+
+.light .hover\:bg-slate-100:hover {
+  background-color: #F1F5F9 !important;
+}
+
+/* ============================================
+   BORDES
+   ============================================ */
+.light .border-blue-200 {
+  border-color: #BFDBFE !important;
+}
+
+.light .border-blue-800 {
+  border-color: #1E40AF !important;
+}
+
+/* ============================================
+   FONDOS ESPECIALES
+   ============================================ */
+.light .bg-blue-50 {
+  background-color: #EFF6FF !important;
+}
+
+.light .bg-blue-900\/20 {
+  background-color: #EFF6FF !important;
+}
+
+.light .text-blue-900 {
+  color: #1E3A8A !important;
+}
+
+.light .text-blue-200 {
+  color: #1E40AF !important;
+}
+
+/* ============================================
+   KBD ELEMENTS
+   ============================================ */
+.light kbd {
+  background-color: #F1F5F9 !important;
+  color: #0F172A !important;
+  border-color: #CBD5E1 !important;
+}
+
+/* ============================================
+   LECTOR DE PANTALLA
+   ============================================ */
+.light #panelLectorPantalla {
+  background-color: #FFFFFF !important;
+  border-color: #E2E8F0 !important;
+  color: #0F172A !important;
+}
+
+/* ============================================
+   ANIMACIONES Y TRANSICIONES
+   ============================================ */
+.light * {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 200ms;
+}
+
+/* ============================================
+   ACCESSIBILITY
+   ============================================ */
+.light .lector-resaltado {
+  outline-color: #0d59f2 !important;
+  background-color: rgba(13, 89, 242, 0.1) !important;
+}
+
+/* ============================================
+   RESPONSIVO
+   ============================================ */
+@media (max-width: 640px) {
+  .light body {
+    background-color: #FFFFFF !important;
+  }
+}
+
+/* ============================================
+   PRINT
+   ============================================ */
+@media print {
+  .light body {
+    background-color: white !important;
+    color: black !important;
+  }
+}
+
+/* ============================================
+   SECCIÓN DE CURSOS - VISTA INFORMATIVA
+   ============================================ */
+
+/* Fondo de la sección */
+.light #listaCursosAlumno {
+  background: linear-gradient(to bottom right, #F8FAFC, #EFF6FF) !important;
+}
+
+/* Títulos y texto */
+.light #listaCursosAlumno h1,
+.light #listaCursosAlumno h2,
+.light #listaCursosAlumno h3 {
+  color: #0F172A !important;
+}
+
+.light #listaCursosAlumno .text-slate-900 {
+  color: #0F172A !important;
+}
+
+.light #listaCursosAlumno .text-slate-600 {
+  color: #475569 !important;
+}
+
+.light #listaCursosAlumno .text-slate-400 {
+  color: #64748B !important;
+}
+
+.light #listaCursosAlumno .text-slate-500 {
+  color: #64748B !important;
+}
+
+.light #listaCursosAlumno .text-slate-700 {
+  color: #334155 !important;
+}
+
+.light #listaCursosAlumno .text-slate-300 {
+  color: #64748B !important;
+}
+
+/* Paneles blancos */
+.light #listaCursosAlumno .bg-white {
+  background-color: #FFFFFF !important;
+  border-color: #E2E8F0 !important;
+}
+
+.light #listaCursosAlumno .bg-slate-800 {
+  background-color: #F8FAFC !important;
+  border-color: #E2E8F0 !important;
+}
+
+.light #listaCursosAlumno .bg-slate-50 {
+  background-color: #F8FAFC !important;
+}
+
+.light #listaCursosAlumno .bg-slate-700 {
+  background-color: #F1F5F9 !important;
+  border-color: #E2E8F0 !important;
+}
+
+/* Bordes */
+.light #listaCursosAlumno .border-slate-200 {
+  border-color: #E2E8F0 !important;
+}
+
+.light #listaCursosAlumno .border-slate-700 {
+  border-color: #CBD5E1 !important;
+}
+
+.light #listaCursosAlumno .border-slate-600 {
+  border-color: #CBD5E1 !important;
+}
+
+/* Iconos de fondo */
+.light #listaCursosAlumno .bg-primary\/10 {
+  background-color: #EFF6FF !important;
+}
+
+.light #listaCursosAlumno .bg-primary\/20 {
+  background-color: #DBEAFE !important;
+}
+
+/* Gradientes de fondo */
+.light #listaCursosAlumno .bg-gradient-to-br {
+  background: linear-gradient(to bottom right, #F8FAFC, #EFF6FF) !important;
+}
+
+.light #listaCursosAlumno .bg-gradient-to-r {
+  background: linear-gradient(to right, #0d59f2, #2563EB) !important;
+}
+
+/* Paneles de información */
+.light #listaCursosAlumno .from-primary\/10 {
+  background-color: #EFF6FF !important;
+}
+
+.light #listaCursosAlumno .to-blue-100 {
+  background-color: #DBEAFE !important;
+}
+
+.light #listaCursosAlumno .from-primary\/20 {
+  background-color: #DBEAFE !important;
+}
+
+.light #listaCursosAlumno .to-blue-900\/20 {
+  background-color: #DBEAFE !important;
+}
+
+/* Botones secundarios */
+.light #listaCursosAlumno button:not(.bg-primary):not(.bg-gradient-to-r) {
+  background-color: #FFFFFF !important;
+  color: #0F172A !important;
+  border-color: #E2E8F0 !important;
+}
+
+.light #listaCursosAlumno button:not(.bg-primary):not(.bg-gradient-to-r):hover {
+  background-color: #F1F5F9 !important;
+}
+
+/* Botones con borde */
+.light #listaCursosAlumno .border-2.border-primary {
+  border-color: #0d59f2 !important;
+}
+
+/* Hover states */
+.light #listaCursosAlumno .hover\:bg-slate-100:hover {
+  background-color: #F1F5F9 !important;
+}
+
+.light #listaCursosAlumno .hover\:bg-slate-600:hover {
+  background-color: #E2E8F0 !important;
+}
+
+.light #listaCursosAlumno .hover\:border-primary:hover {
+  border-color: #0d59f2 !important;
+}
+
+/* Estadísticas */
+.light #listaCursosAlumno .text-primary {
+  color: #0d59f2 !important;
+}
+
+.light #listaCursosAlumno .text-green-600 {
+  color: #059669 !important;
+}
+
+.light #listaCursosAlumno .text-purple-600 {
+  color: #9333EA !important;
+}
+
+/* Cards de categorías */
+.light #listaCursosAlumno #categoriasCursos .bg-slate-50 {
+  background-color: #F8FAFC !important;
+}
+
+.light #listaCursosAlumno #categoriasCursos .bg-slate-700 {
+  background-color: #F1F5F9 !important;
+}
+
+.light #listaCursosAlumno #categoriasCursos .hover\:bg-slate-100:hover {
+  background-color: #E2E8F0 !important;
+}
+
+.light #listaCursosAlumno #categoriasCursos .hover\:bg-slate-600:hover {
+  background-color: #E2E8F0 !important;
+}
+
+/* Cards de cursos preview */
+.light #listaCursosAlumno #previewCursos .bg-slate-50 {
+  background-color: #FFFFFF !important;
+  border-color: #E2E8F0 !important;
+}
+
+.light #listaCursosAlumno #previewCursos .bg-slate-700 {
+  background-color: #F8FAFC !important;
+  border-color: #E2E8F0 !important;
+}
+
+.light #listaCursosAlumno #previewCursos .border-slate-200 {
+  border-color: #E2E8F0 !important;
+}
+
+.light #listaCursosAlumno #previewCursos .border-slate-600 {
+  border-color: #CBD5E1 !important;
+}
+
+.light #listaCursosAlumno #previewCursos .hover\:border-primary:hover {
+  border-color: #0d59f2 !important;
+}
+
+/* Call to action final */
+.light #listaCursosAlumno .bg-gradient-to-r.from-primary {
+  background: linear-gradient(to right, #0d59f2, #2563EB) !important;
+}
+
+.light #listaCursosAlumno .bg-gradient-to-r.from-primary h2,
+.light #listaCursosAlumno .bg-gradient-to-r.from-primary p,
+.light #listaCursosAlumno .bg-gradient-to-r.from-primary .text-white {
+  color: #FFFFFF !important;
+}
+
+.light #listaCursosAlumno .bg-gradient-to-r.from-primary .opacity-90 {
+  opacity: 1 !important;
+  color: #FFFFFF !important;
+}
+
+.light #listaCursosAlumno .bg-primary\/20 {
+  background-color: #DBEAFE !important;
+}
+
+.light #listaCursosAlumno .border-white {
+  border-color: #FFFFFF !important;
+}
+
+/* Botones del Call to Action - Mejorar contraste */
+.light #listaCursosAlumno .bg-gradient-to-r.from-primary button.bg-white {
+  background-color: #FFFFFF !important;
+  color: #0d59f2 !important;
+}
+
+.light #listaCursosAlumno .bg-gradient-to-r.from-primary button.bg-white:hover {
+  background-color: #F1F5F9 !important;
+  color: #0a47c1 !important;
+}
+
+/* Botón "Ya tengo cuenta" - Mejor contraste en modo claro */
+.light #listaCursosAlumno .bg-gradient-to-r.from-primary button.bg-white\/20 {
+  background-color: #1E40AF !important;
+  color: #FFFFFF !important;
+  border-color: #FFFFFF !important;
+}
+
+.light #listaCursosAlumno .bg-gradient-to-r.from-primary button.bg-white\/20:hover {
+  background-color: #1E3A8A !important;
+  color: #FFFFFF !important;
+}
+
+.light #listaCursosAlumno .bg-gradient-to-r.from-primary button.bg-primary\/20 {
+  background-color: #1E40AF !important;
+  color: #FFFFFF !important;
+  border-color: #FFFFFF !important;
+}
+
+.light #listaCursosAlumno .bg-gradient-to-r.from-primary button.bg-primary\/20:hover {
+  background-color: #1E3A8A !important;
+  color: #FFFFFF !important;
+}
+
+.light #listaCursosAlumno .bg-gradient-to-r.from-primary button.text-white {
+  color: #FFFFFF !important;
+}
+
+/* Vista logueada - Filtros */
+.light #listaCursosAlumno #vistaCursosLogueado .bg-white {
+  background-color: #FFFFFF !important;
+}
+
+.light #listaCursosAlumno #vistaCursosLogueado .bg-slate-800 {
+  background-color: #F8FAFC !important;
+}
+
+.light #listaCursosAlumno #vistaCursosLogueado .bg-slate-200 {
+  background-color: #E2E8F0 !important;
+}
+
+.light #listaCursosAlumno #vistaCursosLogueado .bg-slate-700 {
+  background-color: #F1F5F9 !important;
+}
+
+.light #listaCursosAlumno #vistaCursosLogueado .hover\:bg-slate-300:hover {
+  background-color: #CBD5E1 !important;
+}
+
+.light #listaCursosAlumno #vistaCursosLogueado .hover\:bg-slate-600:hover {
+  background-color: #E2E8F0 !important;
+}
+
+/* Cards de cursos en vista logueada */
+.light #listaCursosAlumno #listaCursosContenedor .bg-white {
+  background-color: #FFFFFF !important;
+}
+
+.light #listaCursosAlumno #listaCursosContenedor .bg-slate-800 {
+  background-color: #F8FAFC !important;
+}
+
+.light #listaCursosAlumno #listaCursosContenedor .border-slate-200 {
+  border-color: #E2E8F0 !important;
+}
+
+.light #listaCursosAlumno #listaCursosContenedor .border-slate-700 {
+  border-color: #CBD5E1 !important;
+}
+
+/* Gradientes de iconos de cursos */
+.light #listaCursosAlumno .from-primary\/20 {
+  background-color: #DBEAFE !important;
+}
+
+.light #listaCursosAlumno .to-blue-100 {
+  background-color: #DBEAFE !important;
+}
+
+.light #listaCursosAlumno .from-primary\/30 {
+  background-color: #DBEAFE !important;
+}
+
+.light #listaCursosAlumno .to-blue-900\/30 {
+  background-color: #BFDBFE !important;
+}
+
+/* ============================================
+   SECCIÓN: AYUDA
+   ============================================ */
+.light #ayuda {
+  background-color: #F8FAFC !important;
+}
+
+.light #ayuda .bg-white {
+  background-color: #FFFFFF !important;
+  border-color: #E2E8F0 !important;
+}
+
+.light #ayuda .bg-slate-800 {
+  background-color: #FFFFFF !important;
+  border-color: #E2E8F0 !important;
+}
+
+.light #ayuda .bg-slate-50 {
+  background-color: #F8FAFC !important;
+}
+
+.light #ayuda .bg-slate-700 {
+  background-color: #F1F5F9 !important;
+}
+
+.light #ayuda .bg-slate-100 {
+  background-color: #E2E8F0 !important;
+}
+
+.light #ayuda .text-slate-900 {
+  color: #0F172A !important;
+}
+
+.light #ayuda .text-slate-600 {
+  color: #475569 !important;
+}
+
+.light #ayuda .text-slate-400 {
+  color: #64748B !important;
+}
+
+.light #ayuda .border-slate-300 {
+  border-color: #CBD5E1 !important;
+}
+
+.light #ayuda .border-slate-600 {
+  border-color: #CBD5E1 !important;
+}
+
+.light #ayuda input,
+.light #ayuda textarea {
+  background-color: #FFFFFF !important;
+  color: #0F172A !important;
+  border-color: #CBD5E1 !important;
+}
+
+.light #ayuda details summary {
+  background-color: #F8FAFC !important;
+}
+
+.light #ayuda details summary:hover {
+  background-color: #E2E8F0 !important;
+}
+
+/* ============================================
+   SECCIÓN: MI PERFIL
+   ============================================ */
+.light #miPerfil {
+  background-color: #F8FAFC !important;
+}
+
+.light #miPerfil .bg-white {
+  background-color: #FFFFFF !important;
+  border-color: #E2E8F0 !important;
+}
+
+.light #miPerfil .bg-slate-800 {
+  background-color: #FFFFFF !important;
+  border-color: #E2E8F0 !important;
+}
+
+.light #miPerfil .bg-slate-50 {
+  background-color: #F8FAFC !important;
+}
+
+.light #miPerfil .bg-slate-100 {
+  background-color: #F1F5F9 !important;
+}
+
+.light #miPerfil .text-slate-900 {
+  color: #0F172A !important;
+}
+
+.light #miPerfil .text-slate-600 {
+  color: #475569 !important;
+}
+
+.light #miPerfil .text-slate-400 {
+  color: #64748B !important;
+}
+
+.light #miPerfil input,
+.light #miPerfil select,
+.light #miPerfil textarea {
+  background-color: #FFFFFF !important;
+  color: #0F172A !important;
+  border-color: #CBD5E1 !important;
+}
+
+/* ============================================
+   SECCIÓN: DASHBOARD ALUMNO
+   ============================================ */
+.light #dashboardAlumno {
+  background-color: #F8FAFC !important;
+}
+
+.light #dashboardAlumno .bg-white {
+  background-color: #FFFFFF !important;
+  border-color: #E2E8F0 !important;
+}
+
+.light #dashboardAlumno .bg-slate-800 {
+  background-color: #FFFFFF !important;
+  border-color: #E2E8F0 !important;
+}
+
+.light #dashboardAlumno .bg-slate-50 {
+  background-color: #F1F5F9 !important;
+  border-color: #CBD5E1 !important;
+}
+
+.light #dashboardAlumno .bg-slate-700\/50 {
+  background-color: #F1F5F9 !important;
+  border-color: #CBD5E1 !important;
+}
+
+.light #dashboardAlumno .bg-background-dark\/80 {
+  background-color: #FFFFFF !important;
+  border-color: #E2E8F0 !important;
+}
+
+.light #dashboardAlumno .text-slate-900 {
+  color: #0F172A !important;
+}
+
+.light #dashboardAlumno .text-slate-600 {
+  color: #334155 !important;
+}
+
+.light #dashboardAlumno .text-slate-400 {
+  color: #475569 !important;
+}
+
+.light #dashboardAlumno .text-gray-900 {
+  color: #0F172A !important;
+}
+
+.light #dashboardAlumno .text-gray-500 {
+  color: #475569 !important;
+}
+
+.light #dashboardAlumno .text-gray-400 {
+  color: #64748B !important;
+}
+
+.light #dashboardAlumno .text-gray-800 {
+  color: #0F172A !important;
+}
+
+.light #dashboardAlumno .text-gray-100 {
+  color: #0F172A !important;
+}
+
+.light #dashboardAlumno .text-gray-200 {
+  color: #334155 !important;
+}
+
+.light #dashboardAlumno .text-gray-700 {
+  color: #1E293B !important;
+}
+
+.light #dashboardAlumno .text-white {
+  color: #0F172A !important;
+}
+
+.light #dashboardAlumno .bg-slate-200 {
+  background-color: #E2E8F0 !important;
+}
+
+.light #dashboardAlumno .bg-slate-100 {
+  background-color: #F1F5F9 !important;
+}
+
+.light #dashboardAlumno .border-slate-200 {
+  border-color: #E2E8F0 !important;
+}
+
+.light #dashboardAlumno .border-slate-300 {
+  border-color: #CBD5E1 !important;
+}
+
+.light #dashboardAlumno .hover\:bg-gray-100:hover {
+  background-color: #E2E8F0 !important;
+}
+
+.light #dashboardAlumno .hover\:bg-slate-100:hover {
+  background-color: #E2E8F0 !important;
+}
+
+.light #dashboardAlumno .hover\:bg-background-dark:hover {
+  background-color: #E2E8F0 !important;
+}
+
+/* ============================================
+   SECCIÓN: DASHBOARD DOCENTE
+   ============================================ */
+.light #dashboardDocente {
+  background-color: #F8FAFC !important;
+}
+
+.light #dashboardDocente .bg-white {
+  background-color: #FFFFFF !important;
+  border-color: #E2E8F0 !important;
+}
+
+.light #dashboardDocente .bg-slate-800 {
+  background-color: #FFFFFF !important;
+  border-color: #E2E8F0 !important;
+}
+
+.light #dashboardDocente .bg-slate-50 {
+  background-color: #F8FAFC !important;
+}
+
+.light #dashboardDocente .text-slate-900 {
+  color: #0F172A !important;
+}
+
+.light #dashboardDocente .text-slate-600 {
+  color: #475569 !important;
+}
+
+.light #dashboardDocente .text-slate-400 {
+  color: #64748B !important;
+}
+
+.light #dashboardDocente .border-slate-200 {
+  border-color: #E2E8F0 !important;
+}
+
+/* ============================================
+   SECCIÓN: DOCENTE
+   ============================================ */
+.light #docente {
+  background-color: #F8FAFC !important;
+}
+
+.light #docente .text-white {
+  color: #0F172A !important;
+}
+
+.light #docente .text-slate-400 {
+  color: #475569 !important;
+}
+
+.light #docente .bg-button {
+  background-color: #FFFFFF !important;
+  border-color: #E2E8F0 !important;
+}
+
+.light #docente .bg-button:hover,
+.light #docente .hover\:bg-slate-700:hover {
+  background-color: #F1F5F9 !important;
+}
+
+.light #docente .bg-primary\/20 {
+  background-color: #EFF6FF !important;
+}
+
+.light #docente .group-hover\:bg-primary:hover {
+  background-color: #0d59f2 !important;
+}
+
+.light #docente .group-hover\:text-white:hover {
+  color: #FFFFFF !important;
+}
+
+/* ============================================
+   SECCIÓN: CURSOS
+   ============================================ */
+.light #cursos {
+  background-color: #F8FAFC !important;
+}
+
+.light #cursos .text-white {
+  color: #0F172A !important;
+}
+
+.light #cursos .text-slate-400 {
+  color: #475569 !important;
+}
+
+.light #cursos .bg-slate-50 {
+  background-color: #FFFFFF !important;
+  border-color: #E2E8F0 !important;
+}
+
+/* Catálogo de Cursos - Modo Claro */
+.light #cursos {
+  background: linear-gradient(to bottom right, #F8FAFC, #E0F2FE) !important;
+}
+
+.light #cursos .bg-white {
+  background-color: #FFFFFF !important;
+  border-color: #E2E8F0 !important;
+}
+
+.light #cursos .bg-slate-800 {
+  background-color: #FFFFFF !important;
+  border-color: #E2E8F0 !important;
+}
+
+.light #cursos .bg-slate-900\/50 {
+  background-color: #FFFFFF !important;
+  border-color: #E2E8F0 !important;
+}
+
+.light #cursos .border-slate-200\/80 {
+  border-color: #E2E8F0 !important;
+}
+
+.light #cursos .border-slate-800\/80 {
+  border-color: #CBD5E1 !important;
+}
+
+.light #cursos .hover\:border-primary\/50:hover {
+  border-color: #0d59f2 !important;
+}
+
+.light #cursos .text-slate-600 {
+  color: #475569 !important;
+}
+
+.light #cursos .text-slate-500 {
+  color: #64748B !important;
+}
+
+/* ============================================
+   SECCIÓN: RECURSOS CURSO
+   ============================================ */
+.light #recursosCurso {
+  background-color: #F8FAFC !important;
+}
+
+.light #recursosCurso .bg-slate-900 {
+  background-color: #FFFFFF !important;
+}
+
+.light #recursosCurso .bg-slate-800 {
+  background-color: #F8FAFC !important;
+  border-color: #E2E8F0 !important;
+}
+
+.light #recursosCurso .text-white {
+  color: #0F172A !important;
+}
+
+.light #recursosCurso .text-slate-400 {
+  color: #475569 !important;
+}
+
+.light #recursosCurso .text-slate-300 {
+  color: #64748B !important;
+}
+
+/* ============================================
+   SECCIÓN: LECTOR INMERSIVO
+   ============================================ */
+.light #lectorInmersivo {
+  background-color: #F8FAFC !important;
+}
+
+.light #lectorInmersivo .bg-\[#1a1d29\] {
+  background-color: #FFFFFF !important;
+}
+
+.light #lectorInmersivo .bg-\[#252836\] {
+  background-color: #F8FAFC !important;
+  border-color: #E2E8F0 !important;
+}
+
+.light #lectorInmersivo .bg-\[#e8dcc4\] {
+  background-color: #F5F0E8 !important;
+}
+
+.light #lectorInmersivo .bg-\[#f5f0e8\] {
+  background-color: #FFFFFF !important;
+}
+
+.light #lectorInmersivo .border-\[#8b7355\] {
+  border-color: #CBD5E1 !important;
+}
+
+.light #lectorInmersivo .text-white {
+  color: #0F172A !important;
+}
+
+.light #lectorInmersivo .text-slate-300 {
+  color: #475569 !important;
+}
+
+.light #lectorInmersivo .text-slate-400 {
+  color: #64748B !important;
+}
+
+.light #lectorInmersivo .bg-slate-700 {
+  background-color: #E2E8F0 !important;
+}
+
+.light #lectorInmersivo .hover\:text-white:hover {
+  color: #0F172A !important;
+}
+
+.light #lectorInmersivo .border-slate-700 {
+  border-color: #CBD5E1 !important;
+}
+
+/* ============================================
+   SECCIÓN: MINI FORMULARIO
+   ============================================ */
+.light #miniFormulario {
+  background-color: #F8FAFC !important;
+}
+
+.light #miniFormulario .bg-\[#1a1d29\] {
+  background-color: #FFFFFF !important;
+}
+
+.light #miniFormulario .bg-\[#252836\] {
+  background-color: #F8FAFC !important;
+  border-color: #E2E8F0 !important;
+}
+
+.light #miniFormulario .text-white {
+  color: #0F172A !important;
+}
+
+.light #miniFormulario .text-slate-300 {
+  color: #475569 !important;
+}
+
+.light #miniFormulario .text-slate-400 {
+  color: #64748B !important;
+}
+
+.light #miniFormulario .bg-slate-800 {
+  background-color: #F8FAFC !important;
+  border-color: #E2E8F0 !important;
+}
+
+.light #miniFormulario input,
+.light #miniFormulario textarea,
+.light #miniFormulario select {
+  background-color: #FFFFFF !important;
+  color: #0F172A !important;
+  border-color: #CBD5E1 !important;
+}
+
+/* ============================================
+   SECCIÓN: ENCUESTA SATISFACCIÓN
+   ============================================ */
+.light #encuestaSatisfaccion {
+  background-color: #F8FAFC !important;
+}
+
+.light #encuestaSatisfaccion .bg-slate-900 {
+  background-color: #FFFFFF !important;
+}
+
+.light #encuestaSatisfaccion .bg-slate-800 {
+  background-color: #F8FAFC !important;
+  border-color: #E2E8F0 !important;
+}
+
+.light #encuestaSatisfaccion .text-white {
+  color: #0F172A !important;
+}
+
+.light #encuestaSatisfaccion .text-slate-400 {
+  color: #475569 !important;
+}
+
+.light #encuestaSatisfaccion input,
+.light #encuestaSatisfaccion textarea,
+.light #encuestaSatisfaccion select {
+  background-color: #FFFFFF !important;
+  color: #0F172A !important;
+  border-color: #CBD5E1 !important;
+}
+
+/* ============================================
+   SECCIÓN: RECOMENDACIONES
+   ============================================ */
+.light #recomendaciones {
+  background-color: #F8FAFC !important;
+}
+
+.light #recomendaciones .bg-slate-900 {
+  background-color: #FFFFFF !important;
+}
+
+.light #recomendaciones .bg-slate-800 {
+  background-color: #F8FAFC !important;
+  border-color: #E2E8F0 !important;
+}
+
+.light #recomendaciones .text-white {
+  color: #0F172A !important;
+}
+
+.light #recomendaciones .text-slate-400 {
+  color: #475569 !important;
+}
+
+.light #recomendaciones .text-slate-300 {
+  color: #64748B !important;
+}
+
+/* ============================================
+   SECCIÓN: SUBIR RECURSO
+   ============================================ */
+.light #subir-recurso {
+  background-color: #F8FAFC !important;
+}
+
+.light #subir-recurso .bg-background-light {
+  background-color: #FFFFFF !important;
+}
+
+.light #subir-recurso .bg-background-dark {
+  background-color: #F8FAFC !important;
+}
+
+.light #subir-recurso .text-white {
+  color: #0F172A !important;
+}
+
+.light #subir-recurso .text-slate-400 {
+  color: #475569 !important;
+}
+
+.light #subir-recurso input,
+.light #subir-recurso textarea,
+.light #subir-recurso select {
+  background-color: #FFFFFF !important;
+  color: #0F172A !important;
+  border-color: #CBD5E1 !important;
+}
+
+/* ============================================
+   SECCIÓN: INPUT SUBIR CURSO
+   ============================================ */
+.light #inputSubirCurso {
+  background-color: #F8FAFC !important;
+}
+
+.light #inputSubirCurso .bg-background-light {
+  background-color: #FFFFFF !important;
+}
+
+.light #inputSubirCurso .text-white {
+  color: #0F172A !important;
+}
+
+.light #inputSubirCurso input,
+.light #inputSubirCurso textarea,
+.light #inputSubirCurso select {
+  background-color: #FFFFFF !important;
+  color: #0F172A !important;
+  border-color: #CBD5E1 !important;
+}
+
+/* ============================================
+   SECCIÓN: INICIO
+   ============================================ */
+.light #inicio {
+  background-color: #F8FAFC !important;
+}
+
+.light #inicio .text-white {
+  color: #0F172A !important;
+}
+
+.light #inicio .text-slate-400 {
+  color: #475569 !important;
+}
+
+.light #inicio .bg-slate-800 {
+  background-color: #FFFFFF !important;
+  border-color: #E2E8F0 !important;
+}
+
+.light #inicio .bg-slate-900 {
+  background-color: #F8FAFC !important;
+}
+
+/* ============================================
+   SECCIÓN: LOGIN
+   ============================================ */
+.light #login {
+  background: linear-gradient(to bottom right, #F8FAFC, #EFF6FF) !important;
+}
+
+.light #login .bg-white {
+  background-color: #FFFFFF !important;
+  border-color: #E2E8F0 !important;
+}
+
+.light #login .bg-slate-800 {
+  background-color: #FFFFFF !important;
+  border-color: #E2E8F0 !important;
+}
+
+.light #login .text-slate-900 {
+  color: #0F172A !important;
+}
+
+.light #login .text-slate-600 {
+  color: #475569 !important;
+}
+
+.light #login .text-slate-400 {
+  color: #64748B !important;
+}
+
+.light #login input,
+.light #login select,
+.light #login textarea {
+  background-color: #FFFFFF !important;
+  color: #0F172A !important;
+  border-color: #CBD5E1 !important;
+}
+
+.light #login .border-slate-200 {
+  border-color: #E2E8F0 !important;
+}
+
+.light #login .border-slate-700 {
+  border-color: #CBD5E1 !important;
+}
+
+/* ============================================
+   ESTILOS GENERALES ADICIONALES
+   ============================================ */
+
+/* Asegurar que todos los textos sean legibles */
+.light .text-slate-300 {
+  color: #64748B !important;
+}
+
+.light .text-slate-500 {
+  color: #64748B !important;
+}
+
+/* Asegurar contraste en todos los fondos oscuros */
+.light .dark\:bg-slate-800 {
+  background-color: #FFFFFF !important;
+}
+
+.light .dark\:bg-slate-900 {
+  background-color: #F8FAFC !important;
+}
+
+.light .dark\:bg-slate-700 {
+  background-color: #F1F5F9 !important;
+}
+
+/* Asegurar contraste en todos los textos oscuros */
+.light .dark\:text-white {
+  color: #0F172A !important;
+}
+
+.light .dark\:text-slate-300 {
+  color: #475569 !important;
+}
+
+.light .dark\:text-slate-400 {
+  color: #64748B !important;
+}
+
+/* Bordes en modo claro */
+.light .dark\:border-slate-700 {
+  border-color: #CBD5E1 !important;
+}
+
+.light .dark\:border-slate-600 {
+  border-color: #CBD5E1 !important;
+}
+
+/* Hover states mejorados */
+.light .hover\:bg-slate-700:hover {
+  background-color: #E2E8F0 !important;
+}
+
+.light .hover\:bg-slate-600:hover {
+  background-color: #CBD5E1 !important;
+}
+
+.light .hover\:text-white:hover {
+  color: #0F172A !important;
+}
+

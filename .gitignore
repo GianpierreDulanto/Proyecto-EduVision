@@ -1,0 +1,38 @@
+# Dependencias
+node_modules/
+package-lock.json
+
+# Variables de entorno
+.env
+.env.local
+.env.production
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+*.log
+
+# Archivos de IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Archivos de uploads (mantener estructura pero ignorar contenido)
+uploads/*
+!uploads/.gitkeep
+
+# Archivos temporales
+*.tmp
+*.temp
+.cache/
+
+# Base de datos local (si existe)
+*.sqlite
+*.db
+
+# Archivos de build (si se agregan en el futuro)
+dist/
+build/
+

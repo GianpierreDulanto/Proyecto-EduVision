@@ -1,0 +1,1068 @@
+/* styles/accessibility.css */
+/* Estilos de accesibilidad mejorados */
+
+/* ============================================
+   SWITCHES MEJORADOS (CSS Peer de Tailwind)
+   ============================================ */
+.switch-btn[aria-checked="true"] {
+  background-color: #0d59f2 !important;
+}
+
+.switch-btn[aria-checked="true"] .switch-thumb {
+  transform: translateX(1.25rem);
+}
+
+/* ============================================
+   SWITCHES - OCULTAR CHECKBOX COMPLETAMENTE
+   ============================================ */
+
+/* ============================================
+   SWITCHES - OCULTAR CHECKBOX COMPLETAMENTE
+   ============================================ */
+
+/* Forzar que los checkboxes de switches estén completamente ocultos */
+input[type="checkbox"].opacity-0.w-0.h-0.peer {
+  position: absolute !important;
+  width: 0 !important;
+  height: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  opacity: 0 !important;
+  pointer-events: auto !important; /* Mantener funcionalidad pero invisible */
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  clip: rect(0, 0, 0, 0) !important;
+}
+
+/* Switches modernos con peer - Corregidos para estructura con span */
+input[type="checkbox"].peer:checked ~ span.relative {
+  background-color: #0d59f2 !important;
+}
+
+input[type="checkbox"].peer:checked ~ span.relative > span {
+  transform: translateX(1.5rem) !important;
+}
+
+/* Asegurar que los switches funcionen correctamente */
+label.relative input[type="checkbox"].peer:checked ~ span.relative {
+  background-color: #0d59f2 !important;
+}
+
+label.relative input[type="checkbox"].peer:checked ~ span.relative > span {
+  transform: translateX(1.5rem) !important;
+}
+
+/* Estados hover y focus mejorados para switches */
+label.relative input[type="checkbox"].peer:focus ~ span.relative {
+  box-shadow: 0 0 0 4px rgba(13, 89, 242, 0.2) !important;
+}
+
+label.relative input[type="checkbox"].peer:hover ~ span.relative {
+  opacity: 0.9;
+}
+
+/* Asegurar que el span del switch oculte cualquier elemento del checkbox */
+label.relative > span.relative {
+  position: relative;
+  z-index: 1;
+  display: inline-block;
+}
+
+/* Eliminar cualquier borde o outline del checkbox */
+input[type="checkbox"].opacity-0.peer:focus,
+input[type="checkbox"].opacity-0.peer:active,
+input[type="checkbox"].opacity-0.peer:checked {
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Prevenir que el checkbox nativo se muestre */
+input[type="checkbox"].peer {
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+}
+
+input[type="radio"]:checked {
+  accent-color: #0d59f2;
+}
+
+/* ============================================
+   PERFILES - BOTONES DE RADIO MEJORADOS
+   ============================================ */
+.perfil-btn[aria-checked="true"] {
+  border-color: #0d59f2 !important;
+  background-color: rgba(13, 89, 242, 0.1) !important;
+  box-shadow: 0 0 0 2px rgba(13, 89, 242, 0.3);
+}
+
+.perfil-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(13, 89, 242, 0.5);
+}
+
+.perfil-btn:hover {
+  transform: translateY(-2px);
+}
+
+/* ============================================
+   CONTRASTE ALTO
+   ============================================ */
+body.contraste-alto {
+  filter: contrast(1.5);
+}
+
+body.contraste-alto button,
+body.contraste-alto a,
+body.contraste-alto input,
+body.contraste-alto select,
+body.contraste-alto textarea {
+  filter: contrast(1.2);
+}
+
+/* ============================================
+   TIPOGRAFÍA LEGIBLE
+   ============================================ */
+body.tipografia-legible,
+body.tipografia-legible * {
+  font-family: 'OpenDyslexic', Arial, sans-serif !important;
+}
+
+/* ============================================
+   MODO CEGUERA (ESCALA DE GRISES)
+   ============================================ */
+body.modo-ceguera {
+  filter: grayscale(100%) contrast(1.8);
+}
+
+body.modo-ceguera img,
+body.modo-ceguera video {
+  filter: grayscale(100%) contrast(1.5);
+}
+
+/* ============================================
+   REDUCIR MOVIMIENTO
+   ============================================ */
+body.reducir-movimiento,
+body.reducir-movimiento * {
+  animation-duration: 0.001ms !important;
+  transition-duration: 0.001ms !important;
+}
+
+/* ============================================
+   SUBRAYAR ENLACES
+   ============================================ */
+body.subrayar-enlaces a {
+  text-decoration: underline !important;
+  text-decoration-thickness: 2px !important;
+  text-underline-offset: 3px !important;
+}
+
+body.subrayar-enlaces a:hover {
+  text-decoration-thickness: 3px !important;
+}
+
+/* ============================================
+   ENFOQUE MEJORADO
+   ============================================ */
+body.enfoque-mejorado *:focus,
+body.enfoque-mejorado *:focus-visible {
+  outline: 4px solid #0d59f2 !important;
+  outline-offset: 3px !important;
+  box-shadow: 0 0 0 6px rgba(13, 89, 242, 0.3) !important;
+  position: relative;
+  z-index: 10;
+}
+
+body.enfoque-mejorado button:focus,
+body.enfoque-mejorado a:focus {
+  transform: scale(1.05);
+}
+
+/* ============================================
+   TAMAÑO DE TEXTO
+   ============================================ */
+html.tamano-texto-muy-pequeno {
+  font-size: 12px !important;
+}
+
+html.tamano-texto-pequeno {
+  font-size: 14px !important;
+}
+
+html.tamano-texto-mediano {
+  font-size: 16px !important;
+}
+
+html.tamano-texto-grande {
+  font-size: 18px !important;
+}
+
+html.tamano-texto-muy-grande {
+  font-size: 22px !important;
+}
+
+/* ============================================
+   CURSOR GRANDE
+   ============================================ */
+body.cursor-grande,
+body.cursor-grande * {
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path fill="black" stroke="white" stroke-width="2" d="M4 4 L4 28 L12 20 L16 28 L20 26 L16 18 L24 18 Z"/></svg>') 4 4, auto !important;
+}
+
+body.cursor-grande button,
+body.cursor-grande a,
+body.cursor-grande input,
+body.cursor-grande select,
+body.cursor-grande textarea {
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="14" fill="black" stroke="white" stroke-width="2"/></svg>') 16 16, pointer !important;
+}
+
+/* ============================================
+   SLIDERS PERSONALIZADOS
+   ============================================ */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+}
+
+input[type="range"]::-webkit-slider-track {
+  height: 8px;
+  border-radius: 4px;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #0d59f2;
+  cursor: pointer;
+  border: 3px solid white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  margin-top: -8px;
+}
+
+input[type="range"]::-moz-range-track {
+  height: 8px;
+  border-radius: 4px;
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #0d59f2;
+  cursor: pointer;
+  border: 3px solid white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+input[type="range"]:focus {
+  outline: none;
+}
+
+input[type="range"]:focus::-webkit-slider-thumb {
+  box-shadow: 0 0 0 4px rgba(13, 89, 242, 0.3);
+}
+
+input[type="range"]:focus::-moz-range-thumb {
+  box-shadow: 0 0 0 4px rgba(13, 89, 242, 0.3);
+}
+
+/* ============================================
+   KBD (TECLAS)
+   ============================================ */
+kbd {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1;
+  color: #1e293b;
+  background-color: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.375rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.dark kbd {
+  color: #e2e8f0;
+  background-color: #334155;
+  border-color: #475569;
+}
+
+/* ============================================
+   ICONOS MATERIAL
+   ============================================ */
+.material-symbols-outlined {
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
+  user-select: none;
+}
+
+/* ============================================
+   ANIMACIONES ACCESIBLES
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ============================================
+   ACCESIBILIDAD GENERAL
+   ============================================ */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Mejorar foco visible para todos */
+*:focus-visible {
+  outline: 2px solid #0d59f2;
+  outline-offset: 2px;
+}
+
+/* Skip links para navegación por teclado */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: #0d59f2;
+  color: white;
+  padding: 8px;
+  text-decoration: none;
+  z-index: 100;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* ============================================
+   FUENTES ESPECIALES
+   ============================================ */
+@font-face {
+  font-family: 'OpenDyslexic';
+  src: url('https://cdn.jsdelivr.net/npm/opendyslexic@3.0.0/fonts/OpenDyslexic-Regular.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'OpenDyslexic';
+  src: url('https://cdn.jsdelivr.net/npm/opendyslexic@3.0.0/fonts/OpenDyslexic-Bold.woff2') format('woff2');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ============================================
+   MEJORAS RESPONSIVAS
+   ============================================ */
+@media (max-width: 640px) {
+  .perfil-btn {
+    padding: 0.75rem 0.5rem;
+  }
+  
+  .perfil-btn .material-symbols-outlined {
+    font-size: 1.5rem;
+  }
+  
+  .perfil-btn span:last-child {
+    font-size: 0.75rem;
+  }
+}
+
+/* ============================================
+   ESTADOS DE CARGA
+   ============================================ */
+@keyframes pulse-accessible {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.loading-accessible {
+  animation: pulse-accessible 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* ============================================
+   COLORES DE ALTO CONTRASTE
+   ============================================ */
+@media (prefers-contrast: high) {
+  body {
+    background-color: white;
+    color: black;
+  }
+  
+  button,
+  a {
+    border: 2px solid currentColor;
+  }
+  
+  .bg-primary {
+    background-color: #0000ff !important;
+  }
+  
+  .text-primary {
+    color: #0000ff !important;
+  }
+}
+
+/* ============================================
+   TEMA OSCURO ACCESIBLE
+   ============================================ */
+.dark body.contraste-alto {
+  background-color: #000000;
+  color: #ffffff;
+}
+
+.dark body.contraste-alto button,
+.dark body.contraste-alto a,
+.dark body.contraste-alto input {
+  border-color: #ffffff;
+}
+
+/* ============================================
+   TOOLTIPS ACCESIBLES
+   ============================================ */
+[data-tooltip] {
+  position: relative;
+}
+
+[data-tooltip]:hover::after,
+[data-tooltip]:focus::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1e293b;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  white-space: nowrap;
+  z-index: 1000;
+  margin-bottom: 0.5rem;
+}
+
+/* ============================================
+   LIVE REGIONS
+   ============================================ */
+[aria-live] {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+/* ============================================
+   INDICADORES DE ESTADO
+   ============================================ */
+.estado-activo::before {
+  content: '●';
+  color: #22c55e;
+  margin-right: 0.5rem;
+}
+
+.estado-inactivo::before {
+  content: '●';
+  color: #94a3b8;
+  margin-right: 0.5rem;
+}
+
+/* ============================================
+   MEJORAS DE USABILIDAD
+   ============================================ */
+button,
+a,
+input,
+select,
+textarea {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+button:disabled,
+[aria-disabled="true"] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ============================================
+   ANIMACIÓN DE CARGA ACCESIBLE
+   ============================================ */
+@keyframes spin-accessible {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner-accessible {
+  animation: spin-accessible 1s linear infinite;
+}
+
+/* ============================================
+   NOTIFICACIONES ACCESIBLES
+   ============================================ */
+.notification {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  background: #0d59f2;
+  color: white;
+  padding: 1rem 1.5rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 9999;
+  animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Reducir animaciones si está configurado */
+body.reducir-movimiento .notification {
+  animation: none;
+}
+
+/* ============================================
+   MEJORAS ADICIONALES DE NAVEGACIÓN
+   ============================================ */
+
+/* Mejorar el estado de enfoque cuando se usa el teclado */
+body:not(.using-mouse) *:focus {
+  outline: 3px solid #0d59f2 !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 4px rgba(13, 89, 242, 0.2) !important;
+}
+
+/* Remover outline cuando se usa el mouse */
+body.using-mouse *:focus {
+  outline: none;
+}
+
+/* Animación suave para switches */
+.switch-btn {
+  transition: background-color 0.3s ease;
+}
+
+.switch-thumb {
+  transition: transform 0.3s ease;
+}
+
+/* Animación para botones de perfil */
+.perfil-btn {
+  transition: all 0.3s ease;
+}
+
+.perfil-btn:active {
+  transform: scale(0.97);
+}
+
+/* Estado de enfoque para inputs de rango */
+input[type="range"]:focus {
+  outline: 2px solid #0d59f2;
+  outline-offset: 4px;
+}
+
+/* Mejorar visibilidad de elementos interactivos */
+button:focus,
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+  z-index: 10;
+  position: relative;
+}
+
+/* Indicador de teclado activo */
+.keyboard-focused {
+  outline: 3px solid #0d59f2 !important;
+  outline-offset: 3px !important;
+  box-shadow: 0 0 0 6px rgba(13, 89, 242, 0.15) !important;
+}
+
+/* Estados de hover mejorados */
+button:hover:not(:disabled),
+a:hover {
+  transform: translateY(-1px);
+  transition: transform 0.2s ease;
+}
+
+button:active:not(:disabled),
+a:active {
+  transform: translateY(0);
+}
+
+/* Mejorar contraste en modo oscuro */
+.dark .perfil-btn {
+  border-color: #475569;
+}
+
+.dark .perfil-btn:hover {
+  border-color: #0d59f2;
+}
+
+.dark .perfil-btn[aria-checked="true"] {
+  background-color: rgba(13, 89, 242, 0.2) !important;
+  border-color: #0d59f2 !important;
+}
+
+/* Animaciones suaves para transiciones */
+@media (prefers-reduced-motion: no-preference) {
+  * {
+    scroll-behavior: smooth;
+  }
+  
+  .switch-btn,
+  .switch-thumb,
+  .perfil-btn,
+  button,
+  a {
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+/* Cursor personalizado para elementos interactivos */
+button,
+a,
+[role="button"],
+[role="radio"],
+[role="switch"],
+input[type="range"] {
+  cursor: pointer;
+}
+
+button:disabled,
+[aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
+/* Mejorar áreas de clic para dispositivos táctiles */
+@media (hover: none) and (pointer: coarse) {
+  button,
+  a,
+  input[type="range"] {
+    min-height: 48px;
+    min-width: 48px;
+  }
+  
+  .switch-btn {
+    transform: scale(1.2);
+  }
+}
+
+/* Estilos para modo de alto contraste del sistema */
+@media (prefers-contrast: high) {
+  .perfil-btn,
+  button,
+  input,
+  select {
+    border-width: 2px !important;
+  }
+  
+  .perfil-btn[aria-checked="true"] {
+    background-color: SelectedItem !important;
+    color: SelectedItemText !important;
+  }
+  
+  *:focus {
+    outline-width: 3px !important;
+    outline-style: solid !important;
+  }
+}
+
+/* Indicadores de estado para lectores de pantalla */
+.sr-only-focusable:not(:focus):not(:focus-within) {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border-width: 0 !important;
+}
+
+.sr-only-focusable:focus,
+.sr-only-focusable:focus-within {
+  position: static !important;
+  width: auto !important;
+  height: auto !important;
+  padding: inherit !important;
+  margin: inherit !important;
+  overflow: visible !important;
+  clip: auto !important;
+  white-space: normal !important;
+}
+
+/* Mejorar legibilidad en contraste alto */
+body.contraste-alto h1,
+body.contraste-alto h2,
+body.contraste-alto h3,
+body.contraste-alto h4,
+body.contraste-alto h5,
+body.contraste-alto h6 {
+  font-weight: 700;
+}
+
+body.contraste-alto p,
+body.contraste-alto li,
+body.contraste-alto span {
+  font-weight: 500;
+}
+
+/* Animación de entrada para secciones */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.section:not(.hidden) {
+  animation: fadeInUp 0.4s ease-out;
+}
+
+body.reducir-movimiento .section:not(.hidden) {
+  animation: none;
+}
+
+/* Mejoras para el tema oscuro */
+.dark input[type="range"]::-webkit-slider-track {
+  background: #475569;
+}
+
+.dark input[type="range"]::-moz-range-track {
+  background: #475569;
+}
+
+/* Feedback visual al guardar */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+.saving-feedback {
+  animation: pulse 0.5s ease-in-out;
+}
+
+/* Mejorar contraste de los iconos */
+.material-symbols-outlined {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Estilos para notificaciones de guardado */
+.save-notification {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  background: #22c55e;
+  color: white;
+  padding: 1rem 1.5rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  z-index: 9999;
+  animation: slideInUp 0.3s ease-out;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+@keyframes slideInUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+body.reducir-movimiento .save-notification {
+  animation: none;
+}
+
+/* Accesibilidad para listas de opciones */
+[role="radiogroup"],
+[role="group"] {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+/* Mejoras de usabilidad para formularios */
+label {
+  cursor: pointer;
+}
+
+input[disabled],
+button[disabled],
+select[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Indicador de cambio guardado */
+.saved-indicator {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: #22c55e;
+  border-radius: 50%;
+  margin-left: 0.5rem;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* Estilos para modo impresión */
+@media print {
+  .no-print,
+  header,
+  nav,
+  button,
+  .switch-btn {
+    display: none !important;
+  }
+  
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  
+  * {
+    box-shadow: none !important;
+  }
+}
+
+/* ============================================
+   ESTILOS DEL NAVBAR MEJORADO
+   ============================================ */
+
+/* Enlaces de navegación activos */
+.nav-link.bg-primary\/10,
+.mobile-nav-link.bg-primary\/10 {
+  background-color: rgba(13, 89, 242, 0.1) !important;
+}
+
+.dark .nav-link.bg-primary\/10,
+.dark .mobile-nav-link.bg-primary\/10 {
+  background-color: rgba(13, 89, 242, 0.2) !important;
+}
+
+/* Hover mejorado para enlaces */
+.nav-link:hover,
+.mobile-nav-link:hover {
+  transform: translateY(-1px);
+}
+
+/* Transiciones suaves */
+.nav-link,
+.mobile-nav-link,
+#btnLoginLogout,
+#btnAjustes,
+#btnMenuMobile {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Focus visible mejorado */
+.nav-link:focus,
+.mobile-nav-link:focus,
+#btnLoginLogout:focus,
+#btnAjustes:focus,
+#btnMenuMobile:focus {
+  outline: 2px solid #0d59f2;
+  outline-offset: 2px;
+}
+
+/* Menú móvil animado */
+#menuMobile {
+  animation: slideDown 0.3s ease-out;
+}
+
+#menuMobile.hidden {
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+/* Breadcrumbs mejorados */
+#migasDePan a {
+  position: relative;
+  padding-right: 1.5rem;
+}
+
+#migasDePan a:not(:last-child)::after {
+  content: '›';
+  position: absolute;
+  right: 0.25rem;
+  color: #64748b;
+  font-weight: bold;
+}
+
+#migasDePan a:hover {
+  text-decoration: underline;
+}
+
+/* Header sticky mejorado */
+header {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* Eliminar espacios entre migas de pan y header */
+.sticky.top-0 > nav#migasDePan {
+  margin: 0;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.sticky.top-0 > header {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+/* Asegurar que no haya espacios entre elementos */
+.sticky.top-0 {
+  margin: 0;
+  padding: 0;
+}
+
+.sticky.top-0 > nav#migasDePan + header {
+  margin-top: 0;
+  border-top: none;
+}
+
+/* Logo con hover */
+header a[href="#inicio"]:hover .material-symbols-outlined {
+  transform: scale(1.1);
+  transition: transform 0.2s ease-in-out;
+}
+
+/* Responsive mejorado */
+@media (max-width: 1024px) {
+  .nav-link span:not(.material-symbols-outlined),
+  .mobile-nav-link span:not(.material-symbols-outlined) {
+    display: none;
+  }
+}
+
+/* Accesibilidad: Skip link mejorado */
+a[href="#main-content"]:focus {
+  z-index: 9999 !important;
+  padding: 1rem 2rem !important;
+  font-size: 1.125rem !important;
+  font-weight: bold !important;
+}
+
+/* ============================================
+   BOTONES DE MOSTRAR/OCULTAR CONTRASEÑA
+   ============================================ */
+
+/* Eliminar bordes visibles no deseados */
+#toggleLoginPassword,
+#toggleRegisterPassword,
+#toggleConfirmPassword {
+  border: none !important;
+  background: transparent !important;
+  outline: none !important;
+}
+
+#toggleLoginPassword:focus,
+#toggleRegisterPassword:focus,
+#toggleConfirmPassword:focus {
+  outline: 2px solid #0d59f2 !important;
+  outline-offset: 2px !important;
+  border-radius: 0.5rem !important;
+}
+
+#toggleLoginPassword:hover,
+#toggleRegisterPassword:hover,
+#toggleConfirmPassword:hover {
+  background-color: rgba(241, 245, 249, 0.5) !important;
+}
+
+.dark #toggleLoginPassword:hover,
+.dark #toggleRegisterPassword:hover,
+.dark #toggleConfirmPassword:hover {
+  background-color: rgba(51, 65, 85, 0.5) !important;
+}
+
+/* Asegurar que los iconos se vean correctamente */
+#toggleLoginPassword .material-symbols-outlined,
+#toggleRegisterPassword .material-symbols-outlined,
+#toggleConfirmPassword .material-symbols-outlined {
+  display: inline-block;
+  font-size: 1.5rem;
+  line-height: 1;
+}
+

@@ -1,0 +1,157 @@
+@media (max-width: 720px){
+    .nav-btn { padding: 0.4rem 0.7rem; font-size: 0.95rem; }
+    main { padding-left: 1rem; padding-right: 1rem; }
+}
+
+.botonComienza{
+    margin-top:-70px;
+}
+
+#inputSubirCurso form {
+    background-color: white !important;
+}
+
+#inputSubirCurso form input[type="text"],
+#inputSubirCurso form textarea {
+    color: #1f2937 !important;
+}
+
+#inputSubirCurso form input::placeholder,
+#inputSubirCurso form textarea::placeholder {
+    color: #292c33 !important;
+    opacity: 1;
+}
+
+#inputSubirCurso h2,
+#inputSubirCurso label,
+#inputSubirCurso legend {
+    color: #1f2937 !important;
+    font-weight: 700 !important;
+}
+
+.textN{
+    color: aliceblue !important;
+}
+
+.textB{
+    color: #1f2937 !important;
+}
+
+.opcion-quiz {
+    transition: all 0.3s ease;
+}
+
+.opcion-quiz:hover:not(.border-red-500):not(.border-green-500) {
+    transform: translateX(4px);
+}
+
+#barraProgreso {
+    transition: width 0.5s ease-in-out;
+}
+
+/* Scrollbar personalizado para la transcripción */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: #1e293b;
+    border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #475569;
+    border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #64748b;
+}
+
+/* Efecto hover en el poster del video */
+.aspect-video > div {
+    transition: transform 0.3s ease;
+}
+
+.aspect-video:hover > div {
+    transform: scale(1.02);
+}
+
+/* Modo alto contraste */
+.contraste-alto {
+  background-color: black !important;
+  color: white !important;
+}
+
+.contraste-alto a, 
+.contraste-alto button {
+  color: #ffff00 !important;
+  background-color: black !important;
+  border-color: yellow !important;
+}
+
+/* Tipografia legible */
+.tipografia-legible {
+  font-family: Arial, Helvetica, sans-serif !important;
+  font-weight: 600 !important;
+}
+
+/* Tamaño de texto ajustable */
+.tamano-texto-pequeno {
+  font-size: 0.875rem !important; /* 14px */
+}
+
+.tamano-texto-mediano {
+  font-size: 1rem !important; /* 16px */
+}
+
+.tamano-texto-grande {
+  font-size: 1.25rem !important; /* 20px */
+}
+
+/* Modo Ceguera - filtro para daltonismo */
+.modo-ceguera {
+  filter: grayscale(100%) contrast(150%) !important;
+}
+
+/* Indicador visual para elementos enfocados (para navegación teclado) */
+:focus-visible {
+  outline: 3px solid #0d59f2 !important;
+  outline-offset: 2px !important;
+}
+
+/* Alto contraste */
+.contraste-alto {
+  background-color: black !important;
+  color: white !important;
+}
+
+.contraste-alto * {
+  background-color: black !important;
+  color: white !important;
+}
+
+/* Tipografía legible */
+.tipografia-legible {
+  font-family: Arial, Helvetica, sans-serif !important;
+  letter-spacing: 0.2px !important;
+  line-height: 1.7 !important;
+}
+
+/* Tamaño ajustable */
+html.tamano-texto-grande {
+  font-size: 18px !important;
+}
+html.tamano-texto-normal {
+  font-size: 16px !important;
+}
+html.tamano-texto-pequeno {
+  font-size: 14px !important;
+}
+
+.modo-ceguera, .modo-ceguera * {
+  background: #000 !important;
+  color: #fff !important;
+  border-color: #ff0 !important;
+  filter: grayscale(100%) contrast(180%) brightness(110%) !important;
+}
