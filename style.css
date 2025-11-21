@@ -77,18 +77,7 @@
     transform: scale(1.02);
 }
 
-/* Modo alto contraste */
-.contraste-alto {
-  background-color: black !important;
-  color: white !important;
-}
-
-.contraste-alto a, 
-.contraste-alto button {
-  color: #ffff00 !important;
-  background-color: black !important;
-  border-color: yellow !important;
-}
+/* Modo alto contraste - Reglas movidas a accessibility.css para mejor control por tema */
 
 /* Tipografia legible */
 .tipografia-legible {
@@ -120,16 +109,7 @@
   outline-offset: 2px !important;
 }
 
-/* Alto contraste */
-.contraste-alto {
-  background-color: black !important;
-  color: white !important;
-}
-
-.contraste-alto * {
-  background-color: black !important;
-  color: white !important;
-}
+/* Alto contraste - Reglas movidas a accessibility.css para mejor control por tema */
 
 /* Tipografía legible */
 .tipografia-legible {

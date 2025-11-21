@@ -440,15 +440,114 @@ kbd {
 /* ============================================
    TEMA OSCURO ACCESIBLE
    ============================================ */
+/* ============================================
+   ALTO CONTRASTE - MODO CLARO
+   ============================================ */
+/* Alto contraste en modo claro: fondo blanco, texto negro, bordes más visibles */
+body:not(.dark).contraste-alto {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+body:not(.dark).contraste-alto * {
+  color: #000000 !important;
+}
+
+body:not(.dark).contraste-alto .bg-white,
+body:not(.dark).contraste-alto .bg-slate-50,
+body:not(.dark).contraste-alto .bg-slate-100 {
+  background-color: #ffffff !important;
+}
+
+body:not(.dark).contraste-alto .bg-slate-800,
+body:not(.dark).contraste-alto .bg-slate-700,
+body:not(.dark).contraste-alto .bg-slate-900 {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+body:not(.dark).contraste-alto button,
+body:not(.dark).contraste-alto a,
+body:not(.dark).contraste-alto input,
+body:not(.dark).contraste-alto select,
+body:not(.dark).contraste-alto textarea {
+  border: 2px solid #000000 !important;
+  color: #000000 !important;
+}
+
+body:not(.dark).contraste-alto .bg-primary {
+  background-color: #0000ff !important;
+  color: #ffffff !important;
+  border: 2px solid #000000 !important;
+}
+
+body:not(.dark).contraste-alto .text-primary {
+  color: #0000ff !important;
+}
+
+body:not(.dark).contraste-alto .text-slate-600,
+body:not(.dark).contraste-alto .text-slate-500,
+body:not(.dark).contraste-alto .text-slate-400 {
+  color: #000000 !important;
+}
+
+body:not(.dark).contraste-alto .border-slate-200,
+body:not(.dark).contraste-alto .border-slate-300 {
+  border-color: #000000 !important;
+}
+
+/* ============================================
+   ALTO CONTRASTE - MODO OSCURO
+   ============================================ */
 .dark body.contraste-alto {
-  background-color: #000000;
-  color: #ffffff;
+  background-color: #000000 !important;
+  color: #ffffff !important;
+}
+
+.dark body.contraste-alto * {
+  color: #ffffff !important;
+}
+
+.dark body.contraste-alto .bg-slate-800,
+.dark body.contraste-alto .bg-slate-700,
+.dark body.contraste-alto .bg-slate-900 {
+  background-color: #000000 !important;
+}
+
+.dark body.contraste-alto .bg-white,
+.dark body.contraste-alto .bg-slate-50 {
+  background-color: #000000 !important;
+  color: #ffffff !important;
 }
 
 .dark body.contraste-alto button,
 .dark body.contraste-alto a,
-.dark body.contraste-alto input {
-  border-color: #ffffff;
+.dark body.contraste-alto input,
+.dark body.contraste-alto select,
+.dark body.contraste-alto textarea {
+  border: 2px solid #ffffff !important;
+  color: #ffffff !important;
+}
+
+.dark body.contraste-alto .bg-primary {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border: 2px solid #ffffff !important;
+}
+
+.dark body.contraste-alto .text-primary {
+  color: #ffffff !important;
+}
+
+.dark body.contraste-alto .text-slate-400,
+.dark body.contraste-alto .text-slate-500,
+.dark body.contraste-alto .text-slate-600 {
+  color: #ffffff !important;
+}
+
+.dark body.contraste-alto .border-slate-600,
+.dark body.contraste-alto .border-slate-700 {
+  border-color: #ffffff !important;
 }
 
 /* ============================================
