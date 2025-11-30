@@ -45,7 +45,7 @@
   </head>
 
   <body
-    class="bg-background font-display text-slate-200 min-h-screen flex flex-col"
+    class="bg-background font-display text-slate-300 dark:text-slate-200 min-h-screen flex flex-col"
   >
     <!-- Skip navigation link para accesibilidad -->
     <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-0 focus:left-0 focus:z-50 focus:bg-primary focus:text-white focus:p-4 focus:rounded-br-lg" aria-label="Saltar al contenido principal">
@@ -76,7 +76,7 @@
 
       <!-- Header Principal -->
       <header
-        class="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b-2 border-slate-200 dark:border-slate-700 shadow-sm"
+        class="bg-white dark:bg-slate-900 backdrop-blur-md border-b-2 border-slate-200 dark:border-slate-700 shadow-sm"
         role="banner"
         aria-label="Navegación principal"
       >
@@ -110,10 +110,10 @@
             <a 
               href="#inicio" 
               data-section="inicio"
-              class="nav-link flex items-center gap-2 px-4 py-2 rounded-lg text-base font-medium text-slate-700 dark:text-slate-300 hover:text-primary dark:hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-800 transition-all focus:outline-none focus:ring-2 focus:ring-primary"
+              class="nav-link flex items-center gap-2 px-4 py-2 rounded-lg text-base font-medium text-slate-800 dark:text-slate-200 hover:text-primary dark:hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-800 transition-all focus:outline-none focus:ring-2 focus:ring-primary"
               aria-label="Ir a inicio"
             >
-              <span class="material-symbols-outlined text-xl">home</span>
+              <span class="material-symbols-outlined text-xl" aria-hidden="true">home</span>
               <span>Inicio</span>
             </a>
             
@@ -121,10 +121,10 @@
             <a 
               href="#cursos" 
               data-section="cursos"
-              class="nav-link flex items-center gap-2 px-4 py-2 rounded-lg text-base font-medium text-slate-700 dark:text-slate-300 hover:text-primary dark:hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-800 transition-all focus:outline-none focus:ring-2 focus:ring-primary"
+              class="nav-link flex items-center gap-2 px-4 py-2 rounded-lg text-base font-medium text-slate-800 dark:text-slate-200 hover:text-primary dark:hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-800 transition-all focus:outline-none focus:ring-2 focus:ring-primary"
               aria-label="Ver catálogo de cursos disponibles"
             >
-              <span class="material-symbols-outlined text-xl">menu_book</span>
+              <span class="material-symbols-outlined text-xl" aria-hidden="true">menu_book</span>
               <span>Cursos</span>
             </a>
             
@@ -133,10 +133,10 @@
               href="#dashboardAlumno" 
               data-section="dashboardAlumno"
               id="navInicioAlumno"
-              class="nav-link hidden flex items-center gap-2 px-4 py-2 rounded-lg text-base font-medium text-slate-700 dark:text-slate-300 hover:text-primary dark:hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-800 transition-all focus:outline-none focus:ring-2 focus:ring-primary"
+              class="nav-link hidden flex items-center gap-2 px-4 py-2 rounded-lg text-base font-medium text-slate-800 dark:text-slate-200 hover:text-primary dark:hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-800 transition-all focus:outline-none focus:ring-2 focus:ring-primary"
               aria-label="Ir a inicio"
             >
-              <span class="material-symbols-outlined text-xl">home</span>
+              <span class="material-symbols-outlined text-xl" aria-hidden="true">home</span>
               <span>Inicio</span>
             </a>
             
@@ -145,10 +145,10 @@
               href="#listaCursosAlumno" 
               data-section="listaCursosAlumno"
               id="navMisCursos"
-              class="nav-link hidden flex items-center gap-2 px-4 py-2 rounded-lg text-base font-medium text-slate-700 dark:text-slate-300 hover:text-primary dark:hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-800 transition-all focus:outline-none focus:ring-2 focus:ring-primary"
+              class="nav-link hidden flex items-center gap-2 px-4 py-2 rounded-lg text-base font-medium text-slate-800 dark:text-slate-200 hover:text-primary dark:hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-800 transition-all focus:outline-none focus:ring-2 focus:ring-primary"
               aria-label="Ver mis cursos inscritos"
             >
-              <span class="material-symbols-outlined text-xl">library_books</span>
+              <span class="material-symbols-outlined text-xl" aria-hidden="true">library_books</span>
               <span>Mis Cursos</span>
             </a>
             
@@ -2816,8 +2816,8 @@
             <h3 class="font-semibold text-slate-900 dark:text-white mb-1">Notificaciones por Email</h3>
             <p class="text-sm text-slate-600 dark:text-slate-400">Recibe notificaciones importantes por correo electrónico</p>
           </div>
-          <label class="relative inline-flex items-center cursor-pointer">
-            <input type="checkbox" id="prefEmailNotifications" class="sr-only peer" checked>
+          <label class="relative inline-flex items-center cursor-pointer" for="prefEmailNotifications">
+            <input type="checkbox" id="prefEmailNotifications" class="sr-only peer" checked aria-label="Activar notificaciones por email">
             <div class="w-11 h-6 bg-slate-300 dark:bg-slate-600 rounded-full peer peer-checked:bg-primary transition-colors relative after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5"></div>
           </label>
         </div>
@@ -2827,8 +2827,8 @@
             <h3 class="font-semibold text-slate-900 dark:text-white mb-1">Notificaciones Push</h3>
             <p class="text-sm text-slate-600 dark:text-slate-400">Recibe notificaciones en tiempo real en el navegador</p>
           </div>
-          <label class="relative inline-flex items-center cursor-pointer">
-            <input type="checkbox" id="prefPushNotifications" class="sr-only peer" checked>
+          <label class="relative inline-flex items-center cursor-pointer" for="prefPushNotifications">
+            <input type="checkbox" id="prefPushNotifications" class="sr-only peer" checked aria-label="Activar notificaciones push">
             <div class="w-11 h-6 bg-slate-300 dark:bg-slate-600 rounded-full peer peer-checked:bg-primary transition-colors relative after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5"></div>
           </label>
         </div>
@@ -2838,8 +2838,8 @@
             <h3 class="font-semibold text-slate-900 dark:text-white mb-1">Actualizaciones de Cursos</h3>
             <p class="text-sm text-slate-600 dark:text-slate-400">Notificaciones sobre nuevos contenidos y actividades</p>
           </div>
-          <label class="relative inline-flex items-center cursor-pointer">
-            <input type="checkbox" id="prefCourseUpdates" class="sr-only peer" checked>
+          <label class="relative inline-flex items-center cursor-pointer" for="prefCourseUpdates">
+            <input type="checkbox" id="prefCourseUpdates" class="sr-only peer" checked aria-label="Activar notificaciones de actualizaciones de cursos">
             <div class="w-11 h-6 bg-slate-300 dark:bg-slate-600 rounded-full peer peer-checked:bg-primary transition-colors relative after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5"></div>
           </label>
         </div>
@@ -2849,8 +2849,8 @@
             <h3 class="font-semibold text-slate-900 dark:text-white mb-1">Nuevos Mensajes</h3>
             <p class="text-sm text-slate-600 dark:text-slate-400">Notificaciones cuando recibas mensajes</p>
           </div>
-          <label class="relative inline-flex items-center cursor-pointer">
-            <input type="checkbox" id="prefNewMessages" class="sr-only peer" checked>
+          <label class="relative inline-flex items-center cursor-pointer" for="prefNewMessages">
+            <input type="checkbox" id="prefNewMessages" class="sr-only peer" checked aria-label="Activar notificaciones de nuevos mensajes">
             <div class="w-11 h-6 bg-slate-300 dark:bg-slate-600 rounded-full peer peer-checked:bg-primary transition-colors relative after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5"></div>
           </label>
         </div>
@@ -2860,8 +2860,8 @@
             <h3 class="font-semibold text-slate-900 dark:text-white mb-1">Logros y Badges</h3>
             <p class="text-sm text-slate-600 dark:text-slate-400">Notificaciones cuando desbloquees logros</p>
           </div>
-          <label class="relative inline-flex items-center cursor-pointer">
-            <input type="checkbox" id="prefAchievements" class="sr-only peer" checked>
+          <label class="relative inline-flex items-center cursor-pointer" for="prefAchievements">
+            <input type="checkbox" id="prefAchievements" class="sr-only peer" checked aria-label="Activar notificaciones de logros desbloqueados">
             <div class="w-11 h-6 bg-slate-300 dark:bg-slate-600 rounded-full peer peer-checked:bg-primary transition-colors relative after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5"></div>
           </label>
         </div>
@@ -3433,14 +3433,14 @@
       <div class="flex items-center justify-between mb-3">
         <div class="flex items-center gap-3">
           <span class="material-symbols-outlined text-primary text-3xl" aria-hidden="true">accessibility_new</span>
-          <h3 class="text-xl font-bold text-white">Lector de Pantalla</h3>
-          <span id="estadoLector" class="text-sm px-3 py-1 rounded-full bg-green-600 text-white font-semibold">Activo</span>
+          <h2 class="text-xl font-bold text-white">Lector de Pantalla</h2>
+          <span id="estadoLector" class="text-sm px-3 py-1 rounded-full bg-green-700 dark:bg-green-600 text-white font-semibold">Activo</span>
         </div>
         <div class="flex items-center gap-2">
-          <button id="btnMinimizarLector" class="p-2 hover:bg-slate-800 rounded-lg transition-colors">
+          <button id="btnMinimizarLector" class="p-2 hover:bg-slate-800 rounded-lg transition-colors" aria-label="Minimizar panel de lector de pantalla">
             <span class="material-symbols-outlined" aria-hidden="true">expand_more</span>
           </button>
-          <button id="btnCerrarLector" class="p-2 hover:bg-red-600 rounded-lg transition-colors">
+          <button id="btnCerrarLector" class="p-2 hover:bg-red-600 rounded-lg transition-colors" aria-label="Cerrar panel de lector de pantalla">
             <span class="material-symbols-outlined" aria-hidden="true">close</span>
           </button>
         </div>
