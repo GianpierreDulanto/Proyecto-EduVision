@@ -15,6 +15,9 @@
       rel="stylesheet"
     />
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
     <script>
       tailwind.config = {
         theme: {
@@ -199,6 +202,17 @@
 
           <!-- Botones de Acción -->
           <div class="flex items-center gap-2">
+            <!-- Botón Notificaciones (solo para usuarios logueados) -->
+            <button
+              id="btnNotifications"
+              class="hidden relative flex h-10 w-10 items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
+              aria-label="Ver notificaciones"
+              aria-expanded="false"
+            >
+              <span class="material-symbols-outlined text-xl">notifications</span>
+              <span class="notification-badge absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center hidden">0</span>
+            </button>
+
             <!-- Botón Login/Logout -->
             <a
               id="btnLoginLogout"
@@ -331,6 +345,52 @@
         </div>
       </div>
     </header>
+    </div>
+
+    <!-- Centro de Notificaciones -->
+    <div id="notificationsCenter" class="fixed top-24 right-4 w-96 max-w-[calc(100vw-2rem)] bg-white dark:bg-slate-800 rounded-2xl shadow-2xl z-50 hidden border border-slate-200 dark:border-slate-700 max-h-[calc(100vh-8rem)] flex flex-col" role="dialog" aria-modal="true" aria-label="Centro de notificaciones">
+      <div class="sticky top-0 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-6 py-4 flex items-center justify-between rounded-t-2xl">
+        <h2 class="text-xl font-bold text-slate-900 dark:text-white">Notificaciones</h2>
+        <div class="flex items-center gap-2">
+          <button onclick="window.app.notifications.markAllAsRead()" 
+                  class="text-sm text-primary hover:text-primary/80 transition-colors"
+                  aria-label="Marcar todas como leídas">
+            Marcar todas como leídas
+          </button>
+          <button onclick="window.app.notifications.toggleNotificationsCenter()" 
+                  class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
+                  aria-label="Cerrar notificaciones">
+            <span class="material-symbols-outlined text-slate-600 dark:text-slate-400">close</span>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Filtros -->
+      <div class="px-6 py-3 border-b border-slate-200 dark:border-slate-700 flex gap-2">
+        <button data-filter="all" 
+                onclick="window.app.notifications.setFilter('all')"
+                class="px-3 py-1 rounded-lg text-sm font-medium bg-primary text-white transition-colors">
+          Todas
+        </button>
+        <button data-filter="unread" 
+                onclick="window.app.notifications.setFilter('unread')"
+                class="px-3 py-1 rounded-lg text-sm font-medium bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors">
+          No leídas
+        </button>
+        <button data-filter="read" 
+                onclick="window.app.notifications.setFilter('read')"
+                class="px-3 py-1 rounded-lg text-sm font-medium bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors">
+          Leídas
+        </button>
+      </div>
+      
+      <!-- Lista de Notificaciones -->
+      <div id="notificationsList" class="flex-1 overflow-y-auto">
+        <div class="text-center py-12">
+          <div class="text-6xl mb-4 animate-spin">⏳</div>
+          <p class="text-slate-600 dark:text-slate-400">Cargando notificaciones...</p>
+        </div>
+      </div>
     </div>
 
     <!-- CONTENIDO PRINCIPAL -->
@@ -1123,6 +1183,11 @@
             <span class="material-symbols-outlined inline-block align-middle mr-2">analytics</span>
             Estadísticas
           </button>
+          <button onclick="window.app.admin.cambiarTab('historial')" 
+                  class="admin-tab px-6 py-4 text-sm font-semibold text-slate-600 dark:text-slate-400 border-b-2 border-transparent hover:text-slate-900 dark:hover:text-white">
+            <span class="material-symbols-outlined inline-block align-middle mr-2">history</span>
+            Historial
+          </button>
         </nav>
       </div>
     </div>
@@ -1251,15 +1316,45 @@
 
     <!-- Tab: Estadísticas -->
     <div id="adminTabEstadisticas" class="admin-tab-content hidden">
+      <div id="adminEstadisticas" class="space-y-6">
+        <!-- Se cargará dinámicamente -->
+        <div class="text-center py-12">
+          <div class="text-6xl mb-4 animate-spin">⏳</div>
+          <p class="text-slate-600 dark:text-slate-400">Cargando estadísticas...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab: Historial de Aprobaciones -->
+    <div id="adminTabHistorial" class="admin-tab-content hidden">
       <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-6">
-        <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-6">
-          Estadísticas del Sistema
-        </h2>
-        <div id="adminEstadisticas" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-2xl font-bold text-slate-900 dark:text-white">
+            Historial de Aprobaciones
+          </h2>
+          <div class="flex gap-2">
+            <select id="filtroHistorialTipo" onchange="window.app.admin.cargarHistorialAprobaciones()"
+                    class="px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white">
+              <option value="">Todos los tipos</option>
+              <option value="curso">Cursos</option>
+              <option value="contenido">Contenidos</option>
+              <option value="recurso">Recursos</option>
+            </select>
+            <select id="filtroHistorialEstado" onchange="window.app.admin.cargarHistorialAprobaciones()"
+                    class="px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white">
+              <option value="">Todos los estados</option>
+              <option value="aprobado">Aprobados</option>
+              <option value="rechazado">Rechazados</option>
+              <option value="pendiente">Pendientes</option>
+            </select>
+          </div>
+        </div>
+        <div id="adminHistorialAprobaciones" class="space-y-4">
           <!-- Se cargará dinámicamente -->
-          <p class="text-center text-slate-600 dark:text-slate-400 py-8">
-            Cargando estadísticas...
-          </p>
+          <div class="text-center py-12">
+            <div class="text-6xl mb-4 animate-spin">⏳</div>
+            <p class="text-slate-600 dark:text-slate-400">Cargando historial...</p>
+          </div>
         </div>
       </div>
     </div>
@@ -1640,73 +1735,73 @@
           Selecciona el tipo específico de daltonismo para aplicar el filtro correcto
         </p>
 
-        <div class="space-y-3 max-h-96 overflow-y-auto pr-2">
-          <label class="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-700 rounded-lg cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors">
+        <div class="space-y-3 max-h-96 overflow-y-auto pr-2" role="radiogroup" aria-label="Filtros de daltonismo">
+          <label class="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-700 rounded-lg cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors focus-within:ring-2 focus-within:ring-primary">
             <input type="radio" name="filtroDaltonismo" value="none" checked onchange="aplicarFiltroDaltonismo(this.value)" 
-                   class="w-5 h-5 text-primary focus:ring-primary">
+                   class="w-5 h-5 text-primary focus:ring-primary" tabindex="0">
             <div>
               <div class="font-semibold text-slate-900 dark:text-white">Sin Filtro</div>
               <div class="text-xs text-slate-500 dark:text-slate-400">Visión normal de colores</div>
             </div>
           </label>
 
-          <label class="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-700 rounded-lg cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors">
+          <label class="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-700 rounded-lg cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors focus-within:ring-2 focus-within:ring-primary">
             <input type="radio" name="filtroDaltonismo" value="protanopia" onchange="aplicarFiltroDaltonismo(this.value)" 
-                   class="w-5 h-5 text-primary focus:ring-primary">
+                   class="w-5 h-5 text-primary focus:ring-primary" tabindex="0">
             <div>
               <div class="font-semibold text-slate-900 dark:text-white">🔴 Protanopia</div>
               <div class="text-xs text-slate-500 dark:text-slate-400">Ceguera al rojo (~1% hombres)</div>
             </div>
           </label>
 
-          <label class="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-700 rounded-lg cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors">
+          <label class="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-700 rounded-lg cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors focus-within:ring-2 focus-within:ring-primary">
             <input type="radio" name="filtroDaltonismo" value="deuteranopia" onchange="aplicarFiltroDaltonismo(this.value)" 
-                   class="w-5 h-5 text-primary focus:ring-primary">
+                   class="w-5 h-5 text-primary focus:ring-primary" tabindex="0">
             <div>
               <div class="font-semibold text-slate-900 dark:text-white">🟢 Deuteranopia</div>
               <div class="text-xs text-slate-500 dark:text-slate-400">Ceguera al verde - Más común (~1% hombres)</div>
             </div>
           </label>
 
-          <label class="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-700 rounded-lg cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors">
+          <label class="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-700 rounded-lg cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors focus-within:ring-2 focus-within:ring-primary">
             <input type="radio" name="filtroDaltonismo" value="tritanopia" onchange="aplicarFiltroDaltonismo(this.value)" 
-                   class="w-5 h-5 text-primary focus:ring-primary">
+                   class="w-5 h-5 text-primary focus:ring-primary" tabindex="0">
             <div>
               <div class="font-semibold text-slate-900 dark:text-white">🔵 Tritanopia</div>
               <div class="text-xs text-slate-500 dark:text-slate-400">Ceguera al azul (Muy rara)</div>
             </div>
           </label>
 
-          <label class="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-700 rounded-lg cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors">
+          <label class="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-700 rounded-lg cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors focus-within:ring-2 focus-within:ring-primary">
             <input type="radio" name="filtroDaltonismo" value="protanomaly" onchange="aplicarFiltroDaltonismo(this.value)" 
-                   class="w-5 h-5 text-primary focus:ring-primary">
+                   class="w-5 h-5 text-primary focus:ring-primary" tabindex="0">
             <div>
               <div class="font-semibold text-slate-900 dark:text-white">🟠 Protanomalía</div>
               <div class="text-xs text-slate-500 dark:text-slate-400">Visión débil del rojo</div>
             </div>
           </label>
 
-          <label class="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-700 rounded-lg cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors">
+          <label class="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-700 rounded-lg cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors focus-within:ring-2 focus-within:ring-primary">
             <input type="radio" name="filtroDaltonismo" value="deuteranomaly" onchange="aplicarFiltroDaltonismo(this.value)" 
-                   class="w-5 h-5 text-primary focus:ring-primary">
+                   class="w-5 h-5 text-primary focus:ring-primary" tabindex="0">
             <div>
               <div class="font-semibold text-slate-900 dark:text-white">🟡 Deuteranomalía</div>
               <div class="text-xs text-slate-500 dark:text-slate-400">Visión débil del verde (~5% hombres)</div>
             </div>
           </label>
 
-          <label class="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-700 rounded-lg cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors">
+          <label class="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-700 rounded-lg cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors focus-within:ring-2 focus-within:ring-primary">
             <input type="radio" name="filtroDaltonismo" value="tritanomaly" onchange="aplicarFiltroDaltonismo(this.value)" 
-                   class="w-5 h-5 text-primary focus:ring-primary">
+                   class="w-5 h-5 text-primary focus:ring-primary" tabindex="0">
             <div>
               <div class="font-semibold text-slate-900 dark:text-white">🔷 Tritanomalía</div>
               <div class="text-xs text-slate-500 dark:text-slate-400">Visión débil del azul</div>
             </div>
           </label>
 
-          <label class="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-700 rounded-lg cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors">
+          <label class="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-700 rounded-lg cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors focus-within:ring-2 focus-within:ring-primary">
             <input type="radio" name="filtroDaltonismo" value="achromatopsia" onchange="aplicarFiltroDaltonismo(this.value)" 
-                   class="w-5 h-5 text-primary focus:ring-primary">
+                   class="w-5 h-5 text-primary focus:ring-primary" tabindex="0">
             <div>
               <div class="font-semibold text-slate-900 dark:text-white">⬛ Acromatopsia</div>
               <div class="text-xs text-slate-500 dark:text-slate-400">Visión monocromática (Extremadamente rara)</div>
@@ -2612,6 +2707,18 @@
           Configuración de Accesibilidad
         </button>
         
+        <button onclick="window.app.profile.showChangePasswordModal()" 
+                class="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors">
+          <span class="material-symbols-outlined">lock</span>
+          Cambiar Contraseña
+        </button>
+        
+        <button onclick="window.app.profile.showNotificationPreferences()" 
+                class="flex items-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-semibold transition-colors">
+          <span class="material-symbols-outlined">notifications_active</span>
+          Preferencias de Notificaciones
+        </button>
+        
         <button onclick="window.app.session.logout()" 
                 class="flex items-center gap-2 px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition-colors">
           <span class="material-symbols-outlined">logout</span>
@@ -2620,6 +2727,139 @@
       </div>
     </div>
   </section>
+
+  <!-- Modal: Cambiar Contraseña -->
+  <div id="modalChangePassword" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-md w-full">
+      <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
+        <h2 class="text-xl font-bold text-slate-900 dark:text-white">Cambiar Contraseña</h2>
+        <button onclick="window.app.profile.closeChangePasswordModal()" 
+                class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
+          <span class="material-symbols-outlined text-slate-600 dark:text-slate-400">close</span>
+        </button>
+      </div>
+      
+      <form id="formChangePassword" class="p-6 space-y-4" onsubmit="event.preventDefault(); window.app.profile.handleChangePassword(event);">
+        <div>
+          <label for="inputContraseñaActual" class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+            Contraseña Actual *
+          </label>
+          <input type="password" id="inputContraseñaActual" required 
+                 class="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary" 
+                 placeholder="Ingresa tu contraseña actual">
+        </div>
+        
+        <div>
+          <label for="inputContraseñaNueva" class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+            Nueva Contraseña *
+          </label>
+          <input type="password" id="inputContraseñaNueva" required minlength="6"
+                 class="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary" 
+                 placeholder="Mínimo 6 caracteres">
+        </div>
+        
+        <div>
+          <label for="inputContraseñaConfirmar" class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+            Confirmar Nueva Contraseña *
+          </label>
+          <input type="password" id="inputContraseñaConfirmar" required minlength="6"
+                 class="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary" 
+                 placeholder="Repite la nueva contraseña">
+        </div>
+        
+        <div class="flex gap-3 pt-4">
+          <button type="submit" class="flex-1 px-6 py-3 bg-primary hover:bg-primary/90 text-white rounded-lg font-semibold transition-colors">
+            Cambiar Contraseña
+          </button>
+          <button type="button" onclick="window.app.profile.closeChangePasswordModal()" 
+                  class="px-6 py-3 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-900 dark:text-white rounded-lg font-semibold transition-colors">
+            Cancelar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Preferencias de Notificaciones -->
+  <div id="modalNotificationPreferences" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between sticky top-0 bg-white dark:bg-slate-800">
+        <h2 class="text-xl font-bold text-slate-900 dark:text-white">Preferencias de Notificaciones</h2>
+        <button onclick="document.getElementById('modalNotificationPreferences').classList.add('hidden')" 
+                class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
+          <span class="material-symbols-outlined text-slate-600 dark:text-slate-400">close</span>
+        </button>
+      </div>
+      
+      <div class="p-6 space-y-6">
+        <div class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-700/50 rounded-lg">
+          <div>
+            <h3 class="font-semibold text-slate-900 dark:text-white mb-1">Notificaciones por Email</h3>
+            <p class="text-sm text-slate-600 dark:text-slate-400">Recibe notificaciones importantes por correo electrónico</p>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="prefEmailNotifications" class="sr-only peer" checked>
+            <div class="w-11 h-6 bg-slate-300 dark:bg-slate-600 rounded-full peer peer-checked:bg-primary transition-colors relative after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5"></div>
+          </label>
+        </div>
+        
+        <div class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-700/50 rounded-lg">
+          <div>
+            <h3 class="font-semibold text-slate-900 dark:text-white mb-1">Notificaciones Push</h3>
+            <p class="text-sm text-slate-600 dark:text-slate-400">Recibe notificaciones en tiempo real en el navegador</p>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="prefPushNotifications" class="sr-only peer" checked>
+            <div class="w-11 h-6 bg-slate-300 dark:bg-slate-600 rounded-full peer peer-checked:bg-primary transition-colors relative after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5"></div>
+          </label>
+        </div>
+        
+        <div class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-700/50 rounded-lg">
+          <div>
+            <h3 class="font-semibold text-slate-900 dark:text-white mb-1">Actualizaciones de Cursos</h3>
+            <p class="text-sm text-slate-600 dark:text-slate-400">Notificaciones sobre nuevos contenidos y actividades</p>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="prefCourseUpdates" class="sr-only peer" checked>
+            <div class="w-11 h-6 bg-slate-300 dark:bg-slate-600 rounded-full peer peer-checked:bg-primary transition-colors relative after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5"></div>
+          </label>
+        </div>
+        
+        <div class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-700/50 rounded-lg">
+          <div>
+            <h3 class="font-semibold text-slate-900 dark:text-white mb-1">Nuevos Mensajes</h3>
+            <p class="text-sm text-slate-600 dark:text-slate-400">Notificaciones cuando recibas mensajes</p>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="prefNewMessages" class="sr-only peer" checked>
+            <div class="w-11 h-6 bg-slate-300 dark:bg-slate-600 rounded-full peer peer-checked:bg-primary transition-colors relative after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5"></div>
+          </label>
+        </div>
+        
+        <div class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-700/50 rounded-lg">
+          <div>
+            <h3 class="font-semibold text-slate-900 dark:text-white mb-1">Logros y Badges</h3>
+            <p class="text-sm text-slate-600 dark:text-slate-400">Notificaciones cuando desbloquees logros</p>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="prefAchievements" class="sr-only peer" checked>
+            <div class="w-11 h-6 bg-slate-300 dark:bg-slate-600 rounded-full peer peer-checked:bg-primary transition-colors relative after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5"></div>
+          </label>
+        </div>
+        
+        <div class="flex gap-3 pt-4">
+          <button onclick="window.app.profile.saveNotificationPreferences()" 
+                  class="flex-1 px-6 py-3 bg-primary hover:bg-primary/90 text-white rounded-lg font-semibold transition-colors">
+            Guardar Preferencias
+          </button>
+          <button onclick="document.getElementById('modalNotificationPreferences').classList.add('hidden')" 
+                  class="px-6 py-3 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-900 dark:text-white rounded-lg font-semibold transition-colors">
+            Cancelar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- ====================================
        SECCIÓN: AYUDA Y SOPORTE
@@ -2806,9 +3046,11 @@
           <label for="cursoDescripcion" class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
             Descripción *
           </label>
-          <textarea id="cursoDescripcion" required rows="4" 
-                    class="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary" 
-                    placeholder="Describe el contenido y objetivos del curso"></textarea>
+          <div id="cursoDescripcionEditor" class="bg-white dark:bg-slate-700 rounded-lg border border-slate-300 dark:border-slate-600" style="min-height: 150px;">
+            <!-- Editor WYSIWYG se inicializará aquí -->
+          </div>
+          <textarea id="cursoDescripcion" required class="hidden" placeholder="Describe el contenido y objetivos del curso"></textarea>
+          <p class="text-xs text-slate-500 dark:text-slate-500 mt-1">Usa el editor para formatear tu descripción</p>
         </div>
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -2886,6 +3128,7 @@
             Agregar Nuevo Contenido
           </h3>
           <form id="formContenido" class="space-y-4">
+            <input type="hidden" id="contenidoId" value="">
             <input type="hidden" id="contenidoCursoId" value="">
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -3400,6 +3643,196 @@
       function inicializarPreferenciasAccesibilidad() {
         // Las preferencias se cargan automáticamente en AccessibilityPreferences
         configurarTogglesAccesibilidad();
+        configurarNavegacionTecladoAccesibilidad();
+      }
+
+      // Configurar navegación por teclado para controles de accesibilidad
+      function configurarNavegacionTecladoAccesibilidad() {
+        // Configurar switches (checkboxes ocultos) para que funcionen con Tab + Enter/Space
+        const switches = document.querySelectorAll('input[type="checkbox"].peer, input[type="checkbox"][class*="opacity-0"]');
+        switches.forEach(checkbox => {
+          // Asegurar que pueda recibir foco - usar técnica de sr-only pero accesible
+          checkbox.style.position = 'absolute';
+          checkbox.style.width = '1px';
+          checkbox.style.height = '1px';
+          checkbox.style.margin = '-1px';
+          checkbox.style.padding = '0';
+          checkbox.style.overflow = 'hidden';
+          checkbox.style.clip = 'rect(0, 0, 0, 0)';
+          checkbox.style.whiteSpace = 'nowrap';
+          checkbox.style.borderWidth = '0';
+          
+          if (!checkbox.hasAttribute('tabindex')) {
+            checkbox.setAttribute('tabindex', '0');
+          }
+
+          // Agregar event listener para Enter y Space
+          checkbox.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              checkbox.checked = !checkbox.checked;
+              // Disparar evento change
+              checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+          });
+
+          // Mejorar visibilidad del foco
+          checkbox.addEventListener('focus', () => {
+            checkbox.style.clip = 'auto';
+            checkbox.style.outline = '2px solid #0d59f2';
+            checkbox.style.outlineOffset = '2px';
+            const label = checkbox.closest('label');
+            if (label) {
+              label.style.outline = '2px solid #0d59f2';
+              label.style.outlineOffset = '2px';
+              label.style.borderRadius = '4px';
+            }
+          });
+
+          checkbox.addEventListener('blur', () => {
+            checkbox.style.clip = 'rect(0, 0, 0, 0)';
+            checkbox.style.outline = '';
+            checkbox.style.outlineOffset = '';
+            const label = checkbox.closest('label');
+            if (label) {
+              label.style.outline = '';
+              label.style.outlineOffset = '';
+              label.style.borderRadius = '';
+            }
+          });
+
+          // También permitir que el label active el checkbox con teclado
+          const label = checkbox.closest('label');
+          if (label) {
+            // Hacer que el label pueda recibir foco si el checkbox no puede
+            label.setAttribute('tabindex', '0');
+            label.setAttribute('role', 'switch');
+            label.setAttribute('aria-checked', checkbox.checked);
+            
+            label.addEventListener('keydown', (e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                checkbox.checked = !checkbox.checked;
+                label.setAttribute('aria-checked', checkbox.checked);
+                checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+              }
+            });
+
+            // Actualizar aria-checked cuando cambia el checkbox
+            checkbox.addEventListener('change', () => {
+              label.setAttribute('aria-checked', checkbox.checked);
+            });
+          }
+        });
+
+        // Configurar radio buttons con roving tabindex
+        const radioGroups = {};
+        document.querySelectorAll('input[type="radio"][name]').forEach(radio => {
+          const name = radio.getAttribute('name');
+          if (!radioGroups[name]) {
+            radioGroups[name] = [];
+          }
+          radioGroups[name].push(radio);
+        });
+
+        Object.values(radioGroups).forEach(radios => {
+          // Permitir que todos los radio buttons sean accesibles con Tab
+          // Pero mantener navegación con flechas también
+          radios.forEach((radio, index) => {
+            // Todos los radio buttons pueden recibir foco con Tab
+            if (!radio.hasAttribute('tabindex') || radio.getAttribute('tabindex') === '-1') {
+              radio.setAttribute('tabindex', '0');
+            }
+
+            // Navegación con flechas (mantiene el comportamiento de grupo)
+            radio.addEventListener('keydown', (e) => {
+              let targetIndex = index;
+              
+              switch(e.key) {
+                case 'ArrowRight':
+                case 'ArrowDown':
+                  e.preventDefault();
+                  targetIndex = (index + 1) % radios.length;
+                  radios[targetIndex].focus();
+                  radios[targetIndex].checked = true;
+                  radios[targetIndex].dispatchEvent(new Event('change', { bubbles: true }));
+                  break;
+                  
+                case 'ArrowLeft':
+                case 'ArrowUp':
+                  e.preventDefault();
+                  targetIndex = (index - 1 + radios.length) % radios.length;
+                  radios[targetIndex].focus();
+                  radios[targetIndex].checked = true;
+                  radios[targetIndex].dispatchEvent(new Event('change', { bubbles: true }));
+                  break;
+                  
+                case 'Home':
+                  e.preventDefault();
+                  radios[0].focus();
+                  radios[0].checked = true;
+                  radios[0].dispatchEvent(new Event('change', { bubbles: true }));
+                  break;
+                  
+                case 'End':
+                  e.preventDefault();
+                  const lastIndex = radios.length - 1;
+                  radios[lastIndex].focus();
+                  radios[lastIndex].checked = true;
+                  radios[lastIndex].dispatchEvent(new Event('change', { bubbles: true }));
+                  break;
+                  
+                case 'Enter':
+                case ' ':
+                  e.preventDefault();
+                  radio.checked = true;
+                  radio.dispatchEvent(new Event('change', { bubbles: true }));
+                  break;
+              }
+            });
+          });
+        });
+
+        // Configurar slider de tamaño de texto
+        const slider = document.getElementById('rangoTamanoTexto');
+        if (slider) {
+          slider.addEventListener('keydown', (e) => {
+            const min = parseInt(slider.min) || 1;
+            const max = parseInt(slider.max) || 5;
+            const step = parseInt(slider.step) || 1;
+            let value = parseInt(slider.value) || 3;
+            
+            switch(e.key) {
+              case 'ArrowLeft':
+              case 'ArrowDown':
+                e.preventDefault();
+                value = Math.max(min, value - step);
+                slider.value = value;
+                slider.dispatchEvent(new Event('input', { bubbles: true }));
+                break;
+                
+              case 'ArrowRight':
+              case 'ArrowUp':
+                e.preventDefault();
+                value = Math.min(max, value + step);
+                slider.value = value;
+                slider.dispatchEvent(new Event('input', { bubbles: true }));
+                break;
+                
+              case 'Home':
+                e.preventDefault();
+                slider.value = min;
+                slider.dispatchEvent(new Event('input', { bubbles: true }));
+                break;
+                
+              case 'End':
+                e.preventDefault();
+                slider.value = max;
+                slider.dispatchEvent(new Event('input', { bubbles: true }));
+                break;
+            }
+          });
+        }
       }
       
       // ========================================
@@ -3504,16 +3937,115 @@
       };
       
       // Modales Admin
-      window.mostrarModalAprobacion = function(objetoId, objetoTipo, objetoNombre) {
-        document.getElementById('aprobacionObjetoId').value = objetoId;
-        document.getElementById('aprobacionObjetoTipo').value = objetoTipo;
-        document.getElementById('aprobacionObjetoNombre').textContent = objetoNombre;
-        document.getElementById('modalAprobacion').classList.remove('hidden');
+      window.mostrarModalAprobacion = function(objetoId, objetoTipo, objetoNombre, detalles = null) {
+        console.log('[DEBUG] mostrarModalAprobacion llamado con:', { objetoId, objetoTipo, objetoNombre, detalles });
+        
+        try {
+          const modal = document.getElementById('modalAprobacion');
+          if (!modal) {
+            console.error('[ERROR] Modal de aprobación no encontrado en el DOM');
+            alert('Error: No se encontró el modal de aprobación');
+            return;
+          }
+          
+          const objetoIdInput = document.getElementById('aprobacionObjetoId');
+          const objetoTipoInput = document.getElementById('aprobacionObjetoTipo');
+          const objetoNombreEl = document.getElementById('aprobacionObjetoNombre');
+          
+          if (!objetoIdInput || !objetoTipoInput || !objetoNombreEl) {
+            console.error('[ERROR] Elementos del formulario no encontrados');
+            alert('Error: No se encontraron los elementos del formulario');
+            return;
+          }
+          
+          objetoIdInput.value = objetoId;
+          objetoTipoInput.value = objetoTipo;
+          objetoNombreEl.textContent = objetoNombre || 'Sin nombre';
+          
+          // Mostrar preview si hay detalles
+          const previewContainer = document.getElementById('aprobacionPreview');
+          const previewContent = document.getElementById('aprobacionPreviewContent');
+          
+          if (previewContainer && previewContent) {
+            if (detalles && window.app?.admin?.renderPreview) {
+              try {
+                const previewHTML = window.app.admin.renderPreview(detalles, objetoTipo);
+                previewContent.innerHTML = previewHTML;
+                previewContainer.classList.remove('hidden');
+                console.log('[DEBUG] Preview renderizado correctamente');
+              } catch (error) {
+                console.error('[ERROR] Error al renderizar preview:', error);
+                previewContent.innerHTML = '<p class="text-red-600 dark:text-red-400">Error al cargar los detalles del contenido.</p>';
+              }
+            } else {
+              previewContent.innerHTML = '<p class="text-slate-600 dark:text-slate-400">No hay detalles adicionales disponibles.</p>';
+            }
+          } else {
+            console.warn('[WARNING] Contenedores de preview no encontrados');
+          }
+          
+          // Mostrar el modal - remover hidden y asegurar display flex
+          modal.classList.remove('hidden');
+          
+          // Aplicar estilos directamente con !important para sobrescribir cualquier CSS
+          modal.style.cssText = `
+            display: flex !important;
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            z-index: 99999 !important;
+            background-color: rgba(0, 0, 0, 0.5) !important;
+            align-items: center !important;
+            justify-content: center !important;
+            padding: 1rem !important;
+          `;
+          
+          // Asegurar que el body no tenga overflow
+          document.body.style.overflow = 'hidden';
+          
+          // Forzar reflow para asegurar que se muestre
+          void modal.offsetHeight;
+          
+          // Verificar que el modal sea visible
+          const computedStyle = window.getComputedStyle(modal);
+          const isVisible = computedStyle.display === 'flex' && computedStyle.visibility !== 'hidden';
+          
+          console.log('[DEBUG] Modal de aprobación mostrado correctamente', {
+            display: modal.style.display,
+            computedDisplay: computedStyle.display,
+            zIndex: modal.style.zIndex,
+            computedZIndex: computedStyle.zIndex,
+            classList: modal.classList.toString(),
+            isVisible: isVisible,
+            visibility: computedStyle.visibility,
+            opacity: computedStyle.opacity
+          });
+          
+          if (!isVisible) {
+            console.error('[ERROR] El modal no es visible después de intentar mostrarlo');
+            alert('Error: El modal no se pudo mostrar. Por favor, recarga la página e intenta de nuevo.');
+          }
+        } catch (error) {
+          console.error('[ERROR] Error al mostrar modal de aprobación:', error);
+          alert('Error al abrir el modal de aprobación: ' + error.message);
+        }
       };
       
       window.cerrarModalAprobacion = function() {
-        document.getElementById('modalAprobacion').classList.add('hidden');
-        document.getElementById('formAprobacion').reset();
+        const modal = document.getElementById('modalAprobacion');
+        if (modal) {
+          modal.classList.add('hidden');
+          modal.style.display = 'none';
+        }
+        const form = document.getElementById('formAprobacion');
+        if (form) {
+          form.reset();
+        }
+        document.body.style.overflow = '';
       };
       
       window.mostrarModalEditarUsuario = function(usuarioId) {
@@ -3641,6 +4173,40 @@
       window.aplicarPerfilPredefinido = aplicarPerfilPredefinido;
       window.configurarTogglesAccesibilidad = configurarTogglesAccesibilidad;
       window.inicializarPreferenciasAccesibilidad = inicializarPreferenciasAccesibilidad;
+      window.configurarNavegacionTecladoAccesibilidad = configurarNavegacionTecladoAccesibilidad;
+
+      // Ejecutar cuando se carga el DOM
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+          inicializarPreferenciasAccesibilidad();
+        });
+      } else {
+        inicializarPreferenciasAccesibilidad();
+      }
+
+      // Ejecutar también cuando se navega a la sección de accesibilidad
+      document.addEventListener('DOMContentLoaded', () => {
+        const seccionAccesibilidad = document.getElementById('ajustesAccesibilidad');
+        if (seccionAccesibilidad) {
+          const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+              if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                const target = mutation.target;
+                if (target.id === 'ajustesAccesibilidad' && !target.classList.contains('hidden')) {
+                  // Sección de accesibilidad se hizo visible
+                  setTimeout(() => {
+                    configurarNavegacionTecladoAccesibilidad();
+                  }, 100);
+                }
+              }
+            });
+          });
+          observer.observe(seccionAccesibilidad, {
+            attributes: true,
+            attributeFilter: ['class']
+          });
+        }
+      });
 
       // ========================================
       // MENÚ MÓVIL Y NAVEGACIÓN
@@ -3707,7 +4273,7 @@
        ==================================== -->
   
   <!-- Modal: Aprobación de Contenido -->
-  <div id="modalAprobacion" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+  <div id="modalAprobacion" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center p-4" style="z-index: 99999;">
     <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-2xl w-full">
       <div class="sticky top-0 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-6 py-4 flex items-center justify-between">
         <h2 class="text-2xl font-bold text-slate-900 dark:text-white">
@@ -3725,6 +4291,17 @@
         <div>
           <p class="text-sm text-slate-600 dark:text-slate-400 mb-2">Objeto:</p>
           <p id="aprobacionObjetoNombre" class="text-lg font-semibold text-slate-900 dark:text-white"></p>
+        </div>
+        
+        <!-- Preview del contenido -->
+        <div id="aprobacionPreview" class="bg-slate-50 dark:bg-slate-700/50 rounded-lg p-4 border border-slate-200 dark:border-slate-600">
+          <h3 class="font-semibold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary">preview</span>
+            Detalles del Contenido
+          </h3>
+          <div id="aprobacionPreviewContent">
+            <p class="text-slate-600 dark:text-slate-400">Cargando detalles...</p>
+          </div>
         </div>
         
         <div>
@@ -3771,6 +4348,16 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div id="profileContainer">
         <!-- El contenido se carga dinámicamente desde profile-controller.js -->
+      </div>
+      
+      <!-- Sección de Logros (solo para alumnos) -->
+      <div id="achievementsContainer" class="mt-8">
+        <!-- Se cargará dinámicamente desde achievements-controller.js -->
+      </div>
+      
+      <!-- Sección de Estadísticas Avanzadas (solo para alumnos) -->
+      <div id="statisticsContainer" class="mt-8">
+        <!-- Se cargará dinámicamente desde statistics-controller.js -->
       </div>
     </div>
   </section>

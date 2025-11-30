@@ -1,10 +1,14 @@
 // src/media/player.js
-// Control del reproductor multimedia
+// Control del reproductor multimedia con transcripciones y subtítulos
 
 export class MediaPlayer {
   constructor() {
     this.isPlaying = false;
     this.currentSpeed = 1;
+    this.transcriptionVisible = false;
+    this.captionsVisible = false;
+    this.currentCaptions = null;
+    this.currentTranscription = null;
     
     this.setupEventListeners();
     this.exposeGlobalMethods();

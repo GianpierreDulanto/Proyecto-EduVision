@@ -20,11 +20,12 @@
    SWITCHES - OCULTAR CHECKBOX COMPLETAMENTE
    ============================================ */
 
-/* Forzar que los checkboxes de switches estén completamente ocultos */
-input[type="checkbox"].opacity-0.w-0.h-0.peer {
+/* Forzar que los checkboxes de switches estén completamente ocultos pero accesibles por teclado */
+input[type="checkbox"].opacity-0.w-0.h-0.peer,
+input[type="checkbox"].peer[class*="opacity-0"] {
   position: absolute !important;
-  width: 0 !important;
-  height: 0 !important;
+  width: 1px !important; /* Mínimo 1px para mantener accesibilidad */
+  height: 1px !important; /* Mínimo 1px para mantener accesibilidad */
   padding: 0 !important;
   margin: 0 !important;
   opacity: 0 !important;
@@ -33,9 +34,81 @@ input[type="checkbox"].opacity-0.w-0.h-0.peer {
   -webkit-appearance: none !important;
   -moz-appearance: none !important;
   border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
   clip: rect(0, 0, 0, 0) !important;
+  /* Asegurar que pueda recibir foco */
+  tabindex: 0 !important;
+  z-index: 1 !important; /* Asegurar que esté por encima */
+}
+
+/* Asegurar que los checkboxes ocultos puedan recibir foco */
+input[type="checkbox"].opacity-0.w-0.h-0.peer:focus,
+input[type="checkbox"].peer[class*="opacity-0"]:focus {
+  outline: 2px solid #0d59f2 !important;
+  outline-offset: 2px !important;
+  clip: auto !important;
+  width: 1px !important;
+  height: 1px !important;
+}
+
+/* Hacer que los labels de switches sean enfocables también y muestren el foco */
+label.relative:has(input[type="checkbox"].peer),
+label:has(input[type="checkbox"].peer),
+label.relative:has(input[type="checkbox"][class*="opacity-0"]),
+label:has(input[type="checkbox"][class*="opacity-0"]) {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+label.relative:has(input[type="checkbox"].peer):focus-within,
+label:has(input[type="checkbox"].peer):focus-within,
+label.relative:has(input[type="checkbox"][class*="opacity-0"]):focus-within,
+label:has(input[type="checkbox"][class*="opacity-0"]):focus-within {
+  outline: 2px solid #0d59f2 !important;
+  outline-offset: 2px !important;
+  border-radius: 4px !important;
+}
+
+/* Asegurar que los labels puedan recibir foco si el checkbox no puede */
+label.relative:has(input[type="checkbox"].peer[tabindex="0"]),
+label:has(input[type="checkbox"].peer[tabindex="0"]),
+label.relative:has(input[type="checkbox"][class*="opacity-0"]),
+label:has(input[type="checkbox"][class*="opacity-0"]) {
+  /* El label puede recibir foco implícitamente cuando contiene un input enfocable */
+}
+
+/* Cuando el label tiene foco, mostrar outline en el span del switch */
+label.relative:has(input[type="checkbox"].peer):focus-within span.relative,
+label:has(input[type="checkbox"].peer):focus-within > span,
+label.relative:has(input[type="checkbox"][class*="opacity-0"]):focus-within span.relative,
+label:has(input[type="checkbox"][class*="opacity-0"]):focus-within > span {
+  box-shadow: 0 0 0 2px #0d59f2 !important;
+}
+
+/* Asegurar que los checkboxes ocultos puedan recibir foco - técnica alternativa */
+input[type="checkbox"].opacity-0.w-0.h-0.peer:not(:focus) {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: -1px !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border-width: 0 !important;
+}
+
+input[type="checkbox"].opacity-0.w-0.h-0.peer:focus {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: -1px !important;
+  padding: 0 !important;
+  overflow: visible !important;
+  clip: auto !important;
+  outline: 2px solid #0d59f2 !important;
+  outline-offset: 2px !important;
 }
 
 /* Switches modernos con peer - Corregidos para estructura con span */
@@ -346,6 +419,47 @@ kbd {
   outline-offset: 2px;
 }
 
+/* Asegurar que elementos ocultos no sean accesibles con Tab */
+.hidden,
+[hidden],
+[style*="display: none"],
+[style*="display:none"] {
+  tabindex: -1 !important;
+}
+
+/* Elementos con visibility hidden no deben ser enfocables */
+[style*="visibility: hidden"],
+[style*="visibility:hidden"] {
+  tabindex: -1 !important;
+}
+
+/* Asegurar que elementos interactivos sean accesibles */
+button:not([disabled]):not(.hidden):not([hidden]),
+a[href]:not(.hidden):not([hidden]),
+input:not([disabled]):not(.hidden):not([hidden]),
+select:not([disabled]):not(.hidden):not([hidden]),
+textarea:not([disabled]):not(.hidden):not([hidden]),
+[role="button"]:not([aria-disabled="true"]):not(.hidden):not([hidden]),
+[role="link"]:not(.hidden):not([hidden]),
+[role="tab"]:not(.hidden):not([hidden]),
+[role="menuitem"]:not(.hidden):not([hidden]) {
+  tabindex: 0;
+}
+
+/* Mejorar visibilidad del foco para navegación por teclado */
+body:not(.using-mouse) *:focus-visible {
+  outline: 3px solid #0d59f2 !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 4px rgba(13, 89, 242, 0.2) !important;
+}
+
+/* Indicador visual de foco con teclado */
+.keyboard-focused {
+  outline: 3px solid #0d59f2 !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 4px rgba(13, 89, 242, 0.2) !important;
+}
+
 /* Skip links para navegación por teclado */
 .skip-link {
   position: absolute;
@@ -551,6 +665,289 @@ body:not(.dark).contraste-alto .border-slate-300 {
 }
 
 /* ============================================
+   BOTONES Y ELEMENTOS ESPECÍFICOS - ALTO CONTRASTE
+   ============================================ */
+
+/* Botones rojos (logout, error, eliminar) - Modo claro + contraste alto */
+body:not(.dark).contraste-alto .bg-red-600,
+body:not(.dark).contraste-alto .bg-red-500,
+body:not(.dark).contraste-alto .bg-red-700,
+body:not(.dark).contraste-alto button.bg-red-600,
+body:not(.dark).contraste-alto button.bg-red-500,
+body:not(.dark).contraste-alto button.bg-red-700,
+body:not(.dark).contraste-alto [class*="bg-red"] {
+  background-color: #ff0000 !important;
+  color: #ffffff !important;
+  border: 3px solid #000000 !important;
+}
+
+/* Botones rojos - Modo oscuro + contraste alto */
+.dark body.contraste-alto .bg-red-600,
+.dark body.contraste-alto .bg-red-500,
+.dark body.contraste-alto .bg-red-700,
+.dark body.contraste-alto button.bg-red-600,
+.dark body.contraste-alto button.bg-red-500,
+.dark body.contraste-alto button.bg-red-700,
+.dark body.contraste-alto [class*="bg-red"],
+.dark body.contraste-alto button[class*="bg-red"] {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border: 3px solid #ffffff !important;
+}
+
+/* Específico para botón de logout - usando selector de atributo */
+.dark body.contraste-alto button[onclick*="logout"],
+.dark body.contraste-alto button[onclick*="session.logout"] {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border: 3px solid #ffffff !important;
+  font-weight: bold !important;
+}
+
+/* Asegurar que todos los botones con texto blanco en modo oscuro + contraste alto sean visibles */
+.dark body.contraste-alto button.text-white,
+.dark body.contraste-alto a.text-white {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border: 3px solid #ffffff !important;
+}
+
+/* Estados hover y focus - Modo oscuro + contraste alto */
+.dark body.contraste-alto button:hover,
+.dark body.contraste-alto a:hover,
+.dark body.contraste-alto button:focus,
+.dark body.contraste-alto a:focus {
+  outline: 3px solid #ffffff !important;
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.5) !important;
+}
+
+.dark body.contraste-alto .bg-red-600:hover,
+.dark body.contraste-alto .bg-red-700:hover,
+.dark body.contraste-alto button.bg-red-600:hover,
+.dark body.contraste-alto button.bg-red-700:hover {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border: 3px solid #ffffff !important;
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Estados hover y focus - Modo claro + contraste alto */
+body:not(.dark).contraste-alto button:hover,
+body:not(.dark).contraste-alto a:hover,
+body:not(.dark).contraste-alto button:focus,
+body:not(.dark).contraste-alto a:focus {
+  outline: 3px solid #000000 !important;
+  box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.5) !important;
+}
+
+body:not(.dark).contraste-alto .bg-red-600:hover,
+body:not(.dark).contraste-alto .bg-red-700:hover,
+body:not(.dark).contraste-alto button.bg-red-600:hover,
+body:not(.dark).contraste-alto button.bg-red-700:hover {
+  background-color: #ff0000 !important;
+  color: #ffffff !important;
+  border: 3px solid #000000 !important;
+  box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Botones verdes (success, completar) - Modo claro + contraste alto */
+body:not(.dark).contraste-alto .bg-green-600,
+body:not(.dark).contraste-alto .bg-green-500,
+body:not(.dark).contraste-alto .bg-green-700,
+body:not(.dark).contraste-alto button.bg-green-600,
+body:not(.dark).contraste-alto button.bg-green-500,
+body:not(.dark).contraste-alto button.bg-green-700 {
+  background-color: #008000 !important;
+  color: #ffffff !important;
+  border: 3px solid #000000 !important;
+}
+
+/* Botones verdes - Modo oscuro + contraste alto */
+.dark body.contraste-alto .bg-green-600,
+.dark body.contraste-alto .bg-green-500,
+.dark body.contraste-alto .bg-green-700,
+.dark body.contraste-alto button.bg-green-600,
+.dark body.contraste-alto button.bg-green-500,
+.dark body.contraste-alto button.bg-green-700 {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border: 3px solid #ffffff !important;
+}
+
+/* Botones azules/cyan (siguiente, info) - Modo claro + contraste alto */
+body:not(.dark).contraste-alto .bg-cyan-400,
+body:not(.dark).contraste-alto .bg-cyan-500,
+body:not(.dark).contraste-alto .bg-blue-600,
+body:not(.dark).contraste-alto button.bg-cyan-400,
+body:not(.dark).contraste-alto button.bg-cyan-500,
+body:not(.dark).contraste-alto button.bg-blue-600 {
+  background-color: #0000ff !important;
+  color: #ffffff !important;
+  border: 3px solid #000000 !important;
+}
+
+/* Botones azules/cyan - Modo oscuro + contraste alto */
+.dark body.contraste-alto .bg-cyan-400,
+.dark body.contraste-alto .bg-cyan-500,
+.dark body.contraste-alto .bg-blue-600,
+.dark body.contraste-alto button.bg-cyan-400,
+.dark body.contraste-alto button.bg-cyan-500,
+.dark body.contraste-alto button.bg-blue-600 {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border: 3px solid #ffffff !important;
+}
+
+/* Botones amarillos/amber (warning) - Modo claro + contraste alto */
+body:not(.dark).contraste-alto .bg-amber-500,
+body:not(.dark).contraste-alto .bg-yellow-500,
+body:not(.dark).contraste-alto button.bg-amber-500,
+body:not(.dark).contraste-alto button.bg-yellow-500 {
+  background-color: #ffaa00 !important;
+  color: #000000 !important;
+  border: 3px solid #000000 !important;
+}
+
+/* Botones amarillos/amber - Modo oscuro + contraste alto */
+.dark body.contraste-alto .bg-amber-500,
+.dark body.contraste-alto .bg-yellow-500,
+.dark body.contraste-alto button.bg-amber-500,
+.dark body.contraste-alto button.bg-yellow-500 {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border: 3px solid #ffffff !important;
+}
+
+/* Texto blanco en modo oscuro + contraste alto - asegurar visibilidad */
+.dark body.contraste-alto .text-white,
+.dark body.contraste-alto button.text-white,
+.dark body.contraste-alto a.text-white {
+  color: #ffffff !important;
+  background-color: transparent !important;
+}
+
+/* Texto negro en modo claro + contraste alto */
+body:not(.dark).contraste-alto .text-black,
+body:not(.dark).contraste-alto button.text-black,
+body:not(.dark).contraste-alto a.text-black {
+  color: #000000 !important;
+  background-color: transparent !important;
+}
+
+/* Enlaces y botones de navegación - Modo oscuro + contraste alto */
+.dark body.contraste-alto .nav-link,
+.dark body.contraste-alto .mobile-nav-link,
+.dark body.contraste-alto a[href] {
+  color: #ffffff !important;
+  border: 2px solid #ffffff !important;
+  background-color: transparent !important;
+}
+
+.dark body.contraste-alto .nav-link:hover,
+.dark body.contraste-alto .mobile-nav-link:hover {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+/* Enlaces y botones de navegación - Modo claro + contraste alto */
+body:not(.dark).contraste-alto .nav-link,
+body:not(.dark).contraste-alto .mobile-nav-link,
+body:not(.dark).contraste-alto a[href] {
+  color: #000000 !important;
+  border: 2px solid #000000 !important;
+  background-color: transparent !important;
+}
+
+body:not(.dark).contraste-alto .nav-link:hover,
+body:not(.dark).contraste-alto .mobile-nav-link:hover {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+}
+
+/* Header y navegación - Modo oscuro + contraste alto */
+.dark body.contraste-alto header,
+.dark body.contraste-alto nav {
+  background-color: #000000 !important;
+  border-bottom: 3px solid #ffffff !important;
+}
+
+.dark body.contraste-alto header *,
+.dark body.contraste-alto nav * {
+  color: #ffffff !important;
+}
+
+/* Header y navegación - Modo claro + contraste alto */
+body:not(.dark).contraste-alto header,
+body:not(.dark).contraste-alto nav {
+  background-color: #ffffff !important;
+  border-bottom: 3px solid #000000 !important;
+}
+
+body:not(.dark).contraste-alto header *,
+body:not(.dark).contraste-alto nav * {
+  color: #000000 !important;
+}
+
+/* Inputs y formularios - Modo oscuro + contraste alto */
+.dark body.contraste-alto input,
+.dark body.contraste-alto select,
+.dark body.contraste-alto textarea {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border: 3px solid #ffffff !important;
+}
+
+.dark body.contraste-alto input:focus,
+.dark body.contraste-alto select:focus,
+.dark body.contraste-alto textarea:focus {
+  outline: 3px solid #ffffff !important;
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Inputs y formularios - Modo claro + contraste alto */
+body:not(.dark).contraste-alto input,
+body:not(.dark).contraste-alto select,
+body:not(.dark).contraste-alto textarea {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border: 3px solid #000000 !important;
+}
+
+body:not(.dark).contraste-alto input:focus,
+body:not(.dark).contraste-alto select:focus,
+body:not(.dark).contraste-alto textarea:focus {
+  outline: 3px solid #000000 !important;
+  box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Iconos - Asegurar visibilidad */
+.dark body.contraste-alto .material-symbols-outlined {
+  color: #ffffff !important;
+}
+
+body:not(.dark).contraste-alto .material-symbols-outlined {
+  color: #000000 !important;
+}
+
+/* Cards y contenedores - Modo oscuro + contraste alto */
+.dark body.contraste-alto .bg-slate-900,
+.dark body.contraste-alto .bg-slate-800,
+.dark body.contraste-alto .bg-slate-700 {
+  background-color: #000000 !important;
+  border: 2px solid #ffffff !important;
+  color: #ffffff !important;
+}
+
+/* Cards y contenedores - Modo claro + contraste alto */
+body:not(.dark).contraste-alto .bg-slate-50,
+body:not(.dark).contraste-alto .bg-slate-100,
+body:not(.dark).contraste-alto .bg-white {
+  background-color: #ffffff !important;
+  border: 2px solid #000000 !important;
+  color: #000000 !important;
+}
+
+/* ============================================
    TOOLTIPS ACCESIBLES
    ============================================ */
 [data-tooltip] {
@@ -577,12 +974,26 @@ body:not(.dark).contraste-alto .border-slate-300 {
 /* ============================================
    LIVE REGIONS
    ============================================ */
-[aria-live] {
+/* Ocultar solo las regiones aria-live que son solo para lectores de pantalla */
+[aria-live]:not(#notification-container):not([role="alert"]) {
   position: absolute;
   left: -10000px;
   width: 1px;
   height: 1px;
   overflow: hidden;
+}
+
+/* Asegurar que las notificaciones sean visibles */
+#notification-container,
+#notification-container [role="alert"] {
+  position: fixed !important;
+  left: auto !important;
+  right: 20px !important;
+  top: 20px !important;
+  width: auto !important;
+  height: auto !important;
+  overflow: visible !important;
+  z-index: 99999 !important;
 }
 
 /* ============================================

@@ -281,6 +281,18 @@ export const API = {
   deleteContent: async (contentId) => {
     return apiRequest('/contenido/' + contentId, { method: 'DELETE' });
   },
+  updateContenido: async (contenidoId, data) => {
+    return apiRequest(`/contenido/${contenidoId}`, {
+      method: 'PUT',
+      body: JSON.stringify(data)
+    });
+  },
+  updateContent: async (contentId, data) => {
+    return apiRequest(`/contenido/${contentId}`, {
+      method: 'PUT',
+      body: JSON.stringify(data)
+    });
+  },
   
   // Gestión de quizzes
   createQuiz: async (quizData) => {
@@ -443,6 +455,9 @@ export const API = {
     const queryString = params.toString();
     return apiRequest('/aprobaciones' + (queryString ? '?' + queryString : ''));
   },
+  getHistorialAprobaciones: async (filters = {}) => {
+    return API.getAprobaciones(filters);
+  },
   getPendientesAprobacion: async (tipo = null) => {
     const params = tipo ? '?tipo=' + tipo : '';
     return apiRequest('/aprobaciones/pendientes' + params);
@@ -476,6 +491,15 @@ export const API = {
       method: 'POST',
       body: formData
     }).then(res => res.json());
+  },
+  changePassword: async (usuarioId, contraseñaActual, contraseñaNueva) => {
+    return apiRequest(`/usuarios/${usuarioId}/contraseña`, {
+      method: 'PUT',
+      body: JSON.stringify({
+        contraseña_actual: contraseñaActual,
+        contraseña_nueva: contraseñaNueva
+      })
+    });
   },
   
   // ========================================
@@ -543,6 +567,9 @@ export const API = {
   // PROGRESO
   // ========================================
   getStudentProgress: async (alumnoId) => {
+    return apiRequest(`/alumnos/${alumnoId}/progreso`);
+  },
+  getAlumnoProgreso: async (alumnoId) => {
     return apiRequest(`/alumnos/${alumnoId}/progreso`);
   },
   getCourseProgress: async (alumnoId, cursoId) => {
@@ -718,6 +745,24 @@ export const API = {
   },
   getTeacherRanking: async () => {
     return apiRequest('/estadisticas/docentes');
+  },
+  
+  // ========================================
+  // LOGROS/BADGES
+  // ========================================
+  getLogros: async () => {
+    return apiRequest('/logros');
+  },
+  getAlumnoLogros: async (alumnoId) => {
+    return apiRequest(`/alumnos/${alumnoId}/logros`);
+  },
+  desbloquearLogro: async (alumnoId, logroId) => {
+    return apiRequest(`/alumnos/${alumnoId}/logros/${logroId}/desbloquear`, {
+      method: 'POST'
+    });
+  },
+  verificarLogro: async (codigo, alumnoId) => {
+    return apiRequest(`/logros/verificar/${codigo}?alumno_id=${alumnoId}`);
   }
 };
 

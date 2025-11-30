@@ -87,10 +87,25 @@ class App {
       this.immersiveReader = new ImmersiveReader();
       this.surveyController = surveyController;
       
+      // Inicializar controlador de notificaciones
+      const { notificationsController } = await import('./notifications/notifications-controller.js');
+      this.notifications = notificationsController;
+      
+      // Inicializar controlador de logros
+      const { achievementsController } = await import('./achievements/achievements-controller.js');
+      this.achievements = achievementsController;
+      
+      // Inicializar controlador de estadísticas
+      const { statisticsController } = await import('./statistics/statistics-controller.js');
+      this.statistics = statisticsController;
+      
       this.profile.init();
       this.reviews.init();
       this.certificates.init();
       this.surveyController.init();
+      this.notifications.init();
+      this.achievements.init();
+      this.statistics.init();
       
       // Inicializar StudentController si el usuario es alumno
       if (this.session.isLoggedIn() && this.session.user?.rol === 'alumno') {

@@ -53,6 +53,17 @@ class ProfileController {
       const accessConfig = await API.getAccessibilityConfig(usuarioId);
       this.renderAccessibilitySettings(accessConfig);
       
+      // Cargar logros si es alumno
+      if (profile.rol === 'alumno' && profile.id_alumno) {
+        if (window.app?.achievements) {
+          await window.app.achievements.loadAlumnoLogros(profile.id_alumno);
+        }
+        // Cargar estadísticas
+        if (window.app?.statistics) {
+          await window.app.statistics.loadStudentStatistics(profile.id_alumno);
+        }
+      }
+      
       return profile;
     } catch (error) {
       console.error('Error al cargar perfil:', error);
@@ -416,6 +427,108 @@ class ProfileController {
   renderAccessibilitySettings(config) {
     // Este método se puede expandir para mostrar la configuración de accesibilidad del usuario
     console.log('Configuración de accesibilidad:', config);
+  }
+
+  /**
+   * Mostrar modal de cambio de contraseña
+   */
+  showChangePasswordModal() {
+    const modal = document.getElementById('modalChangePassword');
+    if (modal) {
+      modal.classList.remove('hidden');
+      document.getElementById('formChangePassword').reset();
+    }
+  }
+
+  /**
+   * Cerrar modal de cambio de contraseña
+   */
+  closeChangePasswordModal() {
+    const modal = document.getElementById('modalChangePassword');
+    if (modal) {
+      modal.classList.add('hidden');
+    }
+  }
+
+  /**
+   * Manejar cambio de contraseña
+   */
+  async handleChangePassword(e) {
+    e.preventDefault();
+    
+    const contraseñaActual = document.getElementById('inputContraseñaActual').value;
+    const contraseñaNueva = document.getElementById('inputContraseñaNueva').value;
+    const contraseñaConfirmar = document.getElementById('inputContraseñaConfirmar').value;
+    
+    if (!contraseñaActual || !contraseñaNueva || !contraseñaConfirmar) {
+      showNotification('Por favor completa todos los campos', 'warning');
+      return;
+    }
+    
+    if (contraseñaNueva !== contraseñaConfirmar) {
+      showNotification('Las contraseñas no coinciden', 'error');
+      return;
+    }
+    
+    if (contraseñaNueva.length < 6) {
+      showNotification('La contraseña debe tener al menos 6 caracteres', 'error');
+      return;
+    }
+    
+    try {
+      await API.changePassword(this.currentUser.id_usuario, contraseñaActual, contraseñaNueva);
+      showNotification('Contraseña actualizada correctamente', 'success');
+      this.closeChangePasswordModal();
+    } catch (error) {
+      console.error('Error al cambiar contraseña:', error);
+      showNotification(error.message || 'Error al cambiar la contraseña', 'error');
+    }
+  }
+
+  /**
+   * Mostrar preferencias de notificaciones
+   */
+  showNotificationPreferences() {
+    const modal = document.getElementById('modalNotificationPreferences');
+    if (modal) {
+      modal.classList.remove('hidden');
+      this.loadNotificationPreferences();
+    }
+  }
+
+  /**
+   * Cargar preferencias de notificaciones
+   */
+  async loadNotificationPreferences() {
+    // Por ahora usar localStorage, luego se puede conectar con backend
+    const prefs = JSON.parse(localStorage.getItem('notificationPreferences') || '{}');
+    
+    document.getElementById('prefEmailNotifications').checked = prefs.email !== false;
+    document.getElementById('prefPushNotifications').checked = prefs.push !== false;
+    document.getElementById('prefCourseUpdates').checked = prefs.courseUpdates !== false;
+    document.getElementById('prefNewMessages').checked = prefs.newMessages !== false;
+    document.getElementById('prefAchievements').checked = prefs.achievements !== false;
+  }
+
+  /**
+   * Guardar preferencias de notificaciones
+   */
+  async saveNotificationPreferences() {
+    const prefs = {
+      email: document.getElementById('prefEmailNotifications').checked,
+      push: document.getElementById('prefPushNotifications').checked,
+      courseUpdates: document.getElementById('prefCourseUpdates').checked,
+      newMessages: document.getElementById('prefNewMessages').checked,
+      achievements: document.getElementById('prefAchievements').checked
+    };
+    
+    localStorage.setItem('notificationPreferences', JSON.stringify(prefs));
+    showNotification('Preferencias guardadas correctamente', 'success');
+    
+    const modal = document.getElementById('modalNotificationPreferences');
+    if (modal) {
+      modal.classList.add('hidden');
+    }
   }
 }
 

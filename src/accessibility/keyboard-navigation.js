@@ -11,6 +11,9 @@ export class KeyboardNavigation {
     this.setupSwitchNavigation();
     this.setupButtonKeyboard();
     this.setupSliderKeyboard();
+    this.setupTabNavigation();
+    this.setupModalFocusTrap();
+    this.ensureHiddenElementsNotFocusable();
   }
 
   // Navegación para grupos de radio (perfiles)
@@ -90,7 +93,8 @@ export class KeyboardNavigation {
 
   // Navegación para switches
   setupSwitchNavigation() {
-    document.addEventListener('DOMContentLoaded', () => {
+    const setupSwitches = () => {
+      // Switches con role="switch"
       const switches = document.querySelectorAll('[role="switch"]');
       
       switches.forEach(switchBtn => {
@@ -101,6 +105,116 @@ export class KeyboardNavigation {
           }
         });
       });
+
+      // Checkboxes ocultos usados como switches (con clase peer)
+      const hiddenCheckboxes = document.querySelectorAll('input[type="checkbox"].opacity-0.w-0.h-0.peer, input[type="checkbox"].peer[class*="opacity-0"]');
+      
+      hiddenCheckboxes.forEach(checkbox => {
+        // Asegurar que pueda recibir foco
+        if (!checkbox.hasAttribute('tabindex')) {
+          checkbox.setAttribute('tabindex', '0');
+        }
+
+        // Agregar event listener para Enter y Space
+        checkbox.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            checkbox.checked = !checkbox.checked;
+            // Disparar evento change para que se ejecuten los handlers
+            checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+          }
+        });
+
+        // Mejorar visibilidad del foco
+        checkbox.addEventListener('focus', () => {
+          const label = checkbox.closest('label');
+          if (label) {
+            label.style.outline = '2px solid #0d59f2';
+            label.style.outlineOffset = '2px';
+            label.style.borderRadius = '4px';
+          }
+        });
+
+        checkbox.addEventListener('blur', () => {
+          const label = checkbox.closest('label');
+          if (label) {
+            label.style.outline = '';
+            label.style.outlineOffset = '';
+            label.style.borderRadius = '';
+          }
+        });
+      });
+
+      // Radio buttons - asegurar navegación por flechas
+      const radioGroups = document.querySelectorAll('input[type="radio"][name]');
+      const radioGroupsMap = new Map();
+      
+      radioGroups.forEach(radio => {
+        const name = radio.getAttribute('name');
+        if (!radioGroupsMap.has(name)) {
+          radioGroupsMap.set(name, []);
+        }
+        radioGroupsMap.get(name).push(radio);
+      });
+
+      radioGroupsMap.forEach((radios, name) => {
+        radios.forEach((radio, index) => {
+          radio.addEventListener('keydown', (e) => {
+            let targetIndex = index;
+            
+            switch(e.key) {
+              case 'ArrowRight':
+              case 'ArrowDown':
+                e.preventDefault();
+                targetIndex = (index + 1) % radios.length;
+                radios[targetIndex].focus();
+                radios[targetIndex].checked = true;
+                radios[targetIndex].dispatchEvent(new Event('change', { bubbles: true }));
+                break;
+                
+              case 'ArrowLeft':
+              case 'ArrowUp':
+                e.preventDefault();
+                targetIndex = (index - 1 + radios.length) % radios.length;
+                radios[targetIndex].focus();
+                radios[targetIndex].checked = true;
+                radios[targetIndex].dispatchEvent(new Event('change', { bubbles: true }));
+                break;
+                
+              case 'Home':
+                e.preventDefault();
+                radios[0].focus();
+                radios[0].checked = true;
+                radios[0].dispatchEvent(new Event('change', { bubbles: true }));
+                break;
+                
+              case 'End':
+                e.preventDefault();
+                const lastIndex = radios.length - 1;
+                radios[lastIndex].focus();
+                radios[lastIndex].checked = true;
+                radios[lastIndex].dispatchEvent(new Event('change', { bubbles: true }));
+                break;
+            }
+          });
+        });
+      });
+    };
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', setupSwitches);
+    } else {
+      setupSwitches();
+    }
+
+    // Observar cambios dinámicos en el DOM
+    const observer = new MutationObserver(() => {
+      setupSwitches();
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
     });
   }
 
@@ -378,6 +492,225 @@ export class KeyboardNavigation {
     allItems.forEach(i => i.setAttribute('tabindex', '-1'));
     item.setAttribute('tabindex', '0');
     item.focus();
+  }
+
+  /**
+   * Asegurar que todos los elementos ocultos no sean accesibles con Tab
+   */
+  ensureHiddenElementsNotFocusable() {
+    const observer = new MutationObserver(() => {
+      this.updateHiddenElementsTabindex();
+    });
+
+    // Observar cambios en el DOM
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['class', 'style', 'hidden']
+    });
+
+    // Ejecutar inicialmente
+    this.updateHiddenElementsTabindex();
+
+    // Ejecutar cuando se carga el DOM
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => {
+        this.updateHiddenElementsTabindex();
+      });
+    }
+  }
+
+  /**
+   * Actualizar tabindex de elementos ocultos
+   */
+  updateHiddenElementsTabindex() {
+    // Elementos con clase 'hidden'
+    document.querySelectorAll('.hidden').forEach(el => {
+      if (!el.hasAttribute('tabindex')) {
+        el.setAttribute('tabindex', '-1');
+      }
+    });
+
+    // Elementos con display: none
+    const allElements = document.querySelectorAll('*');
+    allElements.forEach(el => {
+      const style = window.getComputedStyle(el);
+      if (style.display === 'none' || style.visibility === 'hidden') {
+        if (el.getAttribute('tabindex') !== '-1') {
+          const currentTabindex = el.getAttribute('tabindex');
+          if (!currentTabindex || currentTabindex === '0') {
+            el.setAttribute('data-original-tabindex', currentTabindex || '0');
+            el.setAttribute('tabindex', '-1');
+          }
+        }
+      } else {
+        // Restaurar tabindex original si existe
+        const originalTabindex = el.getAttribute('data-original-tabindex');
+        if (originalTabindex !== null) {
+          el.setAttribute('tabindex', originalTabindex);
+          el.removeAttribute('data-original-tabindex');
+        }
+      }
+    });
+
+    // Elementos con atributo hidden
+    document.querySelectorAll('[hidden]').forEach(el => {
+      if (el.getAttribute('tabindex') !== '-1') {
+        el.setAttribute('data-original-tabindex', el.getAttribute('tabindex') || '0');
+        el.setAttribute('tabindex', '-1');
+      }
+    });
+  }
+
+  /**
+   * Configurar navegación por Tab para asegurar que todos los elementos interactivos sean accesibles
+   */
+  setupTabNavigation() {
+    // Asegurar que todos los elementos interactivos tengan tabindex correcto
+    const ensureFocusable = () => {
+      // Botones sin tabindex
+      document.querySelectorAll('button:not([tabindex])').forEach(btn => {
+        if (!btn.hasAttribute('tabindex') && !btn.disabled) {
+          btn.setAttribute('tabindex', '0');
+        }
+      });
+
+      // Enlaces sin tabindex
+      document.querySelectorAll('a[href]:not([tabindex])').forEach(link => {
+        if (!link.hasAttribute('tabindex')) {
+          link.setAttribute('tabindex', '0');
+        }
+      });
+
+      // Inputs, selects, textareas
+      document.querySelectorAll('input, select, textarea').forEach(input => {
+        if (!input.hasAttribute('tabindex') && !input.disabled) {
+          input.setAttribute('tabindex', '0');
+        }
+      });
+
+      // Elementos con role interactivo
+      document.querySelectorAll('[role="button"], [role="link"], [role="tab"], [role="menuitem"]').forEach(el => {
+        if (!el.hasAttribute('tabindex') && !el.hasAttribute('aria-disabled')) {
+          el.setAttribute('tabindex', '0');
+        }
+      });
+    };
+
+    // Ejecutar al cargar
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', ensureFocusable);
+    } else {
+      ensureFocusable();
+    }
+
+    // Observar cambios dinámicos
+    const observer = new MutationObserver(ensureFocusable);
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+  }
+
+  /**
+   * Implementar focus trap en modales
+   */
+  setupModalFocusTrap() {
+    const trapFocus = (modal) => {
+      const focusableElements = modal.querySelectorAll(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      );
+      
+      const firstFocusable = focusableElements[0];
+      const lastFocusable = focusableElements[focusableElements.length - 1];
+
+      if (!firstFocusable) return;
+
+      // Enfocar el primer elemento al abrir
+      setTimeout(() => firstFocusable.focus(), 100);
+
+      // Manejar Tab y Shift+Tab
+      const handleTabKey = (e) => {
+        if (e.key !== 'Tab') return;
+
+        if (e.shiftKey) {
+          // Shift + Tab
+          if (document.activeElement === firstFocusable) {
+            e.preventDefault();
+            lastFocusable.focus();
+          }
+        } else {
+          // Tab
+          if (document.activeElement === lastFocusable) {
+            e.preventDefault();
+            firstFocusable.focus();
+          }
+        }
+      };
+
+      modal.addEventListener('keydown', handleTabKey);
+
+      // Guardar referencia para limpiar después
+      modal._focusTrapHandler = handleTabKey;
+    };
+
+    // Observar cuando se abren modales
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        mutation.addedNodes.forEach((node) => {
+          if (node.nodeType === 1) {
+            // Verificar si es un modal
+            const modals = node.matches && node.matches('[role="dialog"]') 
+              ? [node] 
+              : node.querySelectorAll && node.querySelectorAll('[role="dialog"]');
+            
+            if (modals) {
+              Array.from(modals).forEach(modal => {
+                if (!modal.classList.contains('hidden')) {
+                  trapFocus(modal);
+                }
+              });
+            }
+
+            // Verificar si el nodo contiene modales
+            if (node.querySelectorAll) {
+              node.querySelectorAll('[role="dialog"]:not(.hidden)').forEach(modal => {
+                if (!modal._focusTrapHandler) {
+                  trapFocus(modal);
+                }
+              });
+            }
+          }
+        });
+
+        // Verificar cambios en clases para detectar cuando se muestran modales
+        if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+          const target = mutation.target;
+          if (target.hasAttribute('role') && target.getAttribute('role') === 'dialog') {
+            if (!target.classList.contains('hidden') && !target._focusTrapHandler) {
+              trapFocus(target);
+            } else if (target.classList.contains('hidden') && target._focusTrapHandler) {
+              // Limpiar cuando se cierra
+              target.removeEventListener('keydown', target._focusTrapHandler);
+              delete target._focusTrapHandler;
+            }
+          }
+        }
+      });
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['class']
+    });
+
+    // Aplicar a modales existentes
+    document.querySelectorAll('[role="dialog"]:not(.hidden)').forEach(modal => {
+      trapFocus(modal);
+    });
   }
 }
 

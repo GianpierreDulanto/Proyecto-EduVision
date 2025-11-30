@@ -277,12 +277,26 @@ export function sortBy(array, key, order = 'asc') {
  * @param {number} duration - Duración en ms (0 = permanente)
  */
 export function showNotification(message, type = 'info', duration = 3000) {
+  // Validar que el mensaje no esté vacío
+  if (!message || typeof message !== 'string') {
+    console.warn('showNotification: mensaje inválido', message);
+    return;
+  }
+
+  // Asegurar que el DOM esté listo
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => showNotification(message, type, duration));
+    return;
+  }
+
   // Crear contenedor de notificaciones si no existe
   let container = document.getElementById('notification-container');
   if (!container) {
     container = document.createElement('div');
     container.id = 'notification-container';
-    container.className = 'fixed top-4 right-4 z-50 space-y-2';
+    // Estilos inline como fallback - IMPORTANTE: usar !important para sobrescribir CSS
+    container.style.cssText = 'position: fixed !important; top: 20px !important; right: 20px !important; z-index: 99999 !important; max-width: 400px !important; display: flex !important; flex-direction: column !important; gap: 10px !important; left: auto !important; width: auto !important; height: auto !important; overflow: visible !important;';
+    container.className = 'fixed top-4 right-4 z-[9999] space-y-2 max-w-md';
     container.setAttribute('role', 'region');
     container.setAttribute('aria-label', 'Notificaciones');
     container.setAttribute('aria-live', 'polite');
@@ -291,16 +305,46 @@ export function showNotification(message, type = 'info', duration = 3000) {
 
   // Crear notificación
   const notification = document.createElement('div');
-  const id = 'notif-' + Date.now();
+  const id = 'notif-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
   notification.id = id;
   
-  // Estilos según tipo
-  const styles = {
-    success: 'bg-green-500 border-green-600',
-    error: 'bg-red-500 border-red-600',
-    warning: 'bg-amber-500 border-amber-600',
-    info: 'bg-blue-500 border-blue-600'
+  // Colores según tipo (con fallback inline)
+  const colors = {
+    success: { bg: '#10b981', border: '#059669' }, // green-500, green-600
+    error: { bg: '#ef4444', border: '#dc2626' },   // red-500, red-600
+    warning: { bg: '#f59e0b', border: '#d97706' },  // amber-500, amber-600
+    info: { bg: '#3b82f6', border: '#2563eb' }     // blue-500, blue-600
   };
+  
+  const color = colors[type] || colors.info;
+  
+  // Estilos inline como fallback - IMPORTANTE: usar !important para sobrescribir CSS
+  notification.style.cssText = `
+    background-color: ${color.bg} !important;
+    border: 2px solid ${color.border} !important;
+    color: white !important;
+    padding: 16px 24px !important;
+    border-radius: 8px !important;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    min-width: 300px !important;
+    max-width: 400px !important;
+    transform: translateX(400px) !important;
+    opacity: 0 !important;
+    transition: transform 0.3s ease, opacity 0.3s ease !important;
+    position: relative !important;
+    left: auto !important;
+    right: auto !important;
+    width: auto !important;
+    height: auto !important;
+    overflow: visible !important;
+    z-index: 99999 !important;
+  `;
+  
+  // Clases de Tailwind (si están disponibles)
+  notification.className = `text-white px-6 py-4 rounded-lg shadow-2xl border-2 flex items-center gap-3 min-w-[300px] max-w-md transform transition-all duration-300`;
   
   const icons = {
     success: 'check_circle',
@@ -309,35 +353,87 @@ export function showNotification(message, type = 'info', duration = 3000) {
     info: 'info'
   };
 
-  notification.className = `${styles[type] || styles.info} text-white px-6 py-4 rounded-lg shadow-2xl border-2 flex items-center gap-3 min-w-[300px] max-w-md transform transition-all duration-300 translate-x-0 opacity-100`;
+  // Usar aria-live assertive para errores (más importante)
+  const ariaLive = type === 'error' ? 'assertive' : 'polite';
+
   notification.setAttribute('role', 'alert');
-  notification.innerHTML = `
-    <span class="material-symbols-outlined text-2xl" aria-hidden="true">${icons[type] || icons.info}</span>
-    <p class="flex-1 font-medium">${sanitizeHTML(message)}</p>
-    <button 
-      onclick="document.getElementById('${id}').remove()" 
-      class="text-white/80 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-white/50 rounded p-1"
-      aria-label="Cerrar notificación"
-    >
-      <span class="material-symbols-outlined">close</span>
-    </button>
-  `;
+  notification.setAttribute('aria-live', ariaLive);
+  notification.setAttribute('aria-atomic', 'true');
+  
+  // Crear estructura HTML
+  const iconSpan = document.createElement('span');
+  iconSpan.className = 'material-symbols-outlined';
+  iconSpan.style.cssText = 'font-size: 24px; flex-shrink: 0;';
+  iconSpan.textContent = icons[type] || icons.info;
+  iconSpan.setAttribute('aria-hidden', 'true');
+  
+  const messageP = document.createElement('p');
+  messageP.className = 'flex-1 font-medium text-base leading-relaxed';
+  messageP.style.cssText = 'flex: 1; font-weight: 500; font-size: 16px; line-height: 1.5; margin: 0;';
+  messageP.textContent = message; // Usar textContent en lugar de innerHTML para seguridad
+  
+  const closeButton = document.createElement('button');
+  closeButton.id = `close-${id}`;
+  closeButton.className = 'text-white/80 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-white/50 rounded p-1 flex-shrink-0';
+  closeButton.style.cssText = 'background: transparent; border: none; color: rgba(255,255,255,0.8); cursor: pointer; padding: 4px; border-radius: 4px; flex-shrink: 0;';
+  closeButton.setAttribute('aria-label', 'Cerrar notificación');
+  closeButton.setAttribute('type', 'button');
+  
+  const closeIcon = document.createElement('span');
+  closeIcon.className = 'material-symbols-outlined';
+  closeIcon.style.cssText = 'font-size: 20px;';
+  closeIcon.textContent = 'close';
+  closeButton.appendChild(closeIcon);
+  
+  // Agregar elementos
+  notification.appendChild(iconSpan);
+  notification.appendChild(messageP);
+  notification.appendChild(closeButton);
+
+  // Agregar evento de cierre
+  closeButton.addEventListener('click', () => {
+    removeNotification(notification);
+  });
 
   // Agregar al contenedor
   container.appendChild(notification);
 
+  // Forzar reflow y luego animar entrada
+  notification.offsetHeight; // Trigger reflow
+  
+  setTimeout(() => {
+    notification.style.setProperty('transform', 'translateX(0)', 'important');
+    notification.style.setProperty('opacity', '1', 'important');
+  }, 50);
+
   // Auto-remover si tiene duración
   if (duration > 0) {
     setTimeout(() => {
-      notification.style.transform = 'translateX(400px)';
-      notification.style.opacity = '0';
-      setTimeout(() => {
-        if (notification.parentNode) {
-          notification.remove();
-        }
-      }, 300);
+      removeNotification(notification);
     }, duration);
   }
 
   return notification;
+}
+
+/**
+ * Remueve una notificación con animación
+ */
+function removeNotification(notification) {
+  if (!notification || !notification.parentNode) return;
+  
+  notification.style.setProperty('transform', 'translateX(400px)', 'important');
+  notification.style.setProperty('opacity', '0', 'important');
+  
+  setTimeout(() => {
+    if (notification.parentNode) {
+      notification.remove();
+    }
+    
+    // Limpiar contenedor si está vacío
+    const container = document.getElementById('notification-container');
+    if (container && container.children.length === 0) {
+      container.remove();
+    }
+  }, 300);
 } 

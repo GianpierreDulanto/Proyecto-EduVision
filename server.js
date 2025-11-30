@@ -950,6 +950,28 @@ app.post('/api/contenido', async (req, res) => {
   }
 });
 
+// PUT /api/contenido/:id - Actualizar contenido
+app.put('/api/contenido/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { titulo, tipo, url, orden, curso_id } = req.body;
+    
+    if (!titulo || !tipo || !url) {
+      return res.status(400).json({ error: 'Título, tipo y URL son requeridos' });
+    }
+    
+    await query(
+      'UPDATE contenido SET titulo = ?, tipo = ?, url = ?, orden = ? WHERE id_contenido = ?',
+      [titulo, tipo, url, orden || 1, id]
+    );
+    
+    res.json({ success: true, message: 'Contenido actualizado exitosamente' });
+  } catch (error) {
+    console.error('Error al actualizar contenido:', error);
+    res.status(500).json({ error: 'Error al actualizar el contenido' });
+  }
+});
+
 // DELETE /api/contenido/:id - Eliminar contenido
 app.delete('/api/contenido/:id', async (req, res) => {
   try {
@@ -2095,6 +2117,53 @@ app.post('/api/usuarios/:id/avatar', upload.single('avatar'), async (req, res) =
   }
 });
 
+// PUT /api/usuarios/:id/contraseña - Cambiar contraseña
+app.put('/api/usuarios/:id/contraseña', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { contraseña_actual, contraseña_nueva } = req.body;
+    
+    if (!contraseña_actual || !contraseña_nueva) {
+      return res.status(400).json({ error: 'Contraseña actual y nueva son requeridas' });
+    }
+    
+    if (contraseña_nueva.length < 6) {
+      return res.status(400).json({ error: 'La nueva contraseña debe tener al menos 6 caracteres' });
+    }
+    
+    // Obtener usuario actual
+    const usuarios = await query('SELECT contraseña FROM usuario WHERE id_usuario = ?', [id]);
+    if (usuarios.length === 0) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+    
+    const user = usuarios[0];
+    
+    // Verificar contraseña actual
+    let passwordMatch = false;
+    if (user.contraseña && user.contraseña.startsWith('$2')) {
+      passwordMatch = await bcrypt.compare(contraseña_actual, user.contraseña);
+    } else {
+      passwordMatch = user.contraseña === contraseña_actual;
+    }
+    
+    if (!passwordMatch) {
+      return res.status(401).json({ error: 'Contraseña actual incorrecta' });
+    }
+    
+    // Hashear nueva contraseña
+    const hashedPassword = await bcrypt.hash(contraseña_nueva, 10);
+    
+    // Actualizar contraseña
+    await query('UPDATE usuario SET contraseña = ? WHERE id_usuario = ?', [hashedPassword, id]);
+    
+    res.json({ success: true, message: 'Contraseña actualizada exitosamente' });
+  } catch (error) {
+    console.error('Error al cambiar contraseña:', error);
+    res.status(500).json({ error: 'Error al cambiar la contraseña' });
+  }
+});
+
 // ========================================
 // ENDPOINTS DE CONFIGURACIÓN DE ACCESIBILIDAD
 // ========================================
@@ -3231,6 +3300,136 @@ app.get('/api/estadisticas/docentes', async (req, res) => {
 });
 
 // Ruta principal y catch-all para SPA
+// ========================================
+// ENDPOINTS DE LOGROS/BADGES
+// ========================================
+
+// GET /api/logros - Obtener todos los logros disponibles
+app.get('/api/logros', async (req, res) => {
+  try {
+    const logros = await query('SELECT * FROM logro ORDER BY puntos DESC');
+    res.json(logros);
+  } catch (error) {
+    console.error('Error al obtener logros:', error);
+    res.status(500).json({ error: 'Error al obtener logros' });
+  }
+});
+
+// GET /api/alumnos/:id/logros - Obtener logros de un alumno
+app.get('/api/alumnos/:id/logros', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const logros = await query(
+      `SELECT l.*, la.fecha_desbloqueo,
+              CASE WHEN la.id_logro_alumno IS NOT NULL THEN TRUE ELSE FALSE END AS desbloqueado
+       FROM logro l
+       LEFT JOIN logro_alumno la ON l.id_logro = la.logro_id AND la.alumno_id = ?
+       ORDER BY la.fecha_desbloqueo DESC, l.puntos DESC`,
+      [id]
+    );
+    
+    res.json(logros);
+  } catch (error) {
+    console.error('Error al obtener logros del alumno:', error);
+    res.status(500).json({ error: 'Error al obtener logros' });
+  }
+});
+
+// POST /api/alumnos/:id/logros/:logroId/desbloquear - Desbloquear logro (automático)
+app.post('/api/alumnos/:id/logros/:logroId/desbloquear', async (req, res) => {
+  try {
+    const { id, logroId } = req.params;
+    
+    // Verificar si ya está desbloqueado
+    const existente = await query(
+      'SELECT * FROM logro_alumno WHERE logro_id = ? AND alumno_id = ?',
+      [logroId, id]
+    );
+    
+    if (existente.length > 0) {
+      return res.json({ success: true, message: 'Logro ya estaba desbloqueado', ya_desbloqueado: true });
+    }
+    
+    // Desbloquear logro
+    await query(
+      'INSERT INTO logro_alumno (logro_id, alumno_id) VALUES (?, ?)',
+      [logroId, id]
+    );
+    
+    // Obtener información del logro
+    const logro = await query('SELECT * FROM logro WHERE id_logro = ?', [logroId]);
+    
+    // Crear notificación
+    await query(
+      `INSERT INTO notificacion (usuario_id, tipo, titulo, mensaje, url)
+       SELECT u.id_usuario, 'logro', '¡Logro Desbloqueado!', 
+              CONCAT('Has desbloqueado el logro: ', ?), '#miPerfil'
+       FROM alumno a
+       JOIN usuario u ON a.usuario_id = u.id_usuario
+       WHERE a.id_alumno = ?`,
+      [logro[0]?.nombre || 'Nuevo logro', id]
+    );
+    
+    res.json({ success: true, logro: logro[0], message: 'Logro desbloqueado exitosamente' });
+  } catch (error) {
+    console.error('Error al desbloquear logro:', error);
+    res.status(500).json({ error: 'Error al desbloquear logro' });
+  }
+});
+
+// GET /api/logros/verificar/:codigo - Verificar y desbloquear logro por código
+app.get('/api/logros/verificar/:codigo', async (req, res) => {
+  try {
+    const { codigo } = req.params;
+    const { alumno_id } = req.query;
+    
+    if (!alumno_id) {
+      return res.status(400).json({ error: 'alumno_id es requerido' });
+    }
+    
+    // Buscar logro por código
+    const logros = await query('SELECT * FROM logro WHERE codigo = ?', [codigo]);
+    if (logros.length === 0) {
+      return res.status(404).json({ error: 'Logro no encontrado' });
+    }
+    
+    const logro = logros[0];
+    
+    // Verificar si ya está desbloqueado
+    const existente = await query(
+      'SELECT * FROM logro_alumno WHERE logro_id = ? AND alumno_id = ?',
+      [logro.id_logro, alumno_id]
+    );
+    
+    if (existente.length > 0) {
+      return res.json({ success: true, logro, ya_desbloqueado: true });
+    }
+    
+    // Desbloquear
+    await query(
+      'INSERT INTO logro_alumno (logro_id, alumno_id) VALUES (?, ?)',
+      [logro.id_logro, alumno_id]
+    );
+    
+    // Crear notificación
+    await query(
+      `INSERT INTO notificacion (usuario_id, tipo, titulo, mensaje, url)
+       SELECT u.id_usuario, 'logro', '¡Logro Desbloqueado!', 
+              CONCAT('Has desbloqueado el logro: ', ?), '#miPerfil'
+       FROM alumno a
+       JOIN usuario u ON a.usuario_id = u.id_usuario
+       WHERE a.id_alumno = ?`,
+      [logro.nombre, alumno_id]
+    );
+    
+    res.json({ success: true, logro, desbloqueado: true });
+  } catch (error) {
+    console.error('Error al verificar logro:', error);
+    res.status(500).json({ error: 'Error al verificar logro' });
+  }
+});
+
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });

@@ -2,6 +2,7 @@
 // Gestión de sesión de usuario con autenticación real
 
 import { login as apiLogin, register as apiRegister } from '../api/api.js';
+import { showNotification } from '../utils/helpers.js';
 
 export class SessionManager {
   constructor() {
@@ -29,7 +30,7 @@ export class SessionManager {
         if (correo && contraseña) {
           await this.login(correo, contraseña);
         } else {
-          this.showError('Por favor completa todos los campos');
+          showNotification('Por favor completa todos los campos', 'warning');
         }
       });
     }
@@ -102,17 +103,23 @@ export class SessionManager {
 
       // Validaciones del frontend
       if (!nombre || !apellido || !correo || !contraseña || !confirmarContraseña || !rol) {
-        this.showRegisterError('Por favor completa todos los campos');
+        const errorMsg = 'Por favor completa todos los campos';
+        this.showRegisterError(errorMsg);
+        showNotification(errorMsg, 'warning');
         return;
       }
 
       if (contraseña.length < 6) {
-        this.showRegisterError('La contraseña debe tener al menos 6 caracteres');
+        const errorMsg = 'La contraseña debe tener al menos 6 caracteres';
+        this.showRegisterError(errorMsg);
+        showNotification(errorMsg, 'warning');
         return;
       }
 
       if (contraseña !== confirmarContraseña) {
-        this.showRegisterError('Las contraseñas no coinciden');
+        const errorMsg = 'Las contraseñas no coinciden';
+        this.showRegisterError(errorMsg);
+        showNotification(errorMsg, 'warning');
         return;
       }
 
@@ -133,7 +140,9 @@ export class SessionManager {
       });
 
       if (response.success) {
-        this.showRegisterSuccess('¡Cuenta creada exitosamente! Redirigiendo al inicio de sesión...');
+        const successMsg = '¡Cuenta creada exitosamente! 🎉';
+        this.showRegisterSuccess(successMsg);
+        showNotification(successMsg, 'success', 5000);
         
         // Limpiar formulario
         document.getElementById('formRegister')?.reset();
@@ -145,14 +154,34 @@ export class SessionManager {
           if (loginEmail) {
             loginEmail.focus();
           }
-          this.showRegisterSuccess('Ahora puedes iniciar sesión con tu nueva cuenta');
+          const msg = 'Ahora puedes iniciar sesión con tu nueva cuenta';
+          this.showRegisterSuccess(msg);
+          showNotification(msg, 'info', 4000);
         }, 2000);
       } else {
-        this.showRegisterError(response.error || 'Error al registrar usuario');
+        const errorMsg = response.error || 'Error al registrar usuario';
+        this.showRegisterError(errorMsg);
+        showNotification(errorMsg, 'error');
       }
     } catch (error) {
       console.error('Error en registro:', error);
-      this.showRegisterError(error.message || 'Error al registrar usuario. Intenta nuevamente.');
+      let errorMessage = 'Error al registrar usuario. Intenta nuevamente.';
+      
+      // Mensajes de error más específicos
+      if (error.message) {
+        if (error.message.includes('correo') || error.message.includes('email')) {
+          errorMessage = 'Este correo electrónico ya está registrado. Intenta con otro.';
+        } else if (error.message.includes('500') || error.message.includes('servidor')) {
+          errorMessage = 'Error del servidor. Por favor, intenta más tarde.';
+        } else if (error.message.includes('red') || error.message.includes('fetch')) {
+          errorMessage = 'Error de conexión. Verifica tu conexión a internet.';
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
+      this.showRegisterError(errorMessage);
+      showNotification(errorMessage, 'error');
     } finally {
       // Restaurar botón
       const btnRegistrarse = document.getElementById('btnRegistrarse');
@@ -222,6 +251,10 @@ export class SessionManager {
         // Guardar sesión en localStorage
         this.saveSession();
         
+        // Mostrar notificación de éxito
+        const nombreUsuario = `${this.user.nombre} ${this.user.apellido}`.trim() || this.user.correo;
+        showNotification(`¡Bienvenido, ${nombreUsuario}! 🎉`, 'success', 4000);
+        
         // Actualizar UI
         this.updateNavbarButton();
         
@@ -261,12 +294,29 @@ export class SessionManager {
         
         console.log(`✓ Sesión iniciada: ${this.user.rol} - ${this.user.correo}`);
       } else {
-        this.showLoginError('Error al iniciar sesión. Verifica tus credenciales.');
+        const errorMsg = 'Error al iniciar sesión. Verifica tus credenciales.';
+        this.showLoginError(errorMsg);
+        showNotification(errorMsg, 'error');
       }
     } catch (error) {
       console.error('Error en login:', error);
-      const errorMessage = error.message || 'Credenciales incorrectas o error de conexión';
+      let errorMessage = 'Credenciales incorrectas o error de conexión';
+      
+      // Mensajes de error más específicos
+      if (error.message) {
+        if (error.message.includes('401') || error.message.includes('Credenciales')) {
+          errorMessage = 'Correo o contraseña incorrectos. Verifica tus datos e intenta nuevamente.';
+        } else if (error.message.includes('500') || error.message.includes('servidor')) {
+          errorMessage = 'Error del servidor. Por favor, intenta más tarde.';
+        } else if (error.message.includes('red') || error.message.includes('fetch')) {
+          errorMessage = 'Error de conexión. Verifica tu conexión a internet.';
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
       this.showLoginError(errorMessage);
+      showNotification(errorMessage, 'error');
     } finally {
       // Restaurar botón
       const btnConectarse = document.getElementById('btnConectarse');
@@ -307,6 +357,8 @@ export class SessionManager {
   }
 
   logout() {
+    const nombreUsuario = this.user ? `${this.user.nombre} ${this.user.apellido}`.trim() : 'Usuario';
+    
     this.loggedIn = false;
     this.user = null;
     
@@ -348,6 +400,9 @@ export class SessionManager {
 
     this.updateNavbarButton();
     console.log('👋 Sesión cerrada');
+    
+    // Mostrar notificación de cierre de sesión
+    showNotification(`Sesión cerrada. ¡Hasta pronto, ${nombreUsuario}! 👋`, 'info', 3000);
     
     // Redirigir a inicio
     if (window.app && window.app.router) {
@@ -504,8 +559,8 @@ export class SessionManager {
         if (mobileNavMisCursos) mobileNavMisCursos.classList.add('hidden');
       }
 
-      // Mostrar "Panel Docente" solo para docentes y admins
-      if (rol === 'docente' || rol === 'admin') {
+      // Mostrar "Panel Docente" solo para docentes
+      if (rol === 'docente') {
         if (navDocente) {
           navDocente.classList.remove('hidden');
           navDocente.classList.add('flex');
@@ -516,6 +571,22 @@ export class SessionManager {
       } else {
         if (navDocente) navDocente.classList.add('hidden');
         if (mobileNavDocente) mobileNavDocente.classList.add('hidden');
+      }
+
+      // Mostrar "Panel Admin" solo para administradores
+      const navAdmin = document.getElementById('navAdmin');
+      const mobileNavAdmin = document.getElementById('mobileNavAdmin');
+      if (rol === 'admin') {
+        if (navAdmin) {
+          navAdmin.classList.remove('hidden');
+          navAdmin.classList.add('flex');
+        }
+        if (mobileNavAdmin) {
+          mobileNavAdmin.classList.remove('hidden');
+        }
+      } else {
+        if (navAdmin) navAdmin.classList.add('hidden');
+        if (mobileNavAdmin) mobileNavAdmin.classList.add('hidden');
       }
     } else {
       // Ocultar todas las opciones de usuario logueado

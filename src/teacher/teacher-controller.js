@@ -674,8 +674,8 @@ export class TeacherController {
 
   // Métodos stub que se implementarán según necesidad
   async editCourse(id) {
-    console.log('Editando curso:', id);
-    // TODO: Implementar edición
+    // Usar el método existente editarCurso que ya está implementado
+    await this.editarCurso(id);
   }
 
   async deleteCourse(id) {
@@ -691,8 +691,99 @@ export class TeacherController {
   }
 
   async editContent(id) {
-    console.log('Editando contenido:', id);
-    // TODO: Implementar edición
+    try {
+      // Obtener el contenido actual
+      const cursoId = this.currentCourse;
+      if (!cursoId) {
+        this.showError('No hay curso seleccionado');
+        return;
+      }
+
+      // Cargar contenido del curso
+      const contenidos = await API.getCourseContent(cursoId);
+      const contenido = contenidos.find(c => c.id_contenido === id);
+      
+      if (!contenido) {
+        this.showError('No se encontró el contenido');
+        return;
+      }
+
+      // Llenar formulario de edición
+      document.getElementById('contenidoId').value = contenido.id_contenido;
+      document.getElementById('contenidoTitulo').value = contenido.titulo || '';
+      document.getElementById('contenidoTipo').value = contenido.tipo || 'lectura';
+      document.getElementById('contenidoUrl').value = contenido.url || '';
+      document.getElementById('contenidoOrden').value = contenido.orden || 1;
+      document.getElementById('contenidoCursoId').value = cursoId;
+
+      // Cambiar título del formulario
+      const formTitle = document.querySelector('#modalContenido h3');
+      if (formTitle) {
+        formTitle.textContent = 'Editar Contenido';
+      }
+
+      // Cambiar texto del botón
+      const submitBtn = document.querySelector('#formContenido button[type="submit"]');
+      if (submitBtn) {
+        submitBtn.innerHTML = '<span class="material-symbols-outlined inline-block align-middle mr-2">save</span>Guardar Cambios';
+      }
+
+      // Mostrar modal si no está visible
+      const modal = document.getElementById('modalContenido');
+      if (modal) {
+        modal.classList.remove('hidden');
+      }
+    } catch (error) {
+      console.error('Error al cargar contenido:', error);
+      this.showError('No se pudo cargar el contenido');
+    }
+  }
+
+  async guardarContenido() {
+    try {
+      const contenidoId = document.getElementById('contenidoId').value;
+      const contenidoData = {
+        curso_id: document.getElementById('contenidoCursoId').value,
+        titulo: document.getElementById('contenidoTitulo').value,
+        tipo: document.getElementById('contenidoTipo').value,
+        url: document.getElementById('contenidoUrl').value,
+        orden: document.getElementById('contenidoOrden').value
+      };
+
+      if (contenidoId) {
+        // Actualizar contenido existente
+        await API.updateContenido(contenidoId, contenidoData);
+        this.showSuccess('Contenido actualizado exitosamente');
+      } else {
+        // Crear nuevo contenido
+        await API.createContenido(contenidoData);
+        this.showSuccess('Contenido agregado exitosamente');
+      }
+      
+      // Limpiar formulario
+      document.getElementById('formContenido').reset();
+      document.getElementById('contenidoId').value = '';
+      document.getElementById('contenidoOrden').value = '1';
+      
+      // Restaurar título y botón
+      const formTitle = document.querySelector('#modalContenido h3');
+      if (formTitle) {
+        formTitle.textContent = 'Agregar Nuevo Contenido';
+      }
+      const submitBtn = document.querySelector('#formContenido button[type="submit"]');
+      if (submitBtn) {
+        submitBtn.innerHTML = '<span class="material-symbols-outlined inline-block align-middle mr-2">add</span>Agregar Contenido';
+      }
+      
+      // Recargar lista
+      this.cargarContenidoCurso(contenidoData.curso_id);
+      
+      // Cerrar modal
+      window.cerrarModalContenido();
+    } catch (error) {
+      console.error('Error al guardar contenido:', error);
+      this.showError('No se pudo guardar el contenido');
+    }
   }
 
   async deleteContent(id) {
@@ -724,9 +815,18 @@ export class TeacherController {
   async guardarCurso() {
     try {
       const cursoId = document.getElementById('cursoId').value;
+      
+      // Obtener descripción del editor WYSIWYG si existe
+      let descripcion = '';
+      if (window.cursoDescripcionEditor && window.cursoDescripcionEditor.getHTML) {
+        descripcion = window.cursoDescripcionEditor.getHTML();
+      } else {
+        descripcion = document.getElementById('cursoDescripcion').value;
+      }
+      
       const cursoData = {
         titulo: document.getElementById('cursoTitulo').value,
-        descripcion: document.getElementById('cursoDescripcion').value,
+        descripcion: descripcion,
         id_categoria: document.getElementById('cursoCategoria').value || null,
         id_grado: document.getElementById('cursoGrado').value || null
       };
@@ -796,7 +896,23 @@ export class TeacherController {
       document.getElementById('modalCursoTitulo').textContent = 'Editar Curso';
       document.getElementById('cursoId').value = curso.id_curso;
       document.getElementById('cursoTitulo').value = curso.titulo || '';
-      document.getElementById('cursoDescripcion').value = curso.descripcion || '';
+      
+      // Inicializar editor WYSIWYG si no está inicializado
+      if (!window.cursoDescripcionEditor) {
+        const { default: RichTextEditor } = await import('../editor/rich-text-editor.js');
+        window.cursoDescripcionEditor = new RichTextEditor('cursoDescripcionEditor', {
+          placeholder: 'Describe el contenido y objetivos del curso'
+        });
+        window.cursoDescripcionEditor.init();
+      }
+      
+      // Establecer contenido en el editor
+      if (window.cursoDescripcionEditor && curso.descripcion) {
+        window.cursoDescripcionEditor.setHTML(curso.descripcion);
+      } else {
+        document.getElementById('cursoDescripcion').value = curso.descripcion || '';
+      }
+      
       // Usar id_categoria e id_grado según la estructura de la BD
       document.getElementById('cursoCategoria').value = curso.id_categoria || curso.categoria_id || '';
       document.getElementById('cursoGrado').value = curso.id_grado || curso.grado_id || '';
@@ -847,10 +963,18 @@ export class TeacherController {
               <p class="text-sm text-slate-600 dark:text-slate-400">Orden: ${contenido.orden}</p>
             </div>
           </div>
-          <button onclick="window.app.teacher.eliminarContenido(${contenido.id_contenido})" 
-                  class="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg">
-            <span class="material-symbols-outlined">delete</span>
-          </button>
+          <div class="flex gap-2">
+            <button onclick="window.app.teacher.editContent(${contenido.id_contenido})" 
+                    class="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg"
+                    aria-label="Editar contenido">
+              <span class="material-symbols-outlined">edit</span>
+            </button>
+            <button onclick="window.app.teacher.eliminarContenido(${contenido.id_contenido})" 
+                    class="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg"
+                    aria-label="Eliminar contenido">
+              <span class="material-symbols-outlined">delete</span>
+            </button>
+          </div>
         </div>
       `).join('');
     } catch (error) {
@@ -860,28 +984,8 @@ export class TeacherController {
   }
 
   async agregarContenido() {
-    try {
-      const contenidoData = {
-        curso_id: document.getElementById('contenidoCursoId').value,
-        titulo: document.getElementById('contenidoTitulo').value,
-        tipo: document.getElementById('contenidoTipo').value,
-        url: document.getElementById('contenidoUrl').value,
-        orden: document.getElementById('contenidoOrden').value
-      };
-
-      await API.createContenido(contenidoData);
-      this.showSuccess('Contenido agregado exitosamente');
-      
-      // Limpiar formulario
-      document.getElementById('formContenido').reset();
-      document.getElementById('contenidoOrden').value = '1';
-      
-      // Recargar lista
-      this.cargarContenidoCurso(contenidoData.curso_id);
-    } catch (error) {
-      console.error('Error al agregar contenido:', error);
-      this.showError('No se pudo agregar el contenido');
-    }
+    // Usar el método guardarContenido que maneja tanto creación como edición
+    await this.guardarContenido();
   }
 
   async eliminarContenido(contenidoId) {

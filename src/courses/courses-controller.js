@@ -3,6 +3,7 @@
 
 import { getCursos, getCurso, getCursoRecursos, getCursoContenido, getCategorias, getGrados, inscribirAlumno, getAlumnoCursos } from '../api/api.js';
 import API from '../api/api.js';
+import { showNotification } from '../utils/helpers.js';
 
 export class CoursesController {
   constructor() {
@@ -2882,19 +2883,7 @@ export class CoursesController {
   }
 
   showSuccess(message) {
-    const notification = document.createElement('div');
-    notification.className = 'fixed top-4 right-4 z-50 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2 animate-fade-in';
-    notification.innerHTML = `
-      <span class="material-symbols-outlined">check_circle</span>
-      <span>${message}</span>
-    `;
-    document.body.appendChild(notification);
-    
-    setTimeout(() => {
-      notification.style.opacity = '0';
-      notification.style.transition = 'opacity 0.3s';
-      setTimeout(() => notification.remove(), 300);
-    }, 3000);
+    showNotification(message, 'success');
   }
 
   descargarRecurso(recursoId) {
@@ -2908,8 +2897,9 @@ export class CoursesController {
 
   showError(message) {
     console.error(message);
+    showNotification(message, 'error');
     
-    // Mostrar toast o notificación
+    // Anunciar al lector de pantalla si está activo
     if (window.lectorPantalla && window.lectorPantalla.activo) {
       window.lectorPantalla.anunciar(message);
     }
@@ -3049,7 +3039,7 @@ export class CoursesController {
           <!-- Columna Izquierda: Media Player / Contenido Principal -->
           <div class="flex-1 bg-black flex items-center justify-center p-8 overflow-y-auto">
             ${tipo === 'video' && url ? `
-              <div class="w-full max-w-5xl">
+              <div class="w-full max-w-5xl space-y-4">
                 <div class="relative aspect-video bg-slate-900 rounded-lg overflow-hidden shadow-2xl">
                   <video 
                     id="leccionVideo" 
@@ -3059,11 +3049,29 @@ export class CoursesController {
                   >
                     <source src="${url}" type="video/mp4">
                     Su navegador no soporta el elemento de video.
+                    <track kind="subtitles" src="" srclang="es" label="Español">
                   </video>
+                </div>
+                <!-- Contenedor para transcripción -->
+                <div id="transcriptionContainer" class="hidden">
+                  <!-- Se llenará dinámicamente -->
+                </div>
+                <!-- Botones de control -->
+                <div class="flex gap-2 justify-center">
+                  <button onclick="if(window.app?.mediaPlayer) window.app.mediaPlayer.toggleTranscription(); else alert('Cargando reproductor...')" 
+                          class="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-white rounded-lg font-semibold transition-colors">
+                    <span class="material-symbols-outlined">subtitles</span>
+                    <span>Mostrar Transcripción</span>
+                  </button>
+                  <button onclick="if(window.app?.mediaPlayer) window.app.mediaPlayer.toggleCaptions(); else alert('Cargando reproductor...')" 
+                          class="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors">
+                    <span class="material-symbols-outlined">closed_caption</span>
+                    <span>Subtítulos</span>
+                  </button>
                 </div>
               </div>
             ` : tipo === 'audio' && url ? `
-              <div class="w-full max-w-2xl mx-2 sm:mx-4">
+              <div class="w-full max-w-2xl mx-2 sm:mx-4 space-y-4">
                 <div class="bg-gradient-to-br from-primary/20 to-blue-900/20 rounded-2xl p-12 text-center">
                   <div class="w-32 h-32 mx-auto mb-6 bg-primary/20 rounded-full flex items-center justify-center">
                     <span class="material-symbols-outlined text-6xl text-primary">headphones</span>
@@ -3079,6 +3087,18 @@ export class CoursesController {
                     <source src="${url}" type="audio/mpeg">
                     Su navegador no soporta el elemento de audio.
                   </audio>
+                </div>
+                <!-- Contenedor para transcripción -->
+                <div id="transcriptionContainer" class="hidden">
+                  <!-- Se llenará dinámicamente -->
+                </div>
+                <!-- Botón para mostrar transcripción -->
+                <div class="flex justify-center">
+                  <button onclick="window.app.mediaPlayer.toggleTranscription()" 
+                          class="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-white rounded-lg font-semibold transition-colors">
+                    <span class="material-symbols-outlined">subtitles</span>
+                    <span>Mostrar Transcripción</span>
+                  </button>
                 </div>
               </div>
             ` : `
@@ -3260,6 +3280,17 @@ export class CoursesController {
       // Mostrar notificación
       const { showNotification } = await import('../utils/helpers.js');
       showNotification('¡Lección completada! 🎉', 'success');
+
+      // Verificar logros relacionados
+      if (window.app?.achievements && this.alumnoId) {
+        // Verificar logro de "rápido" si se completó en menos de 5 minutos
+        // (esto se puede mejorar con tracking de tiempo real)
+        try {
+          await window.app.achievements.verificarYDesbloquearLogro('rapido', this.alumnoId);
+        } catch (e) {
+          console.log('No se pudo verificar logro rápido:', e);
+        }
+      }
 
       // Esperar un momento para que la base de datos se actualice
       await new Promise(resolve => setTimeout(resolve, 500));
@@ -4040,12 +4071,38 @@ export class CoursesController {
     // Event listener para siguiente lección
     const btnSiguiente = modal.querySelector('.btn-siguiente-leccion');
     if (btnSiguiente) {
-      btnSiguiente.addEventListener('click', () => {
+      btnSiguiente.addEventListener('click', async () => {
         const siguienteLeccionId = btnSiguiente.dataset.leccionId;
         const siguienteTitulo = btnSiguiente.dataset.siguienteTitulo;
         const siguienteTexto = btnSiguiente.dataset.siguienteTexto;
         const siguienteTipo = btnSiguiente.dataset.siguienteTipo;
         const siguienteUrl = btnSiguiente.dataset.siguienteUrl;
+        
+        // Obtener ID de la lección actual
+        const leccionActualId = leccionId || id;
+        const contenidoActualId = id;
+        const esContenidoAntiguo = !leccionId && contenidoActualId;
+        
+        // Marcar lección actual como completada antes de avanzar
+        if (leccionActualId || contenidoActualId) {
+          try {
+            const { showNotification } = await import('../utils/helpers.js');
+            
+            if (esContenidoAntiguo) {
+              // Usar método antiguo para contenido
+              await this.marcarComoCompletado(contenidoActualId);
+            } else if (leccionActualId) {
+              // Usar método nuevo para lección
+              await this.marcarLeccionCompletada(leccionActualId);
+            }
+            
+            // Mostrar notificación de éxito
+            showNotification('Lección marcada como completada ✓', 'success', 2000);
+          } catch (error) {
+            console.error('Error al marcar lección como completada:', error);
+            // Continuar con la navegación aunque falle el marcado
+          }
+        }
         
         if (siguienteLeccionId) {
           // Cerrar modal actual
