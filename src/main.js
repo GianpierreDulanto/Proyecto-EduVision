@@ -15,6 +15,11 @@ import { ColorBlindnessFilters } from './accessibility/color-blindness.js';
 import { CoursesController } from './courses/courses-controller.js';
 import { TeacherController } from './teacher/teacher-controller.js';
 import { testDatabase } from './api/api.js';
+import profileController from './profile/profile-controller.js';
+import reviewsController from './reviews/reviews-controller.js';
+import certificatesController from './certificates/certificates-controller.js';
+import ImmersiveReader from './immersive-reader/immersive-reader.js';
+import surveyController from './survey/survey-controller.js';
 
 class App {
   constructor() {
@@ -31,6 +36,11 @@ class App {
     this.colorBlindness = null;
     this.courses = null;
     this.teacher = null;
+    this.profile = null;
+    this.reviews = null;
+    this.certificates = null;
+    this.immersiveReader = null;
+    this.surveyController = null;
   }
 
   async init() {
@@ -69,6 +79,18 @@ class App {
       this.keyboardNav = new KeyboardNavigation();
       this.courses = new CoursesController();
       this.teacher = new TeacherController();
+      
+      // Inicializar nuevos controladores
+      this.profile = profileController;
+      this.reviews = reviewsController;
+      this.certificates = certificatesController;
+      this.immersiveReader = new ImmersiveReader();
+      this.surveyController = surveyController;
+      
+      this.profile.init();
+      this.reviews.init();
+      this.certificates.init();
+      this.surveyController.init();
       
       // Inicializar StudentController si el usuario es alumno
       if (this.session.isLoggedIn() && this.session.user?.rol === 'alumno') {

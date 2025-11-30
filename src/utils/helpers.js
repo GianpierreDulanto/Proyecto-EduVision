@@ -268,4 +268,76 @@ export function sortBy(array, key, order = 'asc') {
       return a[key] < b[key] ? 1 : -1;
     }
   });
+}
+
+/**
+ * Muestra una notificación al usuario
+ * @param {string} message - Mensaje a mostrar
+ * @param {string} type - Tipo de notificación ('success', 'error', 'warning', 'info')
+ * @param {number} duration - Duración en ms (0 = permanente)
+ */
+export function showNotification(message, type = 'info', duration = 3000) {
+  // Crear contenedor de notificaciones si no existe
+  let container = document.getElementById('notification-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'notification-container';
+    container.className = 'fixed top-4 right-4 z-50 space-y-2';
+    container.setAttribute('role', 'region');
+    container.setAttribute('aria-label', 'Notificaciones');
+    container.setAttribute('aria-live', 'polite');
+    document.body.appendChild(container);
+  }
+
+  // Crear notificación
+  const notification = document.createElement('div');
+  const id = 'notif-' + Date.now();
+  notification.id = id;
+  
+  // Estilos según tipo
+  const styles = {
+    success: 'bg-green-500 border-green-600',
+    error: 'bg-red-500 border-red-600',
+    warning: 'bg-amber-500 border-amber-600',
+    info: 'bg-blue-500 border-blue-600'
+  };
+  
+  const icons = {
+    success: 'check_circle',
+    error: 'error',
+    warning: 'warning',
+    info: 'info'
+  };
+
+  notification.className = `${styles[type] || styles.info} text-white px-6 py-4 rounded-lg shadow-2xl border-2 flex items-center gap-3 min-w-[300px] max-w-md transform transition-all duration-300 translate-x-0 opacity-100`;
+  notification.setAttribute('role', 'alert');
+  notification.innerHTML = `
+    <span class="material-symbols-outlined text-2xl" aria-hidden="true">${icons[type] || icons.info}</span>
+    <p class="flex-1 font-medium">${sanitizeHTML(message)}</p>
+    <button 
+      onclick="document.getElementById('${id}').remove()" 
+      class="text-white/80 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-white/50 rounded p-1"
+      aria-label="Cerrar notificación"
+    >
+      <span class="material-symbols-outlined">close</span>
+    </button>
+  `;
+
+  // Agregar al contenedor
+  container.appendChild(notification);
+
+  // Auto-remover si tiene duración
+  if (duration > 0) {
+    setTimeout(() => {
+      notification.style.transform = 'translateX(400px)';
+      notification.style.opacity = '0';
+      setTimeout(() => {
+        if (notification.parentNode) {
+          notification.remove();
+        }
+      }, 300);
+    }, duration);
+  }
+
+  return notification;
 } 

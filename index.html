@@ -82,17 +82,20 @@
           <!-- Logo y Nombre -->
           <div class="flex items-center gap-3">
             <a href="#inicio" 
-               class="flex items-center gap-3 group focus:outline-none focus:ring-2 focus:ring-primary rounded-lg p-2 -ml-2"
+               class="flex items-center gap-2 sm:gap-3 group focus:outline-none focus:ring-2 focus:ring-primary rounded-lg p-2 -ml-2"
                aria-label="Edu Vision - Ir al inicio">
-              <div class="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-blue-600 text-white shadow-lg group-hover:shadow-xl transition-shadow">
-                <span class="material-symbols-outlined text-3xl">school</span>
+              <div class="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-primary to-blue-600 text-white shadow-lg group-hover:shadow-xl transition-shadow flex-shrink-0">
+                <span class="material-symbols-outlined text-2xl sm:text-3xl">school</span>
               </div>
-              <div class="flex flex-col">
-                <h1 class="text-2xl font-bold text-slate-900 dark:text-white leading-tight">
+              <div class="flex flex-col min-w-0">
+                <h1 class="text-lg sm:text-2xl font-bold text-slate-900 dark:text-white leading-tight">
                   Edu Vision
                 </h1>
                 <p class="text-xs text-slate-500 dark:text-slate-400 hidden sm:block">
                   Educación Accesible
+                </p>
+                <p class="text-xs text-slate-600 dark:text-slate-300 sm:hidden">
+                  Ir al inicio
                 </p>
               </div>
             </a>
@@ -210,11 +213,12 @@
             <!-- Botón Menú Móvil -->
             <button 
               id="btnMenuMobile"
-              class="lg:hidden flex h-10 w-10 items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
+              class="lg:hidden flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
               aria-label="Abrir menú de navegación"
               aria-expanded="false"
             >
               <span class="material-symbols-outlined text-2xl">menu</span>
+              <span class="text-sm font-medium hidden xs:inline">Menú</span>
             </button>
 
             <!-- Botón Ajustes -->
@@ -233,7 +237,7 @@
       <!-- Menú Móvil (Collapsible) -->
       <div 
         id="menuMobile" 
-        class="lg:hidden hidden border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900"
+        class="lg:hidden hidden border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 z-40 relative shadow-lg"
         role="navigation"
         aria-label="Menú móvil"
       >
@@ -241,21 +245,21 @@
           <a 
             href="#inicio" 
             data-section="inicio"
-            class="mobile-nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium text-slate-700 dark:text-slate-300 hover:text-primary dark:hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
+            class="mobile-nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium text-slate-900 dark:text-slate-100 hover:text-primary dark:hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
             aria-label="Ir a inicio"
           >
-            <span class="material-symbols-outlined text-xl">home</span>
-            <span>Inicio</span>
+            <span class="material-symbols-outlined text-xl text-slate-700 dark:text-slate-300">home</span>
+            <span class="text-slate-900 dark:text-slate-100">Inicio</span>
           </a>
           
           <a 
             href="#listaCursosAlumno" 
             data-section="listaCursosAlumno"
-            class="mobile-nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium text-slate-700 dark:text-slate-300 hover:text-primary dark:hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
+            class="mobile-nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium text-slate-900 dark:text-slate-100 hover:text-primary dark:hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
             aria-label="Ver todos los cursos disponibles"
           >
-            <span class="material-symbols-outlined text-xl">menu_book</span>
-            <span>Cursos</span>
+            <span class="material-symbols-outlined text-xl text-slate-700 dark:text-slate-300">menu_book</span>
+            <span class="text-slate-900 dark:text-slate-100">Cursos</span>
           </a>
           
           <!-- Inicio (Dashboard Alumno) - Solo para alumnos logueados -->
@@ -263,11 +267,11 @@
             href="#dashboardAlumno" 
             data-section="dashboardAlumno"
             id="mobileNavInicioAlumno"
-            class="mobile-nav-link hidden flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium text-slate-700 dark:text-slate-300 hover:text-primary dark:hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
+            class="mobile-nav-link hidden flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium text-slate-900 dark:text-slate-100 hover:text-primary dark:hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
             aria-label="Ir a inicio"
           >
-            <span class="material-symbols-outlined text-xl">home</span>
-            <span>Inicio</span>
+            <span class="material-symbols-outlined text-xl text-slate-700 dark:text-slate-300">home</span>
+            <span class="text-slate-900 dark:text-slate-100">Inicio</span>
           </a>
           
           <!-- Mis Cursos - Solo para alumnos logueados -->
@@ -275,65 +279,54 @@
             href="#listaCursosAlumno" 
             data-section="listaCursosAlumno"
             id="mobileNavMisCursos"
-            class="mobile-nav-link hidden flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium text-slate-700 dark:text-slate-300 hover:text-primary dark:hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
+            class="mobile-nav-link hidden flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium text-slate-900 dark:text-slate-100 hover:text-primary dark:hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
             aria-label="Ver mis cursos inscritos"
           >
-            <span class="material-symbols-outlined text-xl">library_books</span>
-            <span>Mis Cursos</span>
+            <span class="material-symbols-outlined text-xl text-slate-700 dark:text-slate-300">library_books</span>
+            <span class="text-slate-900 dark:text-slate-100">Mis Cursos</span>
           </a>
           
           <a 
             href="#dashboardDocente" 
             data-section="dashboardDocente"
             id="mobileNavDocente"
-            class="mobile-nav-link hidden flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium text-slate-700 dark:text-slate-300 hover:text-primary dark:hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
+            class="mobile-nav-link hidden flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium text-slate-900 dark:text-slate-100 hover:text-primary dark:hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
             aria-label="Panel de docente"
           >
-            <span class="material-symbols-outlined text-xl">dashboard</span>
-            <span>Panel Docente</span>
-          </a>
-          
-          <a 
-            href="#dashboardDocente" 
-            data-section="dashboardDocente"
-            id="mobileNavDocente"
-            class="mobile-nav-link hidden flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium text-slate-700 dark:text-slate-300 hover:text-primary dark:hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
-            aria-label="Panel de docente"
-          >
-            <span class="material-symbols-outlined text-xl">dashboard</span>
-            <span>Panel Docente</span>
+            <span class="material-symbols-outlined text-xl text-slate-700 dark:text-slate-300">dashboard</span>
+            <span class="text-slate-900 dark:text-slate-100">Panel Docente</span>
           </a>
           
           <a 
             href="#dashboardAdmin" 
             data-section="dashboardAdmin"
             id="mobileNavAdmin"
-            class="mobile-nav-link hidden flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium text-slate-700 dark:text-slate-300 hover:text-primary dark:hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
+            class="mobile-nav-link hidden flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium text-slate-900 dark:text-slate-100 hover:text-primary dark:hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
             aria-label="Panel de administración"
           >
-            <span class="material-symbols-outlined text-xl">admin_panel_settings</span>
-            <span>Panel Admin</span>
+            <span class="material-symbols-outlined text-xl text-slate-700 dark:text-slate-300">admin_panel_settings</span>
+            <span class="text-slate-900 dark:text-slate-100">Panel Admin</span>
           </a>
           
           <a 
             href="#miPerfil" 
             data-section="miPerfil"
             id="mobileNavMiPerfil"
-            class="mobile-nav-link hidden flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium text-slate-700 dark:text-slate-300 hover:text-primary dark:hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
+            class="mobile-nav-link hidden flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium text-slate-900 dark:text-slate-100 hover:text-primary dark:hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
             aria-label="Ver mi perfil"
           >
-            <span class="material-symbols-outlined text-xl">account_circle</span>
-            <span>Mi Perfil</span>
+            <span class="material-symbols-outlined text-xl text-slate-700 dark:text-slate-300">account_circle</span>
+            <span class="text-slate-900 dark:text-slate-100">Mi Perfil</span>
           </a>
           
           <a 
             href="#ayuda" 
             data-section="ayuda"
-            class="mobile-nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium text-slate-700 dark:text-slate-300 hover:text-primary dark:hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
+            class="mobile-nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium text-slate-900 dark:text-slate-100 hover:text-primary dark:hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
             aria-label="Ayuda y soporte"
           >
-            <span class="material-symbols-outlined text-xl">help</span>
-            <span>Ayuda</span>
+            <span class="material-symbols-outlined text-xl text-slate-700 dark:text-slate-300">help</span>
+            <span class="text-slate-900 dark:text-slate-100">Ayuda</span>
           </a>
         </div>
       </div>
@@ -579,8 +572,8 @@
       </div>
 
     <!-- Filtros -->
-    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-6 mb-8 border-2 border-slate-200 dark:border-slate-700">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-4 sm:p-6 mb-6 sm:mb-8 border-2 border-slate-200 dark:border-slate-700">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
         <div>
           <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
             Categoría
@@ -1005,34 +998,34 @@
     </div>
 
     <!-- Estadísticas Rápidas -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-      <div class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-lg">
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
+      <div class="bg-white dark:bg-slate-800 rounded-xl p-4 sm:p-6 shadow-lg">
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-sm text-slate-600 dark:text-slate-400 mb-1">Total Cursos</p>
-            <p class="text-3xl font-bold text-slate-900 dark:text-white" id="statTotalCursos">0</p>
+            <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mb-1">Total Cursos</p>
+            <p class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white" id="statTotalCursos">0</p>
           </div>
-          <span class="material-symbols-outlined text-blue-600 text-5xl">school</span>
+          <span class="material-symbols-outlined text-blue-600 text-4xl sm:text-5xl">school</span>
         </div>
       </div>
       
-      <div class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-lg">
+      <div class="bg-white dark:bg-slate-800 rounded-xl p-4 sm:p-6 shadow-lg">
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-sm text-slate-600 dark:text-slate-400 mb-1">Total Alumnos</p>
-            <p class="text-3xl font-bold text-slate-900 dark:text-white" id="statTotalAlumnos">0</p>
+            <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mb-1">Total Alumnos</p>
+            <p class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white" id="statTotalAlumnos">0</p>
           </div>
-          <span class="material-symbols-outlined text-green-600 text-5xl">people</span>
+          <span class="material-symbols-outlined text-green-600 text-4xl sm:text-5xl">people</span>
         </div>
       </div>
       
-      <div class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-lg">
+      <div class="bg-white dark:bg-slate-800 rounded-xl p-4 sm:p-6 shadow-lg sm:col-span-2 md:col-span-1">
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-sm text-slate-600 dark:text-slate-400 mb-1">Contenidos</p>
-            <p class="text-3xl font-bold text-slate-900 dark:text-white" id="statTotalContenidos">0</p>
+            <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mb-1">Contenidos</p>
+            <p class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white" id="statTotalContenidos">0</p>
           </div>
-          <span class="material-symbols-outlined text-purple-600 text-5xl">video_library</span>
+          <span class="material-symbols-outlined text-purple-600 text-4xl sm:text-5xl">video_library</span>
         </div>
       </div>
     </div>
@@ -2112,6 +2105,28 @@
             Cuestionarios
           </button>
         </nav>
+      </div>
+      
+      <!-- Call-to-Action: Encuesta de Satisfacción -->
+      <div id="contenedorEncuesta" class="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border-t-2 border-amber-500 px-6 py-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-amber-500 text-3xl">rate_review</span>
+            <div>
+              <h3 class="font-bold text-slate-900 dark:text-white">¿Qué te parece el curso?</h3>
+              <p class="text-sm text-slate-600 dark:text-slate-400">Comparte tu experiencia y ayúdanos a mejorar</p>
+            </div>
+          </div>
+          <button 
+            id="btnResponderEncuesta"
+            onclick="window.surveyController.showSurvey(window.app.courses.currentCurso?.id_curso)"
+            class="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white rounded-lg font-semibold transition-all shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
+            aria-label="Responder encuesta de satisfacción"
+          >
+            <span class="material-symbols-outlined">star</span>
+            <span>Responder Encuesta</span>
+          </button>
+        </div>
       </div>
     </div>
     
@@ -3258,7 +3273,6 @@
         </div>
       </div>
     </div>
-  </div>
 
 </body>
     <!-- Script principal modular -->
@@ -3752,6 +3766,195 @@
     </div>
   </div>
   
+  <!-- SECCIÓN: Mi Perfil -->
+  <section id="miPerfil" class="section hidden min-h-screen bg-slate-50 dark:bg-slate-900" role="region" aria-labelledby="miPerfil-heading">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div id="profileContainer">
+        <!-- El contenido se carga dinámicamente desde profile-controller.js -->
+      </div>
+    </div>
+  </section>
+
+  <!-- SECCIÓN: Mis Certificados -->
+  <section id="misCertificados" class="section hidden min-h-screen bg-slate-50 dark:bg-slate-900" role="region" aria-labelledby="misCertificados-heading">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div id="certificatesContainer">
+        <!-- El contenido se carga dinámicamente desde certificates-controller.js -->
+      </div>
+    </div>
+  </section>
+
+  <!-- SECCIÓN: Reseñas del Curso -->
+  <section id="courseReviews" class="section hidden min-h-screen bg-slate-50 dark:bg-slate-900" role="region" aria-labelledby="courseReviews-heading">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <!-- Navegación de regreso -->
+      <button 
+        onclick="history.back()" 
+        class="flex items-center gap-2 mb-6 text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary rounded-lg px-3 py-2"
+        aria-label="Volver atrás"
+      >
+        <span class="material-symbols-outlined">arrow_back</span>
+        <span class="font-medium">Volver al Curso</span>
+      </button>
+
+      <div id="reviewsContainer">
+        <!-- El contenido se carga dinámicamente desde reviews-controller.js -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Modal: Escribir Reseña -->
+  <div id="modalWriteReview" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4" role="dialog" aria-labelledby="modalReviewTitle" aria-modal="true">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+      <div class="sticky top-0 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-6 py-4 flex items-center justify-between z-10">
+        <h2 id="modalReviewTitle" class="text-2xl font-bold text-slate-900 dark:text-white">
+          Escribe tu Reseña
+        </h2>
+        <button 
+          onclick="document.getElementById('modalWriteReview').classList.add('hidden')" 
+          class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
+          aria-label="Cerrar modal"
+        >
+          <span class="material-symbols-outlined text-slate-600 dark:text-slate-400">close</span>
+        </button>
+      </div>
+      
+      <form id="formReview" class="p-6 space-y-6">
+        <!-- Calificación General -->
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">
+            Calificación General *
+          </label>
+          <div class="flex items-center gap-2" role="radiogroup" aria-label="Calificación del curso">
+            ${[1, 2, 3, 4, 5].map(num => `
+              <input type="radio" name="calificacion" value="${num}" id="rating${num}" class="sr-only" required>
+              <label for="rating${num}" 
+                     class="cursor-pointer text-4xl text-slate-300 dark:text-slate-600 hover:text-yellow-400 transition-colors focus:outline-none focus:ring-2 focus:ring-primary rounded"
+                     tabindex="0"
+                     role="radio"
+                     aria-checked="false"
+                     aria-label="${num} ${num === 1 ? 'estrella' : 'estrellas'}">
+                <span class="material-symbols-outlined">star</span>
+              </label>
+            `).join('')}
+          </div>
+        </div>
+
+        <!-- Calificación de Accesibilidad -->
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">
+            Calificación de Accesibilidad *
+          </label>
+          <div class="flex items-center gap-2" role="radiogroup" aria-label="Calificación de accesibilidad">
+            ${[1, 2, 3, 4, 5].map(num => `
+              <input type="radio" name="accesibilidad_calificacion" value="${num}" id="accessRating${num}" class="sr-only" required>
+              <label for="accessRating${num}" 
+                     class="cursor-pointer text-4xl text-slate-300 dark:text-slate-600 hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary rounded"
+                     tabindex="0"
+                     role="radio"
+                     aria-checked="false"
+                     aria-label="${num} ${num === 1 ? 'estrella' : 'estrellas'} de accesibilidad">
+                <span class="material-symbols-outlined">accessibility_new</span>
+              </label>
+            `).join('')}
+          </div>
+        </div>
+
+        <!-- Título -->
+        <div>
+          <label for="reviewTitulo" class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+            Título de tu Reseña *
+          </label>
+          <input 
+            type="text" 
+            id="reviewTitulo" 
+            name="titulo" 
+            required
+            maxlength="200"
+            class="w-full px-4 py-3 rounded-lg border-2 border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors"
+            placeholder="Ej: Excelente curso para principiantes"
+            aria-describedby="tituloHelp"
+          />
+          <p id="tituloHelp" class="text-xs text-slate-600 dark:text-slate-400 mt-1">
+            Máximo 200 caracteres
+          </p>
+        </div>
+
+        <!-- Comentario -->
+        <div>
+          <label for="reviewComentario" class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+            Tu Experiencia *
+          </label>
+          <textarea 
+            id="reviewComentario" 
+            name="comentario" 
+            rows="5"
+            required
+            class="w-full px-4 py-3 rounded-lg border-2 border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors"
+            placeholder="Comparte tu experiencia con este curso..."
+            aria-describedby="comentarioHelp"
+          ></textarea>
+          <p id="comentarioHelp" class="text-xs text-slate-600 dark:text-slate-400 mt-1">
+            Describe tu experiencia general con el curso
+          </p>
+        </div>
+
+        <!-- Aspectos Positivos -->
+        <div>
+          <label for="reviewPositivos" class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+            <span class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-green-600">thumb_up</span>
+              Aspectos Positivos
+            </span>
+          </label>
+          <textarea 
+            id="reviewPositivos" 
+            name="aspectos_positivos" 
+            rows="3"
+            class="w-full px-4 py-3 rounded-lg border-2 border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors"
+            placeholder="¿Qué te gustó más del curso?"
+          ></textarea>
+        </div>
+
+        <!-- Aspectos a Mejorar -->
+        <div>
+          <label for="reviewMejorar" class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+            <span class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-amber-600">lightbulb</span>
+              Aspectos a Mejorar
+            </span>
+          </label>
+          <textarea 
+            id="reviewMejorar" 
+            name="aspectos_mejorar" 
+            rows="3"
+            class="w-full px-4 py-3 rounded-lg border-2 border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors"
+            placeholder="¿Qué podría mejorar?"
+          ></textarea>
+        </div>
+
+        <!-- Botones -->
+        <div class="flex gap-4 pt-4">
+          <button 
+            type="button" 
+            onclick="document.getElementById('modalWriteReview').classList.add('hidden')" 
+            class="flex-1 px-6 py-3 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-900 dark:text-white rounded-lg font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-slate-500"
+            aria-label="Cancelar"
+          >
+            Cancelar
+          </button>
+          <button 
+            type="submit" 
+            class="flex-1 px-6 py-3 bg-primary hover:bg-primary/90 text-white rounded-lg font-semibold transition-colors shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+            aria-label="Publicar reseña"
+          >
+            Publicar Reseña
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- Modal: Editar Usuario -->
   <div id="modalEditarUsuario" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">

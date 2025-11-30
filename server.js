@@ -490,8 +490,11 @@ app.get('/api/alumnos/:id/cursos', async (req, res) => {
     const { id } = req.params;
     
     const cursos = await query(
-      `SELECT c.*, ac.fecha_inscripcion, ac.finalizado,
-              cat.nombre AS categoria, g.nombre AS grado,
+      `SELECT DISTINCT c.*, 
+              MAX(ac.fecha_inscripcion) AS fecha_inscripcion, 
+              MAX(ac.finalizado) AS finalizado,
+              cat.nombre AS categoria, 
+              g.nombre AS grado,
               CONCAT(u.nombre, ' ', u.apellido) AS docente
        FROM alumno_curso ac
        INNER JOIN curso c ON ac.curso_id = c.id_curso
@@ -500,7 +503,8 @@ app.get('/api/alumnos/:id/cursos', async (req, res) => {
        LEFT JOIN docente d ON c.docente_id = d.id_docente
        LEFT JOIN usuario u ON d.usuario_id = u.id_usuario
        WHERE ac.alumno_id = ?
-       ORDER BY ac.fecha_inscripcion DESC`,
+       GROUP BY c.id_curso, cat.nombre, g.nombre, u.nombre, u.apellido
+       ORDER BY fecha_inscripcion DESC`,
       [id]
     );
     
@@ -1011,30 +1015,51 @@ app.get('/api/cuestionarios/:id/preguntas', async (req, res) => {
   try {
     const { id } = req.params;
     
+    // Obtener preguntas
     const preguntas = await query(
-      `SELECT p.*, 
-        (SELECT JSON_ARRAYAGG(
-          JSON_OBJECT('id', o.id_opcion, 'texto_opcion', o.texto_opcion, 'es_correcta', o.es_correcta)
-        )
-        FROM opcion o
-        WHERE o.pregunta_id = p.id_pregunta
-        ) AS opciones
+      `SELECT p.id_pregunta, p.cuestionario_id, p.texto_pregunta
        FROM pregunta p
-       WHERE p.cuestionario_id = ?`,
+       WHERE p.cuestionario_id = ?
+       ORDER BY p.id_pregunta`,
       [id]
     );
     
-    // Parsear opciones JSON
-    const preguntasConOpciones = preguntas.map(p => ({
-      ...p,
-      opciones: p.opciones ? JSON.parse(p.opciones) : []
-    }));
+    if (!preguntas || preguntas.length === 0) {
+      return res.json([]);
+    }
+    
+    // Obtener opciones para cada pregunta
+    const preguntasConOpciones = await Promise.all(
+      preguntas.map(async (pregunta) => {
+        const opciones = await query(
+          `SELECT id_opcion, texto_opcion, es_correcta
+           FROM opcion
+           WHERE pregunta_id = ?
+           ORDER BY id_opcion`,
+          [pregunta.id_pregunta]
+        );
+        
+        // Convertir es_correcta a booleano
+        const opcionesFormateadas = (opciones || []).map(opcion => ({
+          id_opcion: opcion.id_opcion,
+          texto_opcion: opcion.texto_opcion,
+          es_correcta: Boolean(opcion.es_correcta)
+        }));
+        
+        return {
+          id_pregunta: pregunta.id_pregunta,
+          cuestionario_id: pregunta.cuestionario_id,
+          texto_pregunta: pregunta.texto_pregunta,
+          opciones: opcionesFormateadas
+        };
+      })
+    );
     
     res.json(preguntasConOpciones);
     
   } catch (error) {
     console.error('Error al obtener preguntas:', error);
-    res.status(500).json({ error: 'Error al obtener las preguntas' });
+    res.status(500).json({ error: 'Error al obtener las preguntas: ' + error.message });
   }
 });
 
@@ -1917,6 +1942,1218 @@ app.put('/api/aprobaciones/:id', async (req, res) => {
 
 // Actualizar el endpoint PUT de cursos para incluir id_cuestionario
 // (Ya existe, solo necesito verificar que incluya id_cuestionario)
+
+// ========================================
+// ENDPOINTS DE GESTIÓN DE PERFIL DE USUARIO
+// ========================================
+
+// GET /api/usuarios/:id/perfil - Obtener perfil completo
+app.get('/api/usuarios/:id/perfil', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const perfil = await query(
+      `SELECT u.id_usuario, u.nombre, u.apellido, u.correo, u.rol, u.estado,
+              u.avatar, u.biografia, u.fecha_registro, u.ultima_conexion,
+              u.telefono, u.pais, u.ciudad, u.sitio_web, u.linkedin, u.twitter, u.verificado,
+              d.id_docente, d.especialidad, d.experiencia,
+              a.id_alumno
+       FROM usuario u
+       LEFT JOIN docente d ON u.id_usuario = d.usuario_id
+       LEFT JOIN alumno a ON u.id_usuario = a.usuario_id
+       WHERE u.id_usuario = ?`,
+      [id]
+    );
+    
+    if (perfil.length === 0) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+    
+    res.json(perfil[0]);
+  } catch (error) {
+    console.error('Error al obtener perfil:', error);
+    res.status(500).json({ error: 'Error al obtener perfil' });
+  }
+});
+
+// PUT /api/usuarios/:id/perfil - Actualizar perfil
+app.put('/api/usuarios/:id/perfil', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { nombre, apellido, telefono, pais, ciudad, biografia, sitio_web, linkedin, twitter } = req.body;
+    
+    await query(
+      `UPDATE usuario 
+       SET nombre = ?, apellido = ?, telefono = ?, pais = ?, ciudad = ?,
+           biografia = ?, sitio_web = ?, linkedin = ?, twitter = ?
+       WHERE id_usuario = ?`,
+      [nombre, apellido, telefono, pais, ciudad, biografia, sitio_web, linkedin, twitter, id]
+    );
+    
+    res.json({ message: 'Perfil actualizado correctamente' });
+  } catch (error) {
+    console.error('Error al actualizar perfil:', error);
+    res.status(500).json({ error: 'Error al actualizar perfil' });
+  }
+});
+
+// POST /api/usuarios/:id/avatar - Subir avatar
+app.post('/api/usuarios/:id/avatar', upload.single('avatar'), async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    if (!req.file) {
+      return res.status(400).json({ error: 'No se proporcionó ningún archivo' });
+    }
+    
+    const avatarUrl = `/uploads/${req.file.filename}`;
+    
+    await query(
+      'UPDATE usuario SET avatar = ? WHERE id_usuario = ?',
+      [avatarUrl, id]
+    );
+    
+    res.json({ message: 'Avatar actualizado correctamente', url: avatarUrl });
+  } catch (error) {
+    console.error('Error al subir avatar:', error);
+    res.status(500).json({ error: 'Error al subir avatar' });
+  }
+});
+
+// ========================================
+// ENDPOINTS DE CONFIGURACIÓN DE ACCESIBILIDAD
+// ========================================
+
+// GET /api/usuarios/:id/accesibilidad - Obtener configuración
+app.get('/api/usuarios/:id/accesibilidad', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    let config = await query(
+      'SELECT * FROM configuracion_accesibilidad WHERE usuario_id = ?',
+      [id]
+    );
+    
+    // Si no existe, crear configuración por defecto
+    if (config.length === 0) {
+      await query(
+        'INSERT INTO configuracion_accesibilidad (usuario_id) VALUES (?)',
+        [id]
+      );
+      config = await query(
+        'SELECT * FROM configuracion_accesibilidad WHERE usuario_id = ?',
+        [id]
+      );
+    }
+    
+    res.json(config[0]);
+  } catch (error) {
+    console.error('Error al obtener configuración de accesibilidad:', error);
+    res.status(500).json({ error: 'Error al obtener configuración' });
+  }
+});
+
+// PUT /api/usuarios/:id/accesibilidad - Actualizar configuración
+app.put('/api/usuarios/:id/accesibilidad', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const config = req.body;
+    
+    await query(
+      `UPDATE configuracion_accesibilidad 
+       SET alto_contraste = ?, tipografia_legible = ?, tamano_texto = ?,
+           espaciado_linea = ?, espaciado_letra = ?, modo_daltonismo = ?,
+           lector_pantalla = ?, velocidad_lector = ?, reducir_movimiento = ?,
+           subrayar_enlaces = ?, enfoque_mejorado = ?, cursor_grande = ?, guia_lectura = ?
+       WHERE usuario_id = ?`,
+      [
+        config.alto_contraste, config.tipografia_legible, config.tamano_texto,
+        config.espaciado_linea, config.espaciado_letra, config.modo_daltonismo,
+        config.lector_pantalla, config.velocidad_lector, config.reducir_movimiento,
+        config.subrayar_enlaces, config.enfoque_mejorado, config.cursor_grande,
+        config.guia_lectura, id
+      ]
+    );
+    
+    res.json({ message: 'Configuración actualizada correctamente' });
+  } catch (error) {
+    console.error('Error al actualizar configuración:', error);
+    res.status(500).json({ error: 'Error al actualizar configuración' });
+  }
+});
+
+// ========================================
+// ENDPOINTS DE NOTIFICACIONES
+// ========================================
+
+// GET /api/usuarios/:id/notificaciones - Obtener notificaciones
+app.get('/api/usuarios/:id/notificaciones', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { leida } = req.query;
+    
+    let sql = 'SELECT * FROM notificacion WHERE usuario_id = ?';
+    const params = [id];
+    
+    if (leida !== undefined) {
+      sql += ' AND leida = ?';
+      params.push(leida === 'true' ? 1 : 0);
+    }
+    
+    sql += ' ORDER BY fecha_creacion DESC LIMIT 50';
+    
+    const notificaciones = await query(sql, params);
+    res.json(notificaciones);
+  } catch (error) {
+    console.error('Error al obtener notificaciones:', error);
+    res.status(500).json({ error: 'Error al obtener notificaciones' });
+  }
+});
+
+// PUT /api/notificaciones/:id/leer - Marcar como leída
+app.put('/api/notificaciones/:id/leer', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    await query(
+      'UPDATE notificacion SET leida = TRUE WHERE id_notificacion = ?',
+      [id]
+    );
+    
+    res.json({ message: 'Notificación marcada como leída' });
+  } catch (error) {
+    console.error('Error al marcar notificación:', error);
+    res.status(500).json({ error: 'Error al marcar notificación' });
+  }
+});
+
+// PUT /api/usuarios/:id/notificaciones/leer-todas - Marcar todas como leídas
+app.put('/api/usuarios/:id/notificaciones/leer-todas', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    await query(
+      'UPDATE notificacion SET leida = TRUE WHERE usuario_id = ?',
+      [id]
+    );
+    
+    res.json({ message: 'Todas las notificaciones marcadas como leídas' });
+  } catch (error) {
+    console.error('Error al marcar notificaciones:', error);
+    res.status(500).json({ error: 'Error al marcar notificaciones' });
+  }
+});
+
+// ========================================
+// ENDPOINTS DE SECCIONES Y LECCIONES
+// ========================================
+
+// GET /api/cursos/:id/secciones - Obtener secciones con lecciones
+app.get('/api/cursos/:id/secciones', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const secciones = await query(
+      `SELECT * FROM seccion_curso WHERE curso_id = ? ORDER BY orden`,
+      [id]
+    );
+    
+    // Obtener lecciones para cada sección
+    for (let seccion of secciones) {
+      seccion.lecciones = await query(
+        `SELECT * FROM leccion WHERE seccion_id = ? ORDER BY orden`,
+        [seccion.id_seccion]
+      );
+    }
+    
+    res.json(secciones);
+  } catch (error) {
+    console.error('Error al obtener secciones:', error);
+    res.status(500).json({ error: 'Error al obtener secciones' });
+  }
+});
+
+// POST /api/cursos/:id/secciones - Crear sección
+app.post('/api/cursos/:id/secciones', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { titulo, descripcion, orden, duracion_estimada } = req.body;
+    
+    const result = await query(
+      `INSERT INTO seccion_curso (curso_id, titulo, descripcion, orden, duracion_estimada)
+       VALUES (?, ?, ?, ?, ?)`,
+      [id, titulo, descripcion, orden, duracion_estimada || 0]
+    );
+    
+    res.json({ 
+      message: 'Sección creada correctamente',
+      id_seccion: result.insertId
+    });
+  } catch (error) {
+    console.error('Error al crear sección:', error);
+    res.status(500).json({ error: 'Error al crear sección' });
+  }
+});
+
+// POST /api/secciones/:id/lecciones - Crear lección
+app.post('/api/secciones/:id/lecciones', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { titulo, descripcion, tipo, contenido, url_recurso, duracion, orden, es_vista_previa, transcripcion } = req.body;
+    
+    const result = await query(
+      `INSERT INTO leccion (seccion_id, titulo, descripcion, tipo, contenido, url_recurso, 
+                            duracion, orden, es_vista_previa, transcripcion)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [id, titulo, descripcion, tipo, contenido, url_recurso, duracion || 0, orden, 
+       es_vista_previa || false, transcripcion]
+    );
+    
+    res.json({ 
+      message: 'Lección creada correctamente',
+      id_leccion: result.insertId
+    });
+  } catch (error) {
+    console.error('Error al crear lección:', error);
+    res.status(500).json({ error: 'Error al crear lección' });
+  }
+});
+
+// PUT /api/lecciones/:id - Actualizar lección
+app.put('/api/lecciones/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { titulo, descripcion, contenido, url_recurso, duracion, transcripcion } = req.body;
+    
+    await query(
+      `UPDATE leccion 
+       SET titulo = ?, descripcion = ?, contenido = ?, url_recurso = ?,
+           duracion = ?, transcripcion = ?
+       WHERE id_leccion = ?`,
+      [titulo, descripcion, contenido, url_recurso, duracion, transcripcion, id]
+    );
+    
+    res.json({ message: 'Lección actualizada correctamente' });
+  } catch (error) {
+    console.error('Error al actualizar lección:', error);
+    res.status(500).json({ error: 'Error al actualizar lección' });
+  }
+});
+
+// DELETE /api/lecciones/:id - Eliminar lección
+app.delete('/api/lecciones/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    await query('DELETE FROM leccion WHERE id_leccion = ?', [id]);
+    
+    res.json({ message: 'Lección eliminada correctamente' });
+  } catch (error) {
+    console.error('Error al eliminar lección:', error);
+    res.status(500).json({ error: 'Error al eliminar lección' });
+  }
+});
+
+// ========================================
+// ENDPOINTS DE PROGRESO
+// ========================================
+
+// GET /api/alumnos/:id/lecciones/:leccionId/progreso - Obtener progreso de lección
+// IMPORTANTE: Esta ruta debe estar ANTES de rutas más generales como /api/alumnos/:id/progreso
+app.get('/api/alumnos/:id/lecciones/:leccionId/progreso', async (req, res) => {
+  try {
+    const { id, leccionId } = req.params;
+    
+    console.log(`[DEBUG] Obteniendo progreso para alumno ${id}, lección ${leccionId}`);
+    
+    const progreso = await query(
+      `SELECT * FROM progreso_leccion 
+       WHERE alumno_id = ? AND leccion_id = ?`,
+      [id, leccionId]
+    );
+    
+    if (progreso.length === 0) {
+      console.log(`[DEBUG] No se encontró progreso, retornando valores por defecto`);
+      return res.json({ completada: false, tiempo_visto: 0 });
+    }
+    
+    // Asegurar que completada sea un booleano (MySQL puede retornar 0/1)
+    const progresoData = progreso[0];
+    if (progresoData.completada !== undefined) {
+      progresoData.completada = progresoData.completada === true || progresoData.completada === 1;
+    }
+    
+    console.log(`[DEBUG] Progreso encontrado:`, progresoData);
+    res.json(progresoData);
+  } catch (error) {
+    console.error('Error al obtener progreso de lección:', error);
+    res.status(500).json({ error: 'Error al obtener progreso: ' + error.message });
+  }
+});
+
+// GET /api/alumnos/:alumnoId/cursos/:cursoId/progreso - Progreso de un curso específico
+app.get('/api/alumnos/:alumnoId/cursos/:cursoId/progreso', async (req, res) => {
+  try {
+    const { alumnoId, cursoId } = req.params;
+    
+    const progreso = await query(
+      'SELECT * FROM v_progreso_alumno WHERE id_alumno = ? AND id_curso = ?',
+      [alumnoId, cursoId]
+    );
+    
+    if (progreso.length === 0) {
+      return res.json({ 
+        porcentaje_completado: 0,
+        lecciones_completadas: 0,
+        total_lecciones_curso: 0
+      });
+    }
+    
+    res.json(progreso[0]);
+  } catch (error) {
+    console.error('Error al obtener progreso del curso:', error);
+    res.status(500).json({ error: 'Error al obtener progreso' });
+  }
+});
+
+// GET /api/alumnos/:id/progreso - Obtener progreso general
+app.get('/api/alumnos/:id/progreso', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const progreso = await query(
+      'SELECT * FROM v_progreso_alumno WHERE id_alumno = ?',
+      [id]
+    );
+    
+    res.json(progreso);
+  } catch (error) {
+    console.error('Error al obtener progreso:', error);
+    res.status(500).json({ error: 'Error al obtener progreso' });
+  }
+});
+
+// POST /api/alumnos/:id/progreso/leccion - Actualizar progreso de lección
+app.post('/api/alumnos/:id/progreso/leccion', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { leccion_id, completada, tiempo_visto, ultima_posicion, notas_alumno } = req.body;
+    
+    console.log('[DEBUG] Actualizando progreso de lección:', {
+      alumno_id: id,
+      leccion_id,
+      completada,
+      tiempo_visto,
+      ultima_posicion,
+      notas_alumno
+    });
+    
+    // Validar que leccion_id existe
+    if (!leccion_id) {
+      return res.status(400).json({ error: 'leccion_id es requerido' });
+    }
+    
+    // Convertir IDs a números
+    const alumnoId = parseInt(id, 10);
+    const leccionId = parseInt(leccion_id, 10);
+    
+    if (isNaN(alumnoId) || isNaN(leccionId)) {
+      return res.status(400).json({ error: 'IDs inválidos' });
+    }
+    
+    // Verificar que el alumno existe
+    const alumnoCheck = await query('SELECT id_alumno FROM alumno WHERE id_alumno = ?', [alumnoId]);
+    if (alumnoCheck.length === 0) {
+      return res.status(404).json({ error: `Alumno con ID ${alumnoId} no encontrado` });
+    }
+    
+    // Verificar que la lección existe
+    const leccionCheck = await query('SELECT id_leccion FROM leccion WHERE id_leccion = ?', [leccionId]);
+    if (leccionCheck.length === 0) {
+      console.warn(`[WARN] Lección con ID ${leccionId} no encontrada en tabla leccion`);
+      // Intentar buscar en contenido antiguo como fallback
+      const contenidoCheck = await query('SELECT id_contenido FROM contenido WHERE id_contenido = ?', [leccionId]);
+      if (contenidoCheck.length === 0) {
+        return res.status(404).json({ error: `Lección con ID ${leccionId} no encontrada` });
+      }
+      // Si existe en contenido, usar ese ID pero no podemos insertar en progreso_leccion
+      // porque requiere una lección válida
+      console.warn(`[WARN] Lección ${leccionId} existe en contenido antiguo, pero no en tabla leccion`);
+    }
+    
+    // Convertir completada a boolean si viene como string
+    const completadaBool = completada === true || completada === 'true' || completada === 1;
+    
+    // Insertar o actualizar progreso
+    try {
+      await query(
+        `INSERT INTO progreso_leccion 
+         (alumno_id, leccion_id, completada, tiempo_visto, ultima_posicion, notas_alumno, fecha_completado)
+         VALUES (?, ?, ?, ?, ?, ?, ?)
+         ON DUPLICATE KEY UPDATE
+           completada = VALUES(completada),
+           tiempo_visto = VALUES(tiempo_visto),
+           ultima_posicion = VALUES(ultima_posicion),
+           notas_alumno = VALUES(notas_alumno),
+           fecha_completado = IF(VALUES(completada) = TRUE, NOW(), fecha_completado)`,
+        [
+          alumnoId, 
+          leccionId, 
+          completadaBool, 
+          tiempo_visto || 0, 
+          ultima_posicion || 0, 
+          notas_alumno || null, 
+          completadaBool ? new Date() : null
+        ]
+      );
+    } catch (dbError) {
+      console.error('[ERROR] Error en INSERT/UPDATE progreso_leccion:', dbError);
+      console.error('[ERROR] Código de error:', dbError.code);
+      console.error('[ERROR] Mensaje:', dbError.message);
+      
+      // Si es un error de clave foránea, dar un mensaje más claro
+      if (dbError.code === 'ER_NO_REFERENCED_ROW_2') {
+        return res.status(400).json({ 
+          error: 'Error de referencia: La lección o el alumno no existen en la base de datos',
+          details: dbError.message 
+        });
+      }
+      
+      throw dbError; // Re-lanzar para que se capture en el catch general
+    }
+    
+    // Si completó la lección, intentar llamar al procedimiento almacenado (si existe)
+    if (completadaBool) {
+      try {
+        await query('CALL sp_completar_leccion(?, ?)', [alumnoId, leccionId]);
+      } catch (procError) {
+        // Si el procedimiento no existe o falla, solo registrar el warning pero continuar
+        console.warn('No se pudo ejecutar sp_completar_leccion:', procError.message);
+      }
+    }
+    
+    res.json({ message: 'Progreso actualizado correctamente' });
+  } catch (error) {
+    console.error('[ERROR] Error al actualizar progreso:', error);
+    console.error('[ERROR] Stack trace:', error.stack);
+    res.status(500).json({ 
+      error: 'Error al actualizar progreso',
+      details: error.message,
+      code: error.code
+    });
+  }
+});
+
+// ========================================
+// ENDPOINTS DE LISTA DE DESEOS
+// ========================================
+
+// GET /api/alumnos/:id/lista-deseos - Obtener lista de deseos
+app.get('/api/alumnos/:id/lista-deseos', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const lista = await query(
+      `SELECT c.*, ld.fecha_agregado,
+              CONCAT(u.nombre, ' ', u.apellido) as nombre_docente,
+              cat.nombre as categoria
+       FROM lista_deseos ld
+       JOIN curso c ON ld.curso_id = c.id_curso
+       LEFT JOIN docente d ON c.docente_id = d.id_docente
+       LEFT JOIN usuario u ON d.usuario_id = u.id_usuario
+       LEFT JOIN categoria cat ON c.id_categoria = cat.id_categoria
+       WHERE ld.alumno_id = ?
+       ORDER BY ld.fecha_agregado DESC`,
+      [id]
+    );
+    
+    res.json(lista);
+  } catch (error) {
+    console.error('Error al obtener lista de deseos:', error);
+    res.status(500).json({ error: 'Error al obtener lista de deseos' });
+  }
+});
+
+// POST /api/alumnos/:id/lista-deseos - Agregar a lista de deseos
+app.post('/api/alumnos/:id/lista-deseos', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { curso_id } = req.body;
+    
+    await query(
+      'INSERT INTO lista_deseos (alumno_id, curso_id) VALUES (?, ?)',
+      [id, curso_id]
+    );
+    
+    res.json({ message: 'Curso agregado a lista de deseos' });
+  } catch (error) {
+    if (error.code === 'ER_DUP_ENTRY') {
+      return res.status(400).json({ error: 'El curso ya está en tu lista de deseos' });
+    }
+    console.error('Error al agregar a lista de deseos:', error);
+    res.status(500).json({ error: 'Error al agregar a lista de deseos' });
+  }
+});
+
+// DELETE /api/alumnos/:id/lista-deseos/:cursoId - Eliminar de lista de deseos
+app.delete('/api/alumnos/:id/lista-deseos/:cursoId', async (req, res) => {
+  try {
+    const { id, cursoId } = req.params;
+    
+    await query(
+      'DELETE FROM lista_deseos WHERE alumno_id = ? AND curso_id = ?',
+      [id, cursoId]
+    );
+    
+    res.json({ message: 'Curso eliminado de lista de deseos' });
+  } catch (error) {
+    console.error('Error al eliminar de lista de deseos:', error);
+    res.status(500).json({ error: 'Error al eliminar de lista de deseos' });
+  }
+});
+
+// ========================================
+// ENDPOINTS DE REVIEWS Y RATINGS
+// ========================================
+
+// GET /api/cursos/:id/resenas - Obtener reseñas de un curso
+app.get('/api/cursos/:id/resenas', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { ordenar } = req.query; // 'recientes', 'utiles', 'calificacion'
+    
+    let orderBy = 'r.fecha_publicacion DESC';
+    if (ordenar === 'utiles') orderBy = 'r.util_count DESC';
+    if (ordenar === 'calificacion') orderBy = 'r.calificacion DESC';
+    
+    const resenas = await query(
+      `SELECT r.*, 
+              CONCAT(u.nombre, ' ', u.apellido) as nombre_alumno,
+              u.avatar as avatar_alumno,
+              resp.respuesta as respuesta_docente,
+              resp.fecha_respuesta
+       FROM resena_curso r
+       JOIN alumno a ON r.alumno_id = a.id_alumno
+       JOIN usuario u ON a.usuario_id = u.id_usuario
+       LEFT JOIN respuesta_resena resp ON r.id_resena = resp.resena_id
+       WHERE r.curso_id = ? AND r.visible = TRUE
+       ORDER BY ${orderBy}`,
+      [id]
+    );
+    
+    res.json(resenas);
+  } catch (error) {
+    console.error('Error al obtener reseñas:', error);
+    res.status(500).json({ error: 'Error al obtener reseñas' });
+  }
+});
+
+// POST /api/cursos/:id/resenas - Crear reseña
+app.post('/api/cursos/:id/resenas', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { alumno_id, calificacion, titulo, comentario, accesibilidad_calificacion, aspectos_positivos, aspectos_mejorar } = req.body;
+    
+    // Verificar que el alumno esté inscrito
+    const inscrito = await query(
+      'SELECT * FROM alumno_curso WHERE alumno_id = ? AND curso_id = ?',
+      [alumno_id, id]
+    );
+    
+    if (inscrito.length === 0) {
+      return res.status(400).json({ error: 'Debes estar inscrito en el curso para dejar una reseña' });
+    }
+    
+    const result = await query(
+      `INSERT INTO resena_curso 
+       (curso_id, alumno_id, calificacion, titulo, comentario, accesibilidad_calificacion, 
+        aspectos_positivos, aspectos_mejorar)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [id, alumno_id, calificacion, titulo, comentario, accesibilidad_calificacion, aspectos_positivos, aspectos_mejorar]
+    );
+    
+    // Actualizar rating del curso
+    await query('CALL sp_actualizar_rating_curso(?)', [id]);
+    
+    res.json({ 
+      message: 'Reseña publicada correctamente',
+      id_resena: result.insertId
+    });
+  } catch (error) {
+    if (error.code === 'ER_DUP_ENTRY') {
+      return res.status(400).json({ error: 'Ya has dejado una reseña para este curso' });
+    }
+    console.error('Error al crear reseña:', error);
+    res.status(500).json({ error: 'Error al crear reseña' });
+  }
+});
+
+// PUT /api/resenas/:id - Actualizar reseña
+app.put('/api/resenas/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { calificacion, titulo, comentario, accesibilidad_calificacion, aspectos_positivos, aspectos_mejorar } = req.body;
+    
+    await query(
+      `UPDATE resena_curso 
+       SET calificacion = ?, titulo = ?, comentario = ?, 
+           accesibilidad_calificacion = ?, aspectos_positivos = ?, aspectos_mejorar = ?,
+           fecha_modificacion = NOW()
+       WHERE id_resena = ?`,
+      [calificacion, titulo, comentario, accesibilidad_calificacion, aspectos_positivos, aspectos_mejorar, id]
+    );
+    
+    res.json({ message: 'Reseña actualizada correctamente' });
+  } catch (error) {
+    console.error('Error al actualizar reseña:', error);
+    res.status(500).json({ error: 'Error al actualizar reseña' });
+  }
+});
+
+// POST /api/resenas/:id/votar - Votar reseña como útil
+app.post('/api/resenas/:id/votar', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { usuario_id, tipo } = req.body; // tipo: 'util' o 'no_util'
+    
+    await query(
+      'INSERT INTO voto_resena (resena_id, usuario_id, tipo) VALUES (?, ?, ?)',
+      [id, usuario_id, tipo]
+    );
+    
+    res.json({ message: 'Voto registrado correctamente' });
+  } catch (error) {
+    if (error.code === 'ER_DUP_ENTRY') {
+      return res.status(400).json({ error: 'Ya has votado esta reseña' });
+    }
+    console.error('Error al votar reseña:', error);
+    res.status(500).json({ error: 'Error al votar reseña' });
+  }
+});
+
+// POST /api/resenas/:id/responder - Docente responde a reseña
+app.post('/api/resenas/:id/responder', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { docente_id, respuesta } = req.body;
+    
+    await query(
+      'INSERT INTO respuesta_resena (resena_id, docente_id, respuesta) VALUES (?, ?, ?)',
+      [id, docente_id, respuesta]
+    );
+    
+    res.json({ message: 'Respuesta publicada correctamente' });
+  } catch (error) {
+    console.error('Error al responder reseña:', error);
+    res.status(500).json({ error: 'Error al responder reseña' });
+  }
+});
+
+// ========================================
+// ENDPOINTS DE CERTIFICADOS
+// ========================================
+
+// GET /api/alumnos/:id/certificados - Obtener certificados del alumno
+app.get('/api/alumnos/:id/certificados', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const certificados = await query(
+      `SELECT c.*, curso.titulo as titulo_curso, curso.imagen_portada,
+              CONCAT(u.nombre, ' ', u.apellido) as nombre_docente
+       FROM certificado c
+       JOIN curso ON c.curso_id = curso.id_curso
+       LEFT JOIN docente d ON curso.docente_id = d.id_docente
+       LEFT JOIN usuario u ON d.usuario_id = u.id_usuario
+       WHERE c.alumno_id = ? AND c.visible = TRUE
+       ORDER BY c.fecha_emision DESC`,
+      [id]
+    );
+    
+    res.json(certificados);
+  } catch (error) {
+    console.error('Error al obtener certificados:', error);
+    res.status(500).json({ error: 'Error al obtener certificados' });
+  }
+});
+
+// GET /api/certificados/verificar/:codigo - Verificar certificado
+app.get('/api/certificados/verificar/:codigo', async (req, res) => {
+  try {
+    const { codigo } = req.params;
+    
+    const certificado = await query(
+      `SELECT c.*, 
+              CONCAT(u_alumno.nombre, ' ', u_alumno.apellido) as nombre_alumno,
+              curso.titulo as titulo_curso,
+              CONCAT(u_docente.nombre, ' ', u_docente.apellido) as nombre_docente
+       FROM certificado c
+       JOIN alumno a ON c.alumno_id = a.id_alumno
+       JOIN usuario u_alumno ON a.usuario_id = u_alumno.id_usuario
+       JOIN curso ON c.curso_id = curso.id_curso
+       LEFT JOIN docente d ON curso.docente_id = d.id_docente
+       LEFT JOIN usuario u_docente ON d.usuario_id = u_docente.id_usuario
+       WHERE c.codigo_verificacion = ? AND c.visible = TRUE`,
+      [codigo]
+    );
+    
+    if (certificado.length === 0) {
+      return res.status(404).json({ error: 'Certificado no encontrado' });
+    }
+    
+    res.json(certificado[0]);
+  } catch (error) {
+    console.error('Error al verificar certificado:', error);
+    res.status(500).json({ error: 'Error al verificar certificado' });
+  }
+});
+
+// ========================================
+// ENDPOINTS DE FOROS
+// ========================================
+
+// GET /api/cursos/:id/foros - Obtener temas del foro
+app.get('/api/cursos/:id/foros', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { categoria, buscar } = req.query;
+    
+    let sql = `
+      SELECT ft.*, 
+             CONCAT(u.nombre, ' ', u.apellido) as nombre_usuario,
+             u.avatar as avatar_usuario,
+             u.rol as rol_usuario,
+             COUNT(DISTINCT fr.id_respuesta) as total_respuestas
+      FROM foro_tema ft
+      JOIN usuario u ON ft.usuario_id = u.id_usuario
+      LEFT JOIN foro_respuesta fr ON ft.id_tema = fr.tema_id
+      WHERE ft.curso_id = ?
+    `;
+    const params = [id];
+    
+    if (categoria) {
+      sql += ' AND ft.categoria = ?';
+      params.push(categoria);
+    }
+    
+    if (buscar) {
+      sql += ' AND (ft.titulo LIKE ? OR ft.contenido LIKE ?)';
+      params.push(`%${buscar}%`, `%${buscar}%`);
+    }
+    
+    sql += ' GROUP BY ft.id_tema ORDER BY ft.fijado DESC, ft.fecha_actualizacion DESC';
+    
+    const temas = await query(sql, params);
+    res.json(temas);
+  } catch (error) {
+    console.error('Error al obtener foros:', error);
+    res.status(500).json({ error: 'Error al obtener foros' });
+  }
+});
+
+// POST /api/cursos/:id/foros - Crear tema de foro
+app.post('/api/cursos/:id/foros', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { usuario_id, leccion_id, titulo, contenido, categoria } = req.body;
+    
+    const result = await query(
+      `INSERT INTO foro_tema (curso_id, leccion_id, usuario_id, titulo, contenido, categoria)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+      [id, leccion_id, usuario_id, titulo, contenido, categoria || 'pregunta']
+    );
+    
+    res.json({ 
+      message: 'Tema creado correctamente',
+      id_tema: result.insertId
+    });
+  } catch (error) {
+    console.error('Error al crear tema:', error);
+    res.status(500).json({ error: 'Error al crear tema' });
+  }
+});
+
+// GET /api/foros/:id - Obtener detalles del tema con respuestas
+app.get('/api/foros/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // Incrementar vistas
+    await query('UPDATE foro_tema SET vistas = vistas + 1 WHERE id_tema = ?', [id]);
+    
+    // Obtener tema
+    const tema = await query(
+      `SELECT ft.*, 
+              CONCAT(u.nombre, ' ', u.apellido) as nombre_usuario,
+              u.avatar as avatar_usuario,
+              u.rol as rol_usuario
+       FROM foro_tema ft
+       JOIN usuario u ON ft.usuario_id = u.id_usuario
+       WHERE ft.id_tema = ?`,
+      [id]
+    );
+    
+    if (tema.length === 0) {
+      return res.status(404).json({ error: 'Tema no encontrado' });
+    }
+    
+    // Obtener respuestas
+    const respuestas = await query(
+      `SELECT fr.*, 
+              CONCAT(u.nombre, ' ', u.apellido) as nombre_usuario,
+              u.avatar as avatar_usuario,
+              u.rol as rol_usuario
+       FROM foro_respuesta fr
+       JOIN usuario u ON fr.usuario_id = u.id_usuario
+       WHERE fr.tema_id = ?
+       ORDER BY fr.marcada_correcta DESC, fr.votos_positivos DESC, fr.fecha_publicacion ASC`,
+      [id]
+    );
+    
+    res.json({
+      tema: tema[0],
+      respuestas: respuestas
+    });
+  } catch (error) {
+    console.error('Error al obtener tema:', error);
+    res.status(500).json({ error: 'Error al obtener tema' });
+  }
+});
+
+// POST /api/foros/:id/responder - Responder a tema
+app.post('/api/foros/:id/responder', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { usuario_id, contenido, es_respuesta_docente } = req.body;
+    
+    const result = await query(
+      `INSERT INTO foro_respuesta (tema_id, usuario_id, contenido, es_respuesta_docente)
+       VALUES (?, ?, ?, ?)`,
+      [id, usuario_id, contenido, es_respuesta_docente || false]
+    );
+    
+    res.json({ 
+      message: 'Respuesta publicada correctamente',
+      id_respuesta: result.insertId
+    });
+  } catch (error) {
+    console.error('Error al responder:', error);
+    res.status(500).json({ error: 'Error al responder' });
+  }
+});
+
+// POST /api/foros/respuestas/:id/votar - Votar respuesta
+app.post('/api/foros/respuestas/:id/votar', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { usuario_id, tipo } = req.body; // 'positivo' o 'negativo'
+    
+    await query(
+      'INSERT INTO foro_voto (respuesta_id, usuario_id, tipo) VALUES (?, ?, ?)',
+      [id, usuario_id, tipo]
+    );
+    
+    res.json({ message: 'Voto registrado correctamente' });
+  } catch (error) {
+    if (error.code === 'ER_DUP_ENTRY') {
+      return res.status(400).json({ error: 'Ya has votado esta respuesta' });
+    }
+    console.error('Error al votar respuesta:', error);
+    res.status(500).json({ error: 'Error al votar respuesta' });
+  }
+});
+
+// PUT /api/foros/respuestas/:id/marcar-correcta - Marcar respuesta como correcta
+app.put('/api/foros/respuestas/:id/marcar-correcta', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // Desmarcar otras respuestas del mismo tema
+    await query(
+      `UPDATE foro_respuesta fr
+       JOIN foro_respuesta fr2 ON fr.tema_id = fr2.tema_id
+       SET fr.marcada_correcta = FALSE
+       WHERE fr2.id_respuesta = ?`,
+      [id]
+    );
+    
+    // Marcar esta respuesta
+    await query(
+      'UPDATE foro_respuesta SET marcada_correcta = TRUE WHERE id_respuesta = ?',
+      [id]
+    );
+    
+    // Marcar tema como resuelto
+    await query(
+      `UPDATE foro_tema ft
+       JOIN foro_respuesta fr ON ft.id_tema = fr.tema_id
+       SET ft.resuelto = TRUE
+       WHERE fr.id_respuesta = ?`,
+      [id]
+    );
+    
+    res.json({ message: 'Respuesta marcada como correcta' });
+  } catch (error) {
+    console.error('Error al marcar respuesta:', error);
+    res.status(500).json({ error: 'Error al marcar respuesta' });
+  }
+});
+
+// ========================================
+// ENDPOINTS DE MENSAJERÍA
+// ========================================
+
+// GET /api/usuarios/:id/mensajes - Obtener mensajes
+app.get('/api/usuarios/:id/mensajes', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { tipo } = req.query; // 'recibidos', 'enviados'
+    
+    let sql;
+    if (tipo === 'enviados') {
+      sql = `
+        SELECT m.*, 
+               CONCAT(u.nombre, ' ', u.apellido) as nombre_destinatario,
+               u.avatar as avatar_destinatario
+        FROM mensaje m
+        JOIN usuario u ON m.destinatario_id = u.id_usuario
+        WHERE m.remitente_id = ? AND m.archivado = FALSE
+        ORDER BY m.fecha_envio DESC
+      `;
+    } else {
+      sql = `
+        SELECT m.*, 
+               CONCAT(u.nombre, ' ', u.apellido) as nombre_remitente,
+               u.avatar as avatar_remitente
+        FROM mensaje m
+        JOIN usuario u ON m.remitente_id = u.id_usuario
+        WHERE m.destinatario_id = ? AND m.archivado = FALSE
+        ORDER BY m.fecha_envio DESC
+      `;
+    }
+    
+    const mensajes = await query(sql, [id]);
+    res.json(mensajes);
+  } catch (error) {
+    console.error('Error al obtener mensajes:', error);
+    res.status(500).json({ error: 'Error al obtener mensajes' });
+  }
+});
+
+// POST /api/mensajes - Enviar mensaje
+app.post('/api/mensajes', async (req, res) => {
+  try {
+    const { remitente_id, destinatario_id, asunto, contenido } = req.body;
+    
+    const result = await query(
+      `INSERT INTO mensaje (remitente_id, destinatario_id, asunto, contenido)
+       VALUES (?, ?, ?, ?)`,
+      [remitente_id, destinatario_id, asunto, contenido]
+    );
+    
+    // Crear notificación
+    await query(
+      `INSERT INTO notificacion (usuario_id, tipo, titulo, mensaje, url)
+       VALUES (?, 'mensaje', 'Nuevo mensaje', ?, '/mensajes')`,
+      [destinatario_id, `Tienes un nuevo mensaje: ${asunto}`]
+    );
+    
+    res.json({ 
+      message: 'Mensaje enviado correctamente',
+      id_mensaje: result.insertId
+    });
+  } catch (error) {
+    console.error('Error al enviar mensaje:', error);
+    res.status(500).json({ error: 'Error al enviar mensaje' });
+  }
+});
+
+// PUT /api/mensajes/:id/leer - Marcar mensaje como leído
+app.put('/api/mensajes/:id/leer', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    await query(
+      'UPDATE mensaje SET leido = TRUE WHERE id_mensaje = ?',
+      [id]
+    );
+    
+    res.json({ message: 'Mensaje marcado como leído' });
+  } catch (error) {
+    console.error('Error al marcar mensaje:', error);
+    res.status(500).json({ error: 'Error al marcar mensaje' });
+  }
+});
+
+// ========================================
+// ENDPOINTS DE INTENTOS DE CUESTIONARIOS
+// ========================================
+
+// GET /api/alumnos/:id/cuestionarios/:quizId/intentos - Obtener intentos
+app.get('/api/alumnos/:id/cuestionarios/:quizId/intentos', async (req, res) => {
+  try {
+    const { id, quizId } = req.params;
+    
+    const intentos = await query(
+      `SELECT * FROM intento_cuestionario 
+       WHERE alumno_id = ? AND cuestionario_id = ?
+       ORDER BY numero_intento DESC`,
+      [id, quizId]
+    );
+    
+    res.json(intentos);
+  } catch (error) {
+    console.error('Error al obtener intentos:', error);
+    res.status(500).json({ error: 'Error al obtener intentos' });
+  }
+});
+
+// POST /api/alumnos/:id/cuestionarios/:quizId/intentos - Registrar intento
+app.post('/api/alumnos/:id/cuestionarios/:quizId/intentos', async (req, res) => {
+  try {
+    const { id, quizId } = req.params;
+    const { puntuacion, tiempo_usado, respuestas_json, aprobado } = req.body;
+    
+    // Obtener número de intento
+    const intentos = await query(
+      'SELECT COALESCE(MAX(numero_intento), 0) + 1 as siguiente FROM intento_cuestionario WHERE alumno_id = ? AND cuestionario_id = ?',
+      [id, quizId]
+    );
+    const numeroIntento = intentos[0].siguiente;
+    
+    const result = await query(
+      `INSERT INTO intento_cuestionario 
+       (cuestionario_id, alumno_id, numero_intento, fecha_finalizacion, puntuacion, aprobado, tiempo_usado, respuestas_json)
+       VALUES (?, ?, ?, NOW(), ?, ?, ?, ?)`,
+      [quizId, id, numeroIntento, puntuacion, aprobado, tiempo_usado, JSON.stringify(respuestas_json)]
+    );
+    
+    res.json({ 
+      message: 'Intento registrado correctamente',
+      id_intento: result.insertId,
+      numero_intento: numeroIntento
+    });
+  } catch (error) {
+    console.error('Error al registrar intento:', error);
+    res.status(500).json({ error: 'Error al registrar intento' });
+  }
+});
+
+// ========================================
+// ENDPOINTS DE TAREAS
+// ========================================
+
+// GET /api/cursos/:id/tareas - Obtener tareas del curso
+app.get('/api/cursos/:id/tareas', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const tareas = await query(
+      'SELECT * FROM tarea WHERE curso_id = ? ORDER BY fecha_limite ASC',
+      [id]
+    );
+    
+    res.json(tareas);
+  } catch (error) {
+    console.error('Error al obtener tareas:', error);
+    res.status(500).json({ error: 'Error al obtener tareas' });
+  }
+});
+
+// POST /api/cursos/:id/tareas - Crear tarea
+app.post('/api/cursos/:id/tareas', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { leccion_id, titulo, descripcion, tipo, puntuacion_maxima, fecha_limite, instrucciones_accesibilidad } = req.body;
+    
+    const result = await query(
+      `INSERT INTO tarea (curso_id, leccion_id, titulo, descripcion, tipo, puntuacion_maxima, fecha_limite, instrucciones_accesibilidad)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [id, leccion_id, titulo, descripcion, tipo, puntuacion_maxima || 100, fecha_limite, instrucciones_accesibilidad]
+    );
+    
+    res.json({ 
+      message: 'Tarea creada correctamente',
+      id_tarea: result.insertId
+    });
+  } catch (error) {
+    console.error('Error al crear tarea:', error);
+    res.status(500).json({ error: 'Error al crear tarea' });
+  }
+});
+
+// POST /api/tareas/:id/entregar - Entregar tarea
+app.post('/api/tareas/:id/entregar', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { alumno_id, contenido, url_archivo } = req.body;
+    
+    // Verificar si es entrega tardía
+    const tarea = await query('SELECT fecha_limite FROM tarea WHERE id_tarea = ?', [id]);
+    const entregaTardia = new Date() > new Date(tarea[0].fecha_limite);
+    
+    const result = await query(
+      `INSERT INTO entrega_tarea (tarea_id, alumno_id, contenido, url_archivo, entrega_tardia)
+       VALUES (?, ?, ?, ?, ?)
+       ON DUPLICATE KEY UPDATE contenido = VALUES(contenido), url_archivo = VALUES(url_archivo), fecha_entrega = NOW()`,
+      [id, alumno_id, contenido, url_archivo, entregaTardia]
+    );
+    
+    res.json({ 
+      message: 'Tarea entregada correctamente',
+      entrega_tardia: entregaTardia
+    });
+  } catch (error) {
+    console.error('Error al entregar tarea:', error);
+    res.status(500).json({ error: 'Error al entregar tarea' });
+  }
+});
+
+// PUT /api/entregas/:id/calificar - Calificar entrega
+app.put('/api/entregas/:id/calificar', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { calificacion, retroalimentacion } = req.body;
+    
+    await query(
+      `UPDATE entrega_tarea 
+       SET calificacion = ?, retroalimentacion = ?, fecha_calificacion = NOW(), estado = 'calificada'
+       WHERE id_entrega = ?`,
+      [calificacion, retroalimentacion, id]
+    );
+    
+    res.json({ message: 'Entrega calificada correctamente' });
+  } catch (error) {
+    console.error('Error al calificar entrega:', error);
+    res.status(500).json({ error: 'Error al calificar entrega' });
+  }
+});
+
+// ========================================
+// ENDPOINTS DE ESTADÍSTICAS AVANZADAS
+// ========================================
+
+// GET /api/estadisticas/cursos - Estadísticas generales de cursos
+app.get('/api/estadisticas/cursos', async (req, res) => {
+  try {
+    const stats = await query('SELECT * FROM v_estadisticas_curso WHERE estado = "publicado" ORDER BY total_inscritos DESC LIMIT 20');
+    res.json(stats);
+  } catch (error) {
+    console.error('Error al obtener estadísticas:', error);
+    res.status(500).json({ error: 'Error al obtener estadísticas' });
+  }
+});
+
+// GET /api/estadisticas/docentes - Ranking de docentes
+app.get('/api/estadisticas/docentes', async (req, res) => {
+  try {
+    const ranking = await query('SELECT * FROM v_ranking_docentes LIMIT 20');
+    res.json(ranking);
+  } catch (error) {
+    console.error('Error al obtener ranking:', error);
+    res.status(500).json({ error: 'Error al obtener ranking' });
+  }
+});
 
 // Ruta principal y catch-all para SPA
 app.get('/', (req, res) => {

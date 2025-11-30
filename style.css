@@ -1,6 +1,26 @@
+/* Breakpoints personalizados */
+@media (min-width: 475px) {
+    .xs\:inline { display: inline; }
+    .xs\:hidden { display: none; }
+}
+
 @media (max-width: 720px){
     .nav-btn { padding: 0.4rem 0.7rem; font-size: 0.95rem; }
     main { padding-left: 1rem; padding-right: 1rem; }
+}
+
+/* Mejoras de touch para móviles */
+.touch-manipulation {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Ajustes responsive para modales */
+@media (max-width: 640px) {
+    .modal-content {
+        margin: 0.5rem;
+        max-height: calc(100vh - 1rem);
+    }
 }
 
 .botonComienza{

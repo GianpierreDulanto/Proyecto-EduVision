@@ -266,6 +266,9 @@ export const API = {
   // Gestión de contenido
   getCourseContent: getCursoContenido,
   addCourseContent: createContenido,
+  getCursoSecciones: async (cursoId) => {
+    return apiRequest(`/cursos/${cursoId}/secciones`);
+  },
   createContenido: async (contenidoData) => {
     return apiRequest('/contenido', {
       method: 'POST',
@@ -452,7 +455,270 @@ export const API = {
   },
   
   // Test
-  testDatabase
+  testDatabase,
+  
+  // ========================================
+  // GESTIÓN DE PERFIL DE USUARIO
+  // ========================================
+  getUserProfile: async (usuarioId) => {
+    return apiRequest(`/usuarios/${usuarioId}/perfil`);
+  },
+  updateUserProfile: async (usuarioId, data) => {
+    return apiRequest(`/usuarios/${usuarioId}/perfil`, {
+      method: 'PUT',
+      body: JSON.stringify(data)
+    });
+  },
+  uploadAvatar: async (usuarioId, file) => {
+    const formData = new FormData();
+    formData.append('avatar', file);
+    return fetch(`${API_BASE_URL}/usuarios/${usuarioId}/avatar`, {
+      method: 'POST',
+      body: formData
+    }).then(res => res.json());
+  },
+  
+  // ========================================
+  // CONFIGURACIÓN DE ACCESIBILIDAD
+  // ========================================
+  getAccessibilityConfig: async (usuarioId) => {
+    return apiRequest(`/usuarios/${usuarioId}/accesibilidad`);
+  },
+  updateAccessibilityConfig: async (usuarioId, config) => {
+    return apiRequest(`/usuarios/${usuarioId}/accesibilidad`, {
+      method: 'PUT',
+      body: JSON.stringify(config)
+    });
+  },
+  
+  // ========================================
+  // NOTIFICACIONES
+  // ========================================
+  getNotifications: async (usuarioId, leida = null) => {
+    const params = leida !== null ? `?leida=${leida}` : '';
+    return apiRequest(`/usuarios/${usuarioId}/notificaciones${params}`);
+  },
+  markNotificationRead: async (notificationId) => {
+    return apiRequest(`/notificaciones/${notificationId}/leer`, {
+      method: 'PUT'
+    });
+  },
+  markAllNotificationsRead: async (usuarioId) => {
+    return apiRequest(`/usuarios/${usuarioId}/notificaciones/leer-todas`, {
+      method: 'PUT'
+    });
+  },
+  
+  // ========================================
+  // SECCIONES Y LECCIONES
+  // ========================================
+  getCourseSections: async (cursoId) => {
+    return apiRequest(`/cursos/${cursoId}/secciones`);
+  },
+  createSection: async (cursoId, data) => {
+    return apiRequest(`/cursos/${cursoId}/secciones`, {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+  },
+  createLesson: async (seccionId, data) => {
+    return apiRequest(`/secciones/${seccionId}/lecciones`, {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+  },
+  updateLesson: async (leccionId, data) => {
+    return apiRequest(`/lecciones/${leccionId}`, {
+      method: 'PUT',
+      body: JSON.stringify(data)
+    });
+  },
+  deleteLesson: async (leccionId) => {
+    return apiRequest(`/lecciones/${leccionId}`, {
+      method: 'DELETE'
+    });
+  },
+  
+  // ========================================
+  // PROGRESO
+  // ========================================
+  getStudentProgress: async (alumnoId) => {
+    return apiRequest(`/alumnos/${alumnoId}/progreso`);
+  },
+  getCourseProgress: async (alumnoId, cursoId) => {
+    return apiRequest(`/alumnos/${alumnoId}/cursos/${cursoId}/progreso`);
+  },
+  updateLessonProgress: async (alumnoId, data) => {
+    return apiRequest(`/alumnos/${alumnoId}/progreso/leccion`, {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+  },
+  getLeccionProgreso: async (alumnoId, leccionId) => {
+    return apiRequest(`/alumnos/${alumnoId}/lecciones/${leccionId}/progreso`);
+  },
+  
+  // ========================================
+  // LISTA DE DESEOS
+  // ========================================
+  getWishlist: async (alumnoId) => {
+    return apiRequest(`/alumnos/${alumnoId}/lista-deseos`);
+  },
+  addToWishlist: async (alumnoId, cursoId) => {
+    return apiRequest(`/alumnos/${alumnoId}/lista-deseos`, {
+      method: 'POST',
+      body: JSON.stringify({ curso_id: cursoId })
+    });
+  },
+  removeFromWishlist: async (alumnoId, cursoId) => {
+    return apiRequest(`/alumnos/${alumnoId}/lista-deseos/${cursoId}`, {
+      method: 'DELETE'
+    });
+  },
+  
+  // ========================================
+  // REVIEWS Y RATINGS
+  // ========================================
+  getCourseReviews: async (cursoId, ordenar = 'recientes') => {
+    return apiRequest(`/cursos/${cursoId}/resenas?ordenar=${ordenar}`);
+  },
+  createReview: async (cursoId, data) => {
+    return apiRequest(`/cursos/${cursoId}/resenas`, {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+  },
+  updateReview: async (resenaId, data) => {
+    return apiRequest(`/resenas/${resenaId}`, {
+      method: 'PUT',
+      body: JSON.stringify(data)
+    });
+  },
+  voteReview: async (resenaId, usuarioId, tipo) => {
+    return apiRequest(`/resenas/${resenaId}/votar`, {
+      method: 'POST',
+      body: JSON.stringify({ usuario_id: usuarioId, tipo })
+    });
+  },
+  respondToReview: async (resenaId, docenteId, respuesta) => {
+    return apiRequest(`/resenas/${resenaId}/responder`, {
+      method: 'POST',
+      body: JSON.stringify({ docente_id: docenteId, respuesta })
+    });
+  },
+  
+  // ========================================
+  // CERTIFICADOS
+  // ========================================
+  getStudentCertificates: async (alumnoId) => {
+    return apiRequest(`/alumnos/${alumnoId}/certificados`);
+  },
+  verifyCertificate: async (codigo) => {
+    return apiRequest(`/certificados/verificar/${codigo}`);
+  },
+  
+  // ========================================
+  // FOROS
+  // ========================================
+  getForumTopics: async (cursoId, filters = {}) => {
+    const params = new URLSearchParams();
+    if (filters.categoria) params.append('categoria', filters.categoria);
+    if (filters.buscar) params.append('buscar', filters.buscar);
+    const query = params.toString();
+    return apiRequest(`/cursos/${cursoId}/foros${query ? '?' + query : ''}`);
+  },
+  createForumTopic: async (cursoId, data) => {
+    return apiRequest(`/cursos/${cursoId}/foros`, {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+  },
+  getForumTopic: async (temaId) => {
+    return apiRequest(`/foros/${temaId}`);
+  },
+  replyToTopic: async (temaId, data) => {
+    return apiRequest(`/foros/${temaId}/responder`, {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+  },
+  voteForumResponse: async (respuestaId, usuarioId, tipo) => {
+    return apiRequest(`/foros/respuestas/${respuestaId}/votar`, {
+      method: 'POST',
+      body: JSON.stringify({ usuario_id: usuarioId, tipo })
+    });
+  },
+  markResponseCorrect: async (respuestaId) => {
+    return apiRequest(`/foros/respuestas/${respuestaId}/marcar-correcta`, {
+      method: 'PUT'
+    });
+  },
+  
+  // ========================================
+  // MENSAJERÍA
+  // ========================================
+  getMessages: async (usuarioId, tipo = 'recibidos') => {
+    return apiRequest(`/usuarios/${usuarioId}/mensajes?tipo=${tipo}`);
+  },
+  sendMessage: async (data) => {
+    return apiRequest('/mensajes', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+  },
+  markMessageRead: async (mensajeId) => {
+    return apiRequest(`/mensajes/${mensajeId}/leer`, {
+      method: 'PUT'
+    });
+  },
+  
+  // ========================================
+  // INTENTOS DE CUESTIONARIOS
+  // ========================================
+  getQuizAttempts: async (alumnoId, quizId) => {
+    return apiRequest(`/alumnos/${alumnoId}/cuestionarios/${quizId}/intentos`);
+  },
+  submitQuizAttempt: async (alumnoId, quizId, data) => {
+    return apiRequest(`/alumnos/${alumnoId}/cuestionarios/${quizId}/intentos`, {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+  },
+  
+  // ========================================
+  // TAREAS
+  // ========================================
+  getCourseTasks: async (cursoId) => {
+    return apiRequest(`/cursos/${cursoId}/tareas`);
+  },
+  createTask: async (cursoId, data) => {
+    return apiRequest(`/cursos/${cursoId}/tareas`, {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+  },
+  submitTask: async (tareaId, alumnoId, data) => {
+    return apiRequest(`/tareas/${tareaId}/entregar`, {
+      method: 'POST',
+      body: JSON.stringify({ alumno_id: alumnoId, ...data })
+    });
+  },
+  gradeTask: async (entregaId, data) => {
+    return apiRequest(`/entregas/${entregaId}/calificar`, {
+      method: 'PUT',
+      body: JSON.stringify(data)
+    });
+  },
+  
+  // ========================================
+  // ESTADÍSTICAS AVANZADAS
+  // ========================================
+  getCourseStats: async () => {
+    return apiRequest('/estadisticas/cursos');
+  },
+  getTeacherRanking: async () => {
+    return apiRequest('/estadisticas/docentes');
+  }
 };
 
 export default API;
