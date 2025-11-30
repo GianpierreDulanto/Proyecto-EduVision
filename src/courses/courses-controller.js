@@ -549,6 +549,11 @@ export class CoursesController {
       return;
     }
 
+    // Obtener rol del usuario actual
+    const sessionData = localStorage.getItem('eduVisionSession');
+    const userRol = sessionData ? JSON.parse(sessionData).user?.rol : null;
+    const esAdmin = userRol === 'admin';
+
     // Obtener IDs de cursos inscritos para verificar estado
     const cursosInscritosIds = this.cursosInscritos.map(c => c.id_curso);
 
@@ -594,6 +599,14 @@ export class CoursesController {
                 class="w-full px-4 py-2 bg-primary hover:bg-primary/90 text-white rounded-lg font-semibold transition-colors"
                 aria-label="Ver curso ${this.escapeHtml(curso.titulo)}">
                 ${cursoInscrito?.finalizado ? 'Ver Curso' : 'Continuar Curso'}
+              </button>
+            ` : esAdmin ? `
+              <button 
+                onclick="window.app.courses.verCursoDetalle(${curso.id_curso})"
+                class="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors flex items-center justify-center gap-2"
+                aria-label="Ver detalles del curso ${this.escapeHtml(curso.titulo)}">
+                <span class="material-symbols-outlined text-lg">visibility</span>
+                Ver Detalles
               </button>
             ` : `
               <button 
@@ -704,16 +717,23 @@ export class CoursesController {
 
   async verCursoDetalle(cursoId) {
     try {
-      // Verificar si el alumno está inscrito
-      if (!this.alumnoId) {
-        this.loadAlumnoId();
-      }
+      // Verificar rol del usuario
+      const sessionData = localStorage.getItem('eduVisionSession');
+      const userRol = sessionData ? JSON.parse(sessionData).user?.rol : null;
+      const esAdmin = userRol === 'admin';
 
-      const estaInscrito = this.cursosInscritos.some(c => c.id_curso === cursoId);
-      
-      if (!estaInscrito) {
-        this.showError('Debes inscribirte en este curso para ver su contenido');
-        return;
+      // Si no es admin, verificar si el alumno está inscrito
+      if (!esAdmin) {
+        if (!this.alumnoId) {
+          this.loadAlumnoId();
+        }
+
+        const estaInscrito = this.cursosInscritos.some(c => c.id_curso === cursoId);
+        
+        if (!estaInscrito) {
+          this.showError('Debes inscribirte en este curso para ver su contenido');
+          return;
+        }
       }
 
       this.currentCurso = await getCurso(cursoId);
@@ -736,22 +756,29 @@ export class CoursesController {
 
   async loadCursoRecursos(cursoId) {
     try {
-      // Verificar que el alumno esté inscrito
-      if (!this.alumnoId) {
-        this.loadAlumnoId();
-      }
-      
-      if (this.cursosInscritos.length === 0 && this.alumnoId) {
-        await this.loadCursosInscritos();
-      }
-      
-      const estaInscrito = this.cursosInscritos.some(c => c.id_curso === cursoId);
-      if (!estaInscrito) {
-        this.showError('Debes inscribirte en este curso para ver su contenido');
-        if (window.app && window.app.router) {
-          window.app.router.navigateTo('listaCursosAlumno');
+      // Verificar rol del usuario
+      const sessionData = localStorage.getItem('eduVisionSession');
+      const userRol = sessionData ? JSON.parse(sessionData).user?.rol : null;
+      const esAdmin = userRol === 'admin';
+
+      // Si no es admin, verificar que el alumno esté inscrito
+      if (!esAdmin) {
+        if (!this.alumnoId) {
+          this.loadAlumnoId();
         }
-        return;
+        
+        if (this.cursosInscritos.length === 0 && this.alumnoId) {
+          await this.loadCursosInscritos();
+        }
+        
+        const estaInscrito = this.cursosInscritos.some(c => c.id_curso === cursoId);
+        if (!estaInscrito) {
+          this.showError('Debes inscribirte en este curso para ver su contenido');
+          if (window.app && window.app.router) {
+            window.app.router.navigateTo('listaCursosAlumno');
+          }
+          return;
+        }
       }
       
       // Cargar información completa del curso

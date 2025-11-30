@@ -267,10 +267,10 @@
           </a>
           
           <a 
-            href="#listaCursosAlumno" 
-            data-section="listaCursosAlumno"
+            href="#cursos" 
+            data-section="cursos"
             class="mobile-nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium text-slate-900 dark:text-slate-100 hover:text-primary dark:hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
-            aria-label="Ver todos los cursos disponibles"
+            aria-label="Ver catálogo de cursos disponibles"
           >
             <span class="material-symbols-outlined text-xl text-slate-700 dark:text-slate-300">menu_book</span>
             <span class="text-slate-900 dark:text-slate-100">Cursos</span>
@@ -635,7 +635,7 @@
     <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-4 sm:p-6 mb-6 sm:mb-8 border-2 border-slate-200 dark:border-slate-700">
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
         <div>
-          <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+          <label for="filtroCategoriaCatalogo" class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
             Categoría
           </label>
           <select id="filtroCategoriaCatalogo" class="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white">
@@ -643,7 +643,7 @@
           </select>
         </div>
         <div>
-          <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+          <label for="filtroGradoCatalogo" class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
             Grado
           </label>
           <select id="filtroGradoCatalogo" class="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white">
@@ -674,7 +674,7 @@
 </section>
 <section id="docente" class="section hidden flex flex-col gap-8 px-4 py-12 sm:px-6 lg:px-8" role="region" aria-labelledby="docente-heading">
   <div class="w-full max-w-4xl mx-auto text-center">
-    <h2 class="text-4xl font-bold tracking-tighter text-white sm:text-5xl md:text-5xl">
+    <h2 id="docente-heading" class="text-4xl font-bold tracking-tighter text-white sm:text-5xl md:text-5xl">
       Módulo Docente
     </h2>
     <p class="mx-auto mt-4 max-w-2xl text-lg text-slate-400">
@@ -1242,19 +1242,25 @@
         
         <!-- Filtros -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <select id="adminFiltroRol" onchange="window.app.admin.filtrarUsuarios()"
-                  class="px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white">
-            <option value="">Todos los roles</option>
-            <option value="admin">Administrador</option>
-            <option value="docente">Docente</option>
-            <option value="alumno">Alumno</option>
-          </select>
-          <select id="adminFiltroEstado" onchange="window.app.admin.filtrarUsuarios()"
-                  class="px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white">
-            <option value="">Todos los estados</option>
-            <option value="activo">Activo</option>
-            <option value="inactivo">Inactivo</option>
-          </select>
+          <div>
+            <label for="adminFiltroRol" class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Filtrar por rol</label>
+            <select id="adminFiltroRol" onchange="window.app.admin.filtrarUsuarios()"
+                    class="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white">
+              <option value="">Todos los roles</option>
+              <option value="admin">Administrador</option>
+              <option value="docente">Docente</option>
+              <option value="alumno">Alumno</option>
+            </select>
+          </div>
+          <div>
+            <label for="adminFiltroEstado" class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Filtrar por estado</label>
+            <select id="adminFiltroEstado" onchange="window.app.admin.filtrarUsuarios()"
+                    class="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white">
+              <option value="">Todos los estados</option>
+              <option value="activo">Activo</option>
+              <option value="inactivo">Inactivo</option>
+            </select>
+          </div>
           <input type="text" id="adminBuscarUsuario" placeholder="Buscar por nombre o correo..."
                  onkeyup="window.app.admin.filtrarUsuarios()"
                  class="px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white">
@@ -1333,20 +1339,28 @@
             Historial de Aprobaciones
           </h2>
           <div class="flex gap-2">
-            <select id="filtroHistorialTipo" onchange="window.app.admin.cargarHistorialAprobaciones()"
-                    class="px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white">
-              <option value="">Todos los tipos</option>
-              <option value="curso">Cursos</option>
-              <option value="contenido">Contenidos</option>
-              <option value="recurso">Recursos</option>
-            </select>
-            <select id="filtroHistorialEstado" onchange="window.app.admin.cargarHistorialAprobaciones()"
-                    class="px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white">
-              <option value="">Todos los estados</option>
-              <option value="aprobado">Aprobados</option>
-              <option value="rechazado">Rechazados</option>
-              <option value="pendiente">Pendientes</option>
-            </select>
+            <div>
+              <label for="filtroHistorialTipo" class="sr-only">Filtrar por tipo</label>
+              <select id="filtroHistorialTipo" onchange="window.app.admin.cargarHistorialAprobaciones()"
+                      class="px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
+                      aria-label="Filtrar historial por tipo">
+                <option value="">Todos los tipos</option>
+                <option value="curso">Cursos</option>
+                <option value="contenido">Contenidos</option>
+                <option value="recurso">Recursos</option>
+              </select>
+            </div>
+            <div>
+              <label for="filtroHistorialEstado" class="sr-only">Filtrar por estado</label>
+              <select id="filtroHistorialEstado" onchange="window.app.admin.cargarHistorialAprobaciones()"
+                      class="px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
+                      aria-label="Filtrar historial por estado">
+                <option value="">Todos los estados</option>
+                <option value="aprobado">Aprobados</option>
+                <option value="rechazado">Rechazados</option>
+                <option value="pendiente">Pendientes</option>
+              </select>
+            </div>
           </div>
         </div>
         <div id="adminHistorialAprobaciones" class="space-y-4">
@@ -1369,7 +1383,7 @@
         <svg class="h-6 w-6 text-primary" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
           <path d="M4 4H17.3334V17.3334H30.6666V30.6666H44V44H4V4Z" fill="currentColor"></path>
         </svg>
-        <h1 class="text-xl font-bold text-gray-900 dark:text-white">Centro de Aprendizaje Inclusivo</h1>
+        <h1 id="subir-recurso-heading" class="text-xl font-bold text-gray-900 dark:text-white">Centro de Aprendizaje Inclusivo</h1>
       </div>
       <button id="btnVolverDashboard" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition">
         ← Volver al Dashboard
@@ -1436,7 +1450,7 @@
 
     <!-- Contenido principal del formulario -->
     <div>
-      <h3 class="text-3xl lg:text-4xl font-bold text-center text-text-light dark:text-text-dark">
+      <h3 id="inputSubirCurso-heading" class="text-3xl lg:text-4xl font-bold text-center text-text-light dark:text-text-dark">
         Subir Información del Curso
       </h3>
       <p class="mt-2 text-center text-md text-subtext-light dark:text-subtext-dark">
@@ -1523,7 +1537,7 @@
 <!-- Modal de Regreso -->
 <div id="modalRegresoDocente" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-200" role="dialog" aria-modal="true" aria-labelledby="modalRegresoDocente-title">
   <div class="bg-white p-6 rounded-2xl shadow-xl text-center w-80">
-    <h2 class="text-xl font-semibold text-gray-900 mb-3">¿Deseas regresar al Dashboard?</h2>
+    <h2 id="modalRegresoDocente-title" class="text-xl font-semibold text-gray-900 mb-3">¿Deseas regresar al Dashboard?</h2>
     <p class="text-gray-700 mb-6">Se perderán los datos no guardados del formulario.</p>
     <div class="flex justify-center gap-4">
       <!-- Botón Cancelar -->
@@ -2289,6 +2303,7 @@
   <!-- Navbar -->
   <div class="bg-[#252836] border-b border-slate-700">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h1 id="lectorInmersivo-heading" class="sr-only">Lector Inmersivo</h1>
       <div class="flex items-center justify-between h-16">
         <div class="flex items-center gap-6 text-slate-300">
           <a href="#" onclick="mostrarSeccion('listaCursosAlumno')" class="hover:text-white">Lista de Cursos</a>
@@ -2346,14 +2361,14 @@
             
             <!-- Controles de reproducción -->
             <div class="flex items-center justify-center gap-4">
-              <button onclick="retroceder15()" class="text-slate-400 hover:text-white transition">
-                <span class="material-symbols-outlined text-2xl">fast_rewind</span>
+              <button onclick="retroceder15()" class="text-slate-400 hover:text-white transition" aria-label="Retroceder 15 segundos">
+                <span class="material-symbols-outlined text-2xl" aria-hidden="true">fast_rewind</span>
               </button>
-              <button onclick="toggleReproduccion()" class="bg-cyan-400 hover:bg-cyan-500 rounded-full w-14 h-14 flex items-center justify-center transition">
-                <span id="iconoReproduccion" class="material-symbols-outlined text-4xl text-white">play_arrow</span>
+              <button onclick="toggleReproduccion()" class="bg-cyan-400 hover:bg-cyan-500 rounded-full w-14 h-14 flex items-center justify-center transition" aria-label="Reproducir o pausar">
+                <span id="iconoReproduccion" class="material-symbols-outlined text-4xl text-white" aria-hidden="true">play_arrow</span>
               </button>
-              <button onclick="adelantar15()" class="text-slate-400 hover:text-white transition">
-                <span class="material-symbols-outlined text-2xl">fast_forward</span>
+              <button onclick="adelantar15()" class="text-slate-400 hover:text-white transition" aria-label="Adelantar 15 segundos">
+                <span class="material-symbols-outlined text-2xl" aria-hidden="true">fast_forward</span>
               </button>
             </div>
           </div>
@@ -2407,7 +2422,7 @@
 <!-- 🪟 MODAL DE CONFIRMACIÓN -->
 <div id="modalRegreso" class="fixed inset-0 bg-black bg-opacity-60 hidden flex items-center justify-center z-50 transition-opacity duration-300" role="dialog" aria-modal="true" aria-labelledby="modalRegreso-title">
   <div class="bg-[#252836] rounded-2xl p-8 text-center max-w-sm w-full shadow-xl border border-slate-700">
-    <h2 class="text-xl font-bold text-white mb-4">¿Estás seguro de volver al dashboard?</h2>
+    <h2 id="modalRegreso-title" class="text-xl font-bold text-white mb-4">¿Estás seguro de volver al dashboard?</h2>
     <div class="flex justify-center gap-4 mt-6">
       <button 
         onclick="confirmarRegreso()" 
@@ -2429,6 +2444,7 @@
 
     <!-- Contenedor del Quiz -->
     <div class="bg-[#252836] rounded-2xl p-8 shadow-2xl max-w-2xl mx-auto">
+      <h1 id="miniFormulario-heading" class="text-2xl md:text-3xl font-bold text-white text-center mb-8 sr-only">Evaluación del Curso</h1>
       
       <!-- Barra de progreso -->
       <div class="mb-8" 
@@ -2528,7 +2544,7 @@
 <section id="encuestaSatisfaccion" class="section hidden bg-slate-900 min-h-screen" role="region" aria-labelledby="encuestaSatisfaccion-heading">
   <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
     <div class="bg-slate-800 rounded-lg p-8">
-      <h1 class="text-3xl font-bold text-white mb-4">Encuesta de satisfacción con el curso</h1>
+      <h1 id="encuestaSatisfaccion-heading" class="text-3xl font-bold text-white mb-4">Encuesta de satisfacción con el curso</h1>
       <p class="text-slate-400 mb-8">Sus comentarios nos ayudan a mejorar nuestros cursos. Por favor, responda honestamente las siguientes preguntas.</p>
       
       <form class="space-y-6" onsubmit="event.preventDefault(); completarEncuesta();">
@@ -2581,7 +2597,7 @@
 <!-- SECCIÓN: Recomendaciones Personalizadas (index3.html) -->
 <section id="recomendaciones" class="section hidden bg-slate-900 min-h-screen" role="region" aria-labelledby="recomendaciones-heading">
   <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <h1 class="text-4xl font-bold text-white mb-4">Recursos recomendados</h1>
+    <h1 id="recomendaciones-heading" class="text-4xl font-bold text-white mb-4">Recursos recomendados</h1>
     <p class="text-slate-400 mb-8">Explore recursos adaptados a su estilo y necesidades de aprendizaje.</p>
     
     <div class="mb-8">
@@ -2681,8 +2697,8 @@
         </div>
       </div>
 
-      <!-- Estadísticas Rápidas -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+      <!-- Estadísticas Rápidas (Solo para alumnos) -->
+      <div id="estadisticasPerfil" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
         <div class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-lg text-center">
           <div class="text-4xl font-bold text-primary mb-2" id="perfil-total-cursos">0</div>
           <div class="text-sm text-slate-600 dark:text-slate-400">Cursos</div>
@@ -2734,8 +2750,9 @@
       <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
         <h2 class="text-xl font-bold text-slate-900 dark:text-white">Cambiar Contraseña</h2>
         <button onclick="window.app.profile.closeChangePasswordModal()" 
-                class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
-          <span class="material-symbols-outlined text-slate-600 dark:text-slate-400">close</span>
+                class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
+                aria-label="Cerrar modal de cambio de contraseña">
+          <span class="material-symbols-outlined text-slate-600 dark:text-slate-400" aria-hidden="true">close</span>
         </button>
       </div>
       
@@ -3025,8 +3042,8 @@
         <h2 id="modalCursoTitulo" class="text-2xl font-bold text-slate-900 dark:text-white">
           Crear Nuevo Curso
         </h2>
-        <button onclick="cerrarModalCurso()" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
-          <span class="material-symbols-outlined text-slate-600 dark:text-slate-400">close</span>
+        <button onclick="cerrarModalCurso()" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors" aria-label="Cerrar modal de curso">
+          <span class="material-symbols-outlined text-slate-600 dark:text-slate-400" aria-hidden="true">close</span>
         </button>
       </div>
       
@@ -3116,8 +3133,8 @@
           </h2>
           <p id="modalContenidoCursoNombre" class="text-sm text-slate-600 dark:text-slate-400 mt-1"></p>
         </div>
-        <button onclick="cerrarModalContenido()" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
-          <span class="material-symbols-outlined text-slate-600 dark:text-slate-400">close</span>
+        <button onclick="cerrarModalContenido()" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors" aria-label="Cerrar modal de contenido">
+          <span class="material-symbols-outlined text-slate-600 dark:text-slate-400" aria-hidden="true">close</span>
         </button>
       </div>
       
@@ -3127,7 +3144,7 @@
           <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-4">
             Agregar Nuevo Contenido
           </h3>
-          <form id="formContenido" class="space-y-4">
+          <form id="formContenido" class="space-y-4" onsubmit="event.preventDefault(); window.app.teacher.guardarContenido();">
             <input type="hidden" id="contenidoId" value="">
             <input type="hidden" id="contenidoCursoId" value="">
             
@@ -3155,13 +3172,25 @@
               </div>
             </div>
             
-            <div>
+            <!-- Campo URL (para video, documento, audio) -->
+            <div id="contenidoUrlContainer">
               <label for="contenidoUrl" class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
                 URL o Ruta *
               </label>
-              <input type="text" id="contenidoUrl" required 
+              <input type="text" id="contenidoUrl" 
                      class="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary" 
                      placeholder="https:// o /uploads/archivo.mp4">
+            </div>
+            
+            <!-- Editor de texto (para lectura) -->
+            <div id="contenidoTextoContainer" class="hidden">
+              <label for="contenidoTexto" class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                Contenido de Texto *
+              </label>
+              <div id="contenidoTextoEditor" class="bg-white dark:bg-slate-700 rounded-lg border border-slate-300 dark:border-slate-600" style="min-height: 200px;">
+                <!-- Editor WYSIWYG se inicializará aquí -->
+              </div>
+              <input type="hidden" id="contenidoTexto" value="">
             </div>
             
             <div>
@@ -3205,8 +3234,8 @@
           </h2>
           <p id="modalQuizCursoNombre" class="text-sm text-slate-600 dark:text-slate-400 mt-1"></p>
         </div>
-        <button onclick="cerrarModalQuiz()" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
-          <span class="material-symbols-outlined text-slate-600 dark:text-slate-400">close</span>
+        <button onclick="cerrarModalQuiz()" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors" aria-label="Cerrar modal de gestión de evaluaciones">
+          <span class="material-symbols-outlined text-slate-600 dark:text-slate-400" aria-hidden="true">close</span>
         </button>
       </div>
       
@@ -3270,8 +3299,8 @@
           </h2>
           <p id="modalPreguntasQuizNombre" class="text-sm text-slate-600 dark:text-slate-400 mt-1"></p>
         </div>
-        <button onclick="cerrarModalPreguntasQuiz()" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
-          <span class="material-symbols-outlined text-slate-600 dark:text-slate-400">close</span>
+        <button onclick="cerrarModalPreguntasQuiz()" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors" aria-label="Cerrar modal de preguntas del quiz">
+          <span class="material-symbols-outlined text-slate-600 dark:text-slate-400" aria-hidden="true">close</span>
         </button>
       </div>
       
@@ -3339,8 +3368,8 @@
           </h2>
           <p id="modalEstadisticasCursoNombre" class="text-sm text-slate-600 dark:text-slate-400 mt-1"></p>
         </div>
-        <button onclick="cerrarModalEstadisticas()" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
-          <span class="material-symbols-outlined text-slate-600 dark:text-slate-400">close</span>
+        <button onclick="cerrarModalEstadisticas()" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors" aria-label="Cerrar modal de estadísticas">
+          <span class="material-symbols-outlined text-slate-600 dark:text-slate-400" aria-hidden="true">close</span>
         </button>
       </div>
       
@@ -3457,6 +3486,7 @@
 
         <div class="bg-slate-800 rounded-lg p-4">
           <h4 class="text-sm font-semibold text-gray-300 mb-3">Modo</h4>
+          <label for="modoLectura" class="block text-sm font-semibold text-gray-300 mb-2">Modo de lectura</label>
           <select id="modoLectura" class="w-full bg-slate-700 text-white px-3 py-2 rounded text-sm mb-2">
             <option value="elemento">Por Elemento</option>
             <option value="continuo">Continuo</option>
@@ -3860,6 +3890,53 @@
       
       // Modal Contenido
       window.mostrarModalContenido = function(cursoId, cursoNombre) {
+        // Inicializar formulario: mostrar URL por defecto, ocultar editor
+        const urlContainer = document.getElementById('contenidoUrlContainer');
+        const textoContainer = document.getElementById('contenidoTextoContainer');
+        const urlInput = document.getElementById('contenidoUrl');
+        
+        if (urlContainer) urlContainer.classList.remove('hidden');
+        if (textoContainer) textoContainer.classList.add('hidden');
+        if (urlInput) urlInput.setAttribute('required', 'required');
+        
+        // Limpiar formulario
+        const form = document.getElementById('formContenido');
+        if (form) form.reset();
+        document.getElementById('contenidoId').value = '';
+        document.getElementById('contenidoCursoId').value = cursoId;
+        document.getElementById('contenidoOrden').value = '1';
+        
+        // Limpiar editor si existe
+        if (window.contenidoTextoEditor) {
+          window.contenidoTextoEditor.setContent('');
+        }
+        
+        // Restaurar título y botón
+        const formTitle = document.querySelector('#modalContenido h3');
+        if (formTitle) {
+          formTitle.textContent = 'Agregar Nuevo Contenido';
+        }
+        const submitBtn = document.querySelector('#formContenido button[type="submit"]');
+        if (submitBtn) {
+          submitBtn.innerHTML = '<span class="material-symbols-outlined inline-block align-middle mr-2">add</span>Agregar Contenido';
+        }
+        
+        // Actualizar nombre del curso
+        const cursoNombreEl = document.getElementById('modalContenidoCursoNombre');
+        if (cursoNombreEl) {
+          cursoNombreEl.textContent = cursoNombre || '';
+        }
+        
+        // Cargar contenido del curso
+        if (window.app && window.app.teacher) {
+          window.app.teacher.cargarContenidoCurso(cursoId);
+        }
+        
+        // Mostrar modal
+        const modal = document.getElementById('modalContenido');
+        if (modal) {
+          modal.classList.remove('hidden');
+        }
         document.getElementById('contenidoCursoId').value = cursoId;
         document.getElementById('modalContenidoCursoNombre').textContent = cursoNombre;
         document.getElementById('modalContenido').classList.remove('hidden');
@@ -4279,8 +4356,8 @@
         <h2 class="text-2xl font-bold text-slate-900 dark:text-white">
           Revisar y Aprobar
         </h2>
-        <button onclick="cerrarModalAprobacion()" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
-          <span class="material-symbols-outlined text-slate-600 dark:text-slate-400">close</span>
+        <button onclick="cerrarModalAprobacion()" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors" aria-label="Cerrar modal de aprobación">
+          <span class="material-symbols-outlined text-slate-600 dark:text-slate-400" aria-hidden="true">close</span>
         </button>
       </div>
       
@@ -4344,7 +4421,7 @@
   </div>
   
   <!-- SECCIÓN: Mi Perfil -->
-  <section id="miPerfil" class="section hidden min-h-screen bg-slate-50 dark:bg-slate-900" role="region" aria-labelledby="miPerfil-heading">
+  <section id="miPerfil2" class="section hidden min-h-screen bg-slate-50 dark:bg-slate-900" role="region" aria-labelledby="miPerfil2-heading">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div id="profileContainer">
         <!-- El contenido se carga dinámicamente desde profile-controller.js -->
@@ -4365,6 +4442,7 @@
   <!-- SECCIÓN: Mis Certificados -->
   <section id="misCertificados" class="section hidden min-h-screen bg-slate-50 dark:bg-slate-900" role="region" aria-labelledby="misCertificados-heading">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <h1 id="misCertificados-heading" class="text-4xl font-bold text-slate-900 dark:text-white mb-8">Mis Certificados</h1>
       <div id="certificatesContainer">
         <!-- El contenido se carga dinámicamente desde certificates-controller.js -->
       </div>
@@ -4374,6 +4452,7 @@
   <!-- SECCIÓN: Reseñas del Curso -->
   <section id="courseReviews" class="section hidden min-h-screen bg-slate-50 dark:bg-slate-900" role="region" aria-labelledby="courseReviews-heading">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <h1 id="courseReviews-heading" class="text-4xl font-bold text-slate-900 dark:text-white mb-6">Reseñas del Curso</h1>
       <!-- Navegación de regreso -->
       <button 
         onclick="history.back()" 
@@ -4549,8 +4628,8 @@
         <h2 class="text-2xl font-bold text-slate-900 dark:text-white">
           Editar Usuario
         </h2>
-        <button onclick="cerrarModalEditarUsuario()" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
-          <span class="material-symbols-outlined text-slate-600 dark:text-slate-400">close</span>
+        <button onclick="cerrarModalEditarUsuario()" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors" aria-label="Cerrar modal de editar usuario">
+          <span class="material-symbols-outlined text-slate-600 dark:text-slate-400" aria-hidden="true">close</span>
         </button>
       </div>
       
@@ -4615,8 +4694,8 @@
         <h2 id="modalCategoriaTitulo" class="text-2xl font-bold text-slate-900 dark:text-white">
           Crear Categoría
         </h2>
-        <button onclick="cerrarModalCategoria()" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
-          <span class="material-symbols-outlined text-slate-600 dark:text-slate-400">close</span>
+        <button onclick="cerrarModalCategoria()" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors" aria-label="Cerrar modal de categoría">
+          <span class="material-symbols-outlined text-slate-600 dark:text-slate-400" aria-hidden="true">close</span>
         </button>
       </div>
       
@@ -4662,8 +4741,8 @@
         <h2 id="modalGradoTitulo" class="text-2xl font-bold text-slate-900 dark:text-white">
           Crear Grado
         </h2>
-        <button onclick="cerrarModalGrado()" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
-          <span class="material-symbols-outlined text-slate-600 dark:text-slate-400">close</span>
+        <button onclick="cerrarModalGrado()" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors" aria-label="Cerrar modal de grado">
+          <span class="material-symbols-outlined text-slate-600 dark:text-slate-400" aria-hidden="true">close</span>
         </button>
       </div>
       

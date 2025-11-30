@@ -616,6 +616,28 @@ export class SessionManager {
         btnMisCursosCatalogo.classList.add('hidden');
       }
     }
+
+    // Ocultar enlace "Cursos" para docentes (solo deben ver sus propios cursos en el panel docente)
+    const navCursos = document.querySelector('a[data-section="cursos"]');
+    const mobileNavCursos = document.querySelector('.mobile-nav-link[data-section="cursos"]');
+    
+    if (isLoggedIn && rol === 'docente') {
+      // Ocultar enlace de cursos para docentes
+      if (navCursos) {
+        navCursos.classList.add('hidden');
+      }
+      if (mobileNavCursos) {
+        mobileNavCursos.classList.add('hidden');
+      }
+    } else {
+      // Mostrar enlace de cursos para otros usuarios o no logueados
+      if (navCursos) {
+        navCursos.classList.remove('hidden');
+      }
+      if (mobileNavCursos) {
+        mobileNavCursos.classList.remove('hidden');
+      }
+    }
   }
 
   loadProfileData() {
@@ -638,6 +660,17 @@ export class SessionManager {
         'admin': '👤 Administrador'
       };
       perfilRol.textContent = roles[this.user.rol] || this.user.rol;
+    }
+
+    // Ocultar estadísticas (Cursos, Progreso, Calificación) - Solo para alumnos
+    const estadisticasSection = document.getElementById('estadisticasPerfil');
+    if (estadisticasSection) {
+      if (this.user.rol === 'alumno') {
+        estadisticasSection.classList.remove('hidden');
+      } else {
+        // Ocultar para docentes y administradores
+        estadisticasSection.classList.add('hidden');
+      }
     }
   }
 

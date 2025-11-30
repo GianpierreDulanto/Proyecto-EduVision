@@ -96,6 +96,14 @@ export class Router {
       }
     }
 
+    // Si un docente intenta acceder a la sección de cursos, redirigir a su panel docente
+    if (sectionId === 'cursos' && this.session.isLoggedIn()) {
+      const user = this.session.user;
+      if (user.rol === 'docente') {
+        sectionId = 'dashboardDocente';
+      }
+    }
+
     // Si el usuario NO está logueado y trata de ir a un dashboard, redirigir a inicio
     if ((sectionId === 'dashboardAdmin' || sectionId === 'dashboardDocente' || sectionId === 'dashboardAlumno') && !this.session.isLoggedIn()) {
       sectionId = 'inicio';

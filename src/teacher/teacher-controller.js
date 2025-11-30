@@ -43,6 +43,12 @@ export class TeacherController {
     if (formCrearQuiz) {
       formCrearQuiz.addEventListener('submit', (e) => this.handleCreateQuiz(e));
     }
+
+    // Cambio de tipo de contenido
+    const contenidoTipo = document.getElementById('contenidoTipo');
+    if (contenidoTipo) {
+      contenidoTipo.addEventListener('change', () => this.handleContenidoTipoChange());
+    }
   }
 
   // ================== GESTIÓN DE CURSOS ==================
@@ -711,10 +717,36 @@ export class TeacherController {
       // Llenar formulario de edición
       document.getElementById('contenidoId').value = contenido.id_contenido;
       document.getElementById('contenidoTitulo').value = contenido.titulo || '';
-      document.getElementById('contenidoTipo').value = contenido.tipo || 'lectura';
-      document.getElementById('contenidoUrl').value = contenido.url || '';
+      const tipo = contenido.tipo || 'lectura';
+      document.getElementById('contenidoTipo').value = tipo;
       document.getElementById('contenidoOrden').value = contenido.orden || 1;
       document.getElementById('contenidoCursoId').value = cursoId;
+
+      // Manejar campos según el tipo
+      if (tipo === 'lectura') {
+        // Si es lectura, usar el editor de texto
+        document.getElementById('contenidoUrl').value = '';
+        // Inicializar editor si no está inicializado
+        if (!window.contenidoTextoEditor) {
+          const { default: RichTextEditor } = await import('../editor/rich-text-editor.js');
+          window.contenidoTextoEditor = new RichTextEditor('contenidoTextoEditor', {
+            placeholder: 'Escribe el contenido de lectura aquí...'
+          });
+        }
+        // Cargar contenido en el editor
+        if (window.contenidoTextoEditor && contenido.texto) {
+          window.contenidoTextoEditor.setContent(contenido.texto);
+        }
+        // Mostrar editor, ocultar URL
+        document.getElementById('contenidoUrlContainer').classList.add('hidden');
+        document.getElementById('contenidoTextoContainer').classList.remove('hidden');
+      } else {
+        // Si no es lectura, usar campo URL
+        document.getElementById('contenidoUrl').value = contenido.url || '';
+        // Ocultar editor, mostrar URL
+        document.getElementById('contenidoUrlContainer').classList.remove('hidden');
+        document.getElementById('contenidoTextoContainer').classList.add('hidden');
+      }
 
       // Cambiar título del formulario
       const formTitle = document.querySelector('#modalContenido h3');
@@ -739,16 +771,67 @@ export class TeacherController {
     }
   }
 
+  async handleContenidoTipoChange() {
+    const tipo = document.getElementById('contenidoTipo').value;
+    const urlContainer = document.getElementById('contenidoUrlContainer');
+    const textoContainer = document.getElementById('contenidoTextoContainer');
+    const urlInput = document.getElementById('contenidoUrl');
+    
+    if (tipo === 'lectura') {
+      // Mostrar editor de texto, ocultar campo URL
+      if (urlContainer) urlContainer.classList.add('hidden');
+      if (textoContainer) textoContainer.classList.remove('hidden');
+      if (urlInput) urlInput.removeAttribute('required');
+      
+      // Inicializar editor si no está inicializado
+      if (!window.contenidoTextoEditor) {
+        try {
+          const { default: RichTextEditor } = await import('../editor/rich-text-editor.js');
+          window.contenidoTextoEditor = new RichTextEditor('contenidoTextoEditor', {
+            placeholder: 'Escribe el contenido de lectura aquí...'
+          });
+        } catch (error) {
+          console.error('Error al cargar editor:', error);
+        }
+      }
+    } else {
+      // Mostrar campo URL, ocultar editor
+      if (urlContainer) urlContainer.classList.remove('hidden');
+      if (textoContainer) textoContainer.classList.add('hidden');
+      if (urlInput) urlInput.setAttribute('required', 'required');
+    }
+  }
+
   async guardarContenido() {
     try {
       const contenidoId = document.getElementById('contenidoId').value;
+      const tipo = document.getElementById('contenidoTipo').value;
+      
       const contenidoData = {
         curso_id: document.getElementById('contenidoCursoId').value,
         titulo: document.getElementById('contenidoTitulo').value,
-        tipo: document.getElementById('contenidoTipo').value,
-        url: document.getElementById('contenidoUrl').value,
+        tipo: tipo,
         orden: document.getElementById('contenidoOrden').value
       };
+
+      // Si es tipo lectura, usar el contenido del editor; si no, usar la URL
+      if (tipo === 'lectura') {
+        if (window.contenidoTextoEditor) {
+          const texto = window.contenidoTextoEditor.getContent();
+          contenidoData.texto = texto;
+          contenidoData.url = null;
+        } else {
+          throw new Error('El editor de texto no está inicializado');
+        }
+      } else {
+        const url = document.getElementById('contenidoUrl').value;
+        if (!url || url.trim() === '') {
+          this.showError('Por favor, ingresa una URL o ruta');
+          return;
+        }
+        contenidoData.url = url;
+        contenidoData.texto = null;
+      }
 
       if (contenidoId) {
         // Actualizar contenido existente
@@ -764,6 +847,17 @@ export class TeacherController {
       document.getElementById('formContenido').reset();
       document.getElementById('contenidoId').value = '';
       document.getElementById('contenidoOrden').value = '1';
+      
+      // Limpiar editor si existe
+      if (window.contenidoTextoEditor) {
+        window.contenidoTextoEditor.setContent('');
+      }
+      
+      // Restaurar visibilidad de campos
+      const urlContainer = document.getElementById('contenidoUrlContainer');
+      const textoContainer = document.getElementById('contenidoTextoContainer');
+      if (urlContainer) urlContainer.classList.remove('hidden');
+      if (textoContainer) textoContainer.classList.add('hidden');
       
       // Restaurar título y botón
       const formTitle = document.querySelector('#modalContenido h3');
@@ -782,7 +876,7 @@ export class TeacherController {
       window.cerrarModalContenido();
     } catch (error) {
       console.error('Error al guardar contenido:', error);
-      this.showError('No se pudo guardar el contenido');
+      this.showError('No se pudo guardar el contenido: ' + (error.message || 'Error desconocido'));
     }
   }
 
@@ -1068,8 +1162,16 @@ export class TeacherController {
 
   async verPreguntasQuiz(quizId) {
     try {
+      // Obtener cursoId del modal o del contexto actual
+      const cursoId = document.getElementById('quizCursoId')?.value || this.currentCourse;
+      
+      if (!cursoId) {
+        this.showError('No se pudo identificar el curso');
+        return;
+      }
+      
       // Obtener información del quiz
-      const quizzes = await API.getQuizzesCurso(this.currentCourse);
+      const quizzes = await API.getQuizzesCurso(cursoId);
       const quiz = quizzes.find(q => q.id_cuestionario === quizId);
       
       if (!quiz) {
@@ -1083,7 +1185,7 @@ export class TeacherController {
       }
     } catch (error) {
       console.error('Error al abrir preguntas del quiz:', error);
-      this.showError('No se pudieron cargar las preguntas');
+      this.showError('No se pudieron cargar las preguntas: ' + (error.message || 'Error desconocido'));
     }
   }
 
@@ -1095,8 +1197,12 @@ export class TeacherController {
     try {
       await API.deleteQuiz(quizId);
       this.showSuccess('Cuestionario eliminado exitosamente');
-      // Recargar la lista de quizzes
-      await this.cargarQuizzesCurso(this.currentCourse);
+      
+      // Recargar la lista de quizzes - obtener cursoId del modal
+      const cursoId = document.getElementById('quizCursoId')?.value || this.currentCourse;
+      if (cursoId) {
+        await this.cargarQuizzesCurso(cursoId);
+      }
     } catch (error) {
       console.error('Error al eliminar quiz:', error);
       this.showError('No se pudo eliminar el cuestionario: ' + (error.message || 'Error desconocido'));
