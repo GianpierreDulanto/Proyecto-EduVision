@@ -462,6 +462,18 @@ app.post('/api/inscribir', async (req, res) => {
       return res.status(400).json({ error: 'Datos incompletos' });
     }
     
+    // Validar que el alumno existe
+    const alumno = await query('SELECT id_alumno FROM alumno WHERE id_alumno = ?', [alumno_id]);
+    if (alumno.length === 0) {
+      return res.status(404).json({ error: 'Alumno no encontrado' });
+    }
+    
+    // Validar que el curso existe
+    const curso = await query('SELECT id_curso FROM curso WHERE id_curso = ?', [curso_id]);
+    if (curso.length === 0) {
+      return res.status(404).json({ error: 'Curso no encontrado' });
+    }
+    
     // Verificar si ya está inscrito
     const existente = await query(
       'SELECT id_alumno_curso FROM alumno_curso WHERE alumno_id = ? AND curso_id = ?',
@@ -480,7 +492,37 @@ app.post('/api/inscribir', async (req, res) => {
     res.json({ success: true, inscripcionId: result.insertId });
   } catch (error) {
     console.error('Error al inscribir:', error);
-    res.status(500).json({ error: 'Error al inscribir' });
+    console.error('Detalles del error:', {
+      code: error.code,
+      errno: error.errno,
+      sqlState: error.sqlState,
+      sqlMessage: error.sqlMessage,
+      message: error.message,
+      stack: error.stack
+    });
+    
+    // Proporcionar mensaje de error más detallado
+    let errorMessage = 'Error al inscribir';
+    if (error.code === 'ER_NO_SUCH_TABLE') {
+      errorMessage = 'Error: La tabla alumno_curso no existe en la base de datos';
+    } else if (error.code === 'ER_NO_REFERENCED_ROW_2') {
+      errorMessage = 'Error: El alumno o curso especificado no existe';
+    } else if (error.code === 'ER_DUP_ENTRY') {
+      errorMessage = 'Ya estás inscrito en este curso';
+    } else if (error.sqlMessage) {
+      errorMessage = `Error de base de datos: ${error.sqlMessage}`;
+    } else if (error.message) {
+      errorMessage = `Error: ${error.message}`;
+    }
+    
+    res.status(500).json({ 
+      error: errorMessage,
+      details: process.env.NODE_ENV === 'development' ? {
+        code: error.code,
+        sqlMessage: error.sqlMessage,
+        message: error.message
+      } : undefined
+    });
   }
 });
 
@@ -1199,9 +1241,42 @@ app.get('/api/test-db', async (req, res) => {
       hasPassword: !!dbConfig.password
     });
     
+    // Probar conexión básica
     const result = await query('SELECT 1 AS test');
     console.log('✅ Conexión exitosa');
-    res.json({ ok: true, message: 'Conexión exitosa', result });
+    
+    // Verificar que la tabla alumno_curso existe
+    let tableExists = false;
+    let tableStructure = null;
+    try {
+      const tables = await query(
+        "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'alumno_curso'",
+        [dbConfig.database]
+      );
+      tableExists = tables.length > 0;
+      
+      if (tableExists) {
+        // Obtener estructura de la tabla
+        tableStructure = await query(
+          "SELECT COLUMN_NAME, DATA_TYPE, IS_NULLABLE, COLUMN_KEY FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'alumno_curso' ORDER BY ORDINAL_POSITION",
+          [dbConfig.database]
+        );
+      }
+    } catch (tableError) {
+      console.error('Error al verificar tabla:', tableError.message);
+    }
+    
+    res.json({ 
+      ok: true, 
+      message: 'Conexión exitosa', 
+      result,
+      tableCheck: {
+        alumno_curso: {
+          exists: tableExists,
+          structure: tableStructure
+        }
+      }
+    });
   } catch (error) {
     console.error('❌ Error en test-db:', error.message);
     console.error('Detalles:', {
