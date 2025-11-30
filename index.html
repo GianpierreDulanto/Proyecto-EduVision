@@ -759,8 +759,8 @@
           <!-- Campo Email -->
           <div>
             <label for="login-email" class="block text-base font-semibold text-slate-900 dark:text-white mb-2">
-              <span class="material-symbols-outlined inline-block align-middle mr-2 text-primary">email</span>
-              Correo Electrónico <span class="text-red-600 dark:text-red-400" aria-label="requerido">*</span>
+              <span class="material-symbols-outlined inline-block align-middle mr-2 text-primary" aria-hidden="true">email</span>
+              Correo Electrónico <span class="text-red-600 dark:text-red-400" aria-hidden="true">*</span>
             </label>
             <input 
               id="login-email" 
@@ -781,8 +781,8 @@
           <!-- Campo Contraseña -->
           <div>
             <label for="login-password" class="block text-base font-semibold text-slate-900 dark:text-white mb-2">
-              <span class="material-symbols-outlined inline-block align-middle mr-2 text-primary">lock</span>
-              Contraseña <span class="text-red-600 dark:text-red-400" aria-label="requerido">*</span>
+              <span class="material-symbols-outlined inline-block align-middle mr-2 text-primary" aria-hidden="true">lock</span>
+              Contraseña <span class="text-red-600 dark:text-red-400" aria-hidden="true">*</span>
             </label>
             <div class="relative">
               <input 
@@ -849,8 +849,8 @@
           <!-- Tipo de Usuario -->
           <div>
             <label for="user-type" class="block text-base font-semibold text-slate-900 dark:text-white mb-2">
-              <span class="material-symbols-outlined inline-block align-middle mr-2 text-primary">badge</span>
-              Soy un <span class="text-red-600 dark:text-red-400" aria-label="requerido">*</span>
+              <span class="material-symbols-outlined inline-block align-middle mr-2 text-primary" aria-hidden="true">badge</span>
+              Soy un <span class="text-red-600 dark:text-red-400" aria-hidden="true">*</span>
             </label>
             <select 
               id="user-type" 
@@ -872,8 +872,8 @@
           <!-- Nombre -->
           <div>
             <label for="register-nombre" class="block text-base font-semibold text-slate-900 dark:text-white mb-2">
-              <span class="material-symbols-outlined inline-block align-middle mr-2 text-primary">person</span>
-              Nombre <span class="text-red-600 dark:text-red-400" aria-label="requerido">*</span>
+              <span class="material-symbols-outlined inline-block align-middle mr-2 text-primary" aria-hidden="true">person</span>
+              Nombre <span class="text-red-600 dark:text-red-400" aria-hidden="true">*</span>
             </label>
             <input 
               id="register-nombre" 
@@ -894,8 +894,8 @@
           <!-- Apellido -->
           <div>
             <label for="register-apellido" class="block text-base font-semibold text-slate-900 dark:text-white mb-2">
-              <span class="material-symbols-outlined inline-block align-middle mr-2 text-primary">person</span>
-              Apellido <span class="text-red-600 dark:text-red-400" aria-label="requerido">*</span>
+              <span class="material-symbols-outlined inline-block align-middle mr-2 text-primary" aria-hidden="true">person</span>
+              Apellido <span class="text-red-600 dark:text-red-400" aria-hidden="true">*</span>
             </label>
             <input 
               id="register-apellido" 
@@ -916,8 +916,8 @@
           <!-- Email -->
           <div>
             <label for="register-email" class="block text-base font-semibold text-slate-900 dark:text-white mb-2">
-              <span class="material-symbols-outlined inline-block align-middle mr-2 text-primary">email</span>
-              Correo Electrónico <span class="text-red-600 dark:text-red-400" aria-label="requerido">*</span>
+              <span class="material-symbols-outlined inline-block align-middle mr-2 text-primary" aria-hidden="true">email</span>
+              Correo Electrónico <span class="text-red-600 dark:text-red-400" aria-hidden="true">*</span>
             </label>
             <input 
               id="register-email" 
@@ -938,8 +938,8 @@
           <!-- Contraseña -->
           <div>
             <label for="register-password" class="block text-base font-semibold text-slate-900 dark:text-white mb-2">
-              <span class="material-symbols-outlined inline-block align-middle mr-2 text-primary">lock</span>
-              Contraseña <span class="text-red-600 dark:text-red-400" aria-label="requerido">*</span>
+              <span class="material-symbols-outlined inline-block align-middle mr-2 text-primary" aria-hidden="true">lock</span>
+              Contraseña <span class="text-red-600 dark:text-red-400" aria-hidden="true">*</span>
             </label>
             <div class="relative">
               <input 
@@ -972,8 +972,8 @@
           <!-- Confirmar Contraseña -->
           <div>
             <label for="confirm-password" class="block text-base font-semibold text-slate-900 dark:text-white mb-2">
-              <span class="material-symbols-outlined inline-block align-middle mr-2 text-primary">lock</span>
-              Confirmar Contraseña <span class="text-red-600 dark:text-red-400" aria-label="requerido">*</span>
+              <span class="material-symbols-outlined inline-block align-middle mr-2 text-primary" aria-hidden="true">lock</span>
+              Confirmar Contraseña <span class="text-red-600 dark:text-red-400" aria-hidden="true">*</span>
             </label>
             <div class="relative">
               <input 
@@ -3062,14 +3062,14 @@
         </div>
         
         <div>
-          <label for="cursoDescripcion" class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+          <label id="cursoDescripcion-label" for="cursoDescripcion" class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
             Descripción *
           </label>
-          <div id="cursoDescripcionEditor" class="bg-white dark:bg-slate-700 rounded-lg border border-slate-300 dark:border-slate-600" style="min-height: 150px;">
+          <div id="cursoDescripcionEditor" class="bg-white dark:bg-slate-700 rounded-lg border border-slate-300 dark:border-slate-600" style="min-height: 150px;" role="textbox" aria-labelledby="cursoDescripcion-label" aria-describedby="cursoDescripcion-help">
             <!-- Editor WYSIWYG se inicializará aquí -->
           </div>
-          <textarea id="cursoDescripcion" required class="hidden" placeholder="Describe el contenido y objetivos del curso"></textarea>
-          <p class="text-xs text-slate-500 dark:text-slate-500 mt-1">Usa el editor para formatear tu descripción</p>
+          <textarea id="cursoDescripcion" required class="hidden" placeholder="Describe el contenido y objetivos del curso" aria-labelledby="cursoDescripcion-label"></textarea>
+          <p id="cursoDescripcion-help" class="text-xs text-slate-500 dark:text-slate-500 mt-1">Usa el editor para formatear tu descripción</p>
         </div>
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -3186,13 +3186,13 @@
             
             <!-- Editor de texto (para lectura) -->
             <div id="contenidoTextoContainer" class="hidden">
-              <label for="contenidoTexto" class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+              <label id="contenidoTexto-label" for="contenidoTexto" class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
                 Contenido de Texto *
               </label>
-              <div id="contenidoTextoEditor" class="bg-white dark:bg-slate-700 rounded-lg border border-slate-300 dark:border-slate-600" style="min-height: 200px;">
+              <div id="contenidoTextoEditor" class="bg-white dark:bg-slate-700 rounded-lg border border-slate-300 dark:border-slate-600" style="min-height: 200px;" role="textbox" aria-labelledby="contenidoTexto-label">
                 <!-- Editor WYSIWYG se inicializará aquí -->
               </div>
-              <input type="hidden" id="contenidoTexto" value="">
+              <input type="hidden" id="contenidoTexto" value="" aria-labelledby="contenidoTexto-label">
             </div>
             
             <div>
