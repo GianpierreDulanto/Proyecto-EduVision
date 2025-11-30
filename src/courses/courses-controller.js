@@ -1444,11 +1444,16 @@ export class CoursesController {
       return;
     }
     
-    // Verificar si todas las lecciones están completadas
+    // Verificar rol del usuario
+    const sessionData = localStorage.getItem('eduVisionSession');
+    const userRol = sessionData ? JSON.parse(sessionData).user?.rol : null;
+    const esAdmin = userRol === 'admin';
+    
+    // Verificar si todas las lecciones están completadas (solo para alumnos)
     let todasLeccionesCompletadas = true;
     let leccionesPendientes = 0;
     
-    if (secciones && secciones.length > 0) {
+    if (!esAdmin && secciones && secciones.length > 0) {
       const todasLasLecciones = [];
       secciones.forEach(seccion => {
         if (seccion.lecciones && seccion.lecciones.length > 0) {
@@ -1471,7 +1476,8 @@ export class CoursesController {
         ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
         : 'bg-slate-100 text-slate-800 dark:bg-slate-700 dark:text-slate-400';
       
-      const puedeAcceder = cuestionario.estado === 'activo' && (secciones.length === 0 || todasLeccionesCompletadas);
+      // Los administradores siempre pueden ver, los alumnos necesitan cumplir requisitos
+      const puedeAcceder = esAdmin ? true : (cuestionario.estado === 'activo' && (secciones.length === 0 || todasLeccionesCompletadas));
       
       return `
         <div class="bg-slate-50 dark:bg-slate-700/50 rounded-xl p-6 border ${
@@ -1507,22 +1513,32 @@ export class CoursesController {
               ` : ''}
             </div>
           </div>
-          <button 
-            onclick="${puedeAcceder ? `window.app.courses.iniciarCuestionario(${cuestionario.id_cuestionario})` : ''}"
-            class="w-full px-4 py-3 ${
-              puedeAcceder 
-                ? 'bg-primary hover:bg-primary/90' 
-                : 'bg-slate-400 dark:bg-slate-600 cursor-not-allowed'
-            } text-white rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
-            ${!puedeAcceder ? 'disabled' : ''}
-            aria-label="Iniciar cuestionario: ${this.escapeHtml(cuestionario.titulo || '')}">
-            <span class="material-symbols-outlined">quiz</span>
-            ${puedeAcceder 
-              ? 'Iniciar Cuestionario' 
-              : cuestionario.estado !== 'activo' 
-                ? 'Cuestionario Inactivo' 
-                : 'Completa las lecciones primero'}
-          </button>
+          ${esAdmin ? `
+            <button 
+              onclick="window.app.courses.verCuestionarioAdmin(${cuestionario.id_cuestionario})"
+              class="w-full px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              aria-label="Ver cuestionario: ${this.escapeHtml(cuestionario.titulo || '')}">
+              <span class="material-symbols-outlined">visibility</span>
+              Ver Cuestionario
+            </button>
+          ` : `
+            <button 
+              onclick="${puedeAcceder ? `window.app.courses.iniciarCuestionario(${cuestionario.id_cuestionario})` : ''}"
+              class="w-full px-4 py-3 ${
+                puedeAcceder 
+                  ? 'bg-primary hover:bg-primary/90' 
+                  : 'bg-slate-400 dark:bg-slate-600 cursor-not-allowed'
+              } text-white rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
+              ${!puedeAcceder ? 'disabled' : ''}
+              aria-label="Iniciar cuestionario: ${this.escapeHtml(cuestionario.titulo || '')}">
+              <span class="material-symbols-outlined">quiz</span>
+              ${puedeAcceder 
+                ? 'Iniciar Cuestionario' 
+                : cuestionario.estado !== 'activo' 
+                  ? 'Cuestionario Inactivo' 
+                  : 'Completa las lecciones primero'}
+            </button>
+          `}
         </div>
       `;
     }).join('');
@@ -1589,6 +1605,144 @@ export class CoursesController {
     } else {
       this.showError('No hay URL disponible para este recurso');
     }
+  }
+
+  /**
+   * Ver cuestionario en modo solo lectura (para administradores)
+   */
+  async verCuestionarioAdmin(cuestionarioId) {
+    try {
+      // Obtener el cuestionario completo con preguntas y opciones
+      const preguntas = await API.getQuizQuestions(cuestionarioId);
+      
+      if (!preguntas || preguntas.length === 0) {
+        this.showError('Este cuestionario no tiene preguntas disponibles');
+        return;
+      }
+
+      // Obtener información del cuestionario
+      const cuestionarios = await API.getCursoCuestionarios(this.currentCurso?.id_curso);
+      const cuestionario = cuestionarios.find(q => q.id_cuestionario === cuestionarioId);
+      
+      if (!cuestionario) {
+        this.showError('No se pudo cargar la información del cuestionario');
+        return;
+      }
+
+      // Crear modal para mostrar el cuestionario en modo solo lectura
+      this.mostrarCuestionarioSoloLectura(cuestionario, preguntas);
+    } catch (error) {
+      console.error('Error al ver cuestionario:', error);
+      this.showError('Error al cargar el cuestionario');
+    }
+  }
+
+  /**
+   * Mostrar cuestionario en modo solo lectura
+   */
+  mostrarCuestionarioSoloLectura(cuestionario, preguntas) {
+    // Crear o actualizar modal
+    let modal = document.getElementById('modalCuestionarioAdmin');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'modalCuestionarioAdmin';
+      modal.className = 'fixed inset-0 bg-black/90 backdrop-blur-sm z-[100] flex items-center justify-center p-4 overflow-y-auto';
+      document.body.appendChild(modal);
+    }
+
+    modal.innerHTML = `
+      <div class="bg-slate-800 rounded-2xl shadow-2xl max-w-4xl w-full p-6 md:p-8 my-8 border-2 border-blue-500">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h2 class="text-3xl font-bold text-white mb-2">${this.escapeHtml(cuestionario.titulo || 'Cuestionario')}</h2>
+            <p class="text-slate-300">${this.escapeHtml(cuestionario.descripcion || 'Sin descripción')}</p>
+            <div class="mt-3 flex items-center gap-4 text-sm text-slate-400">
+              <span>Total de preguntas: <strong class="text-white">${preguntas.length}</strong></span>
+              ${cuestionario.tiempo_limite ? `<span>Tiempo límite: <strong class="text-white">${cuestionario.tiempo_limite} minutos</strong></span>` : ''}
+              <span>Calificación mínima: <strong class="text-white">${cuestionario.calificacion_minima || 60}%</strong></span>
+            </div>
+          </div>
+          <button 
+            onclick="document.getElementById('modalCuestionarioAdmin').remove()"
+            class="p-2 hover:bg-slate-700 rounded-lg transition-colors"
+            aria-label="Cerrar modal">
+            <span class="material-symbols-outlined text-white text-2xl">close</span>
+          </button>
+        </div>
+
+        <div class="bg-blue-500/20 border border-blue-500 rounded-lg p-4 mb-6">
+          <p class="text-blue-300 flex items-center gap-2">
+            <span class="material-symbols-outlined">info</span>
+            <strong>Modo de Inspección:</strong> Estás viendo este cuestionario en modo solo lectura. Las respuestas correctas están marcadas en verde.
+          </p>
+        </div>
+
+        <div class="space-y-6 max-h-[60vh] overflow-y-auto pr-2">
+          ${preguntas.map((pregunta, index) => {
+            // Parsear opciones si vienen como JSON string
+            let opciones = pregunta.opciones;
+            if (typeof opciones === 'string') {
+              try {
+                opciones = JSON.parse(opciones);
+              } catch (e) {
+                opciones = [];
+              }
+            }
+
+            return `
+              <div class="bg-slate-700/50 rounded-xl p-6 border border-slate-600">
+                <div class="flex items-start gap-3 mb-4">
+                  <span class="flex-shrink-0 w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white font-bold">
+                    ${index + 1}
+                  </span>
+                  <div class="flex-1">
+                    <h3 class="text-lg font-bold text-white mb-3">
+                      ${this.escapeHtml(pregunta.texto_pregunta || pregunta.pregunta || 'Sin texto')}
+                    </h3>
+                    <div class="space-y-2">
+                      ${(opciones || []).map(opcion => {
+                        const esCorrecta = opcion.es_correcta === 1 || opcion.es_correcta === true;
+                        return `
+                          <div class="flex items-center gap-3 p-3 rounded-lg ${
+                            esCorrecta 
+                              ? 'bg-green-900/50 border-2 border-green-500' 
+                              : 'bg-slate-600/50 border border-slate-500'
+                          }">
+                            <span class="material-symbols-outlined text-xl ${
+                              esCorrecta ? 'text-green-400' : 'text-slate-400'
+                            }">
+                              ${esCorrecta ? 'check_circle' : 'radio_button_unchecked'}
+                            </span>
+                            <span class="flex-1 text-white ${esCorrecta ? 'font-semibold' : ''}">
+                              ${this.escapeHtml(opcion.texto_opcion || opcion.opcion || '')}
+                            </span>
+                            ${esCorrecta ? `
+                              <span class="px-2 py-1 bg-green-600 text-white text-xs font-semibold rounded">
+                                Correcta
+                              </span>
+                            ` : ''}
+                          </div>
+                        `;
+                      }).join('')}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+
+        <div class="mt-6 flex justify-end">
+          <button 
+            onclick="document.getElementById('modalCuestionarioAdmin').remove()"
+            class="px-6 py-3 bg-slate-600 hover:bg-slate-500 text-white rounded-lg font-semibold transition-colors">
+            Cerrar
+          </button>
+        </div>
+      </div>
+    `;
+
+    modal.classList.remove('hidden');
   }
 
   async iniciarCuestionario(cuestionarioId) {

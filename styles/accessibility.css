@@ -655,8 +655,21 @@ body:not(.dark).contraste-alto .border-slate-300 {
 
 .dark body.contraste-alto .text-slate-400,
 .dark body.contraste-alto .text-slate-500,
-.dark body.contraste-alto .text-slate-600 {
+.dark body.contraste-alto .text-slate-600,
+.dark body.contraste-alto .text-gray-400,
+.dark body.contraste-alto .text-gray-500 {
   color: #ffffff !important;
+}
+
+/* Mejorar contraste en modo normal para elementos con bajo contraste */
+body:not(.dark) .text-slate-400,
+body:not(.dark) .text-gray-400 {
+  color: #64748b !important; /* slate-500 para mejor contraste */
+}
+
+.dark .text-slate-400,
+.dark .text-gray-400 {
+  color: #cbd5e1 !important; /* slate-300 para mejor contraste */
 }
 
 .dark body.contraste-alto .border-slate-600,

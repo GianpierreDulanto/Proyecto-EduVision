@@ -60,7 +60,7 @@
            aria-label="Navegación secundaria - Migas de pan"
            class="bg-slate-100 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-4 sm:px-6 lg:px-8 py-2">
         <div class="max-w-7xl mx-auto">
-          <ol class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400" itemscope itemtype="https://schema.org/BreadcrumbList">
+          <ol class="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300" itemscope itemtype="https://schema.org/BreadcrumbList">
             <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
               <a href="#inicio" 
                  itemprop="item" 
@@ -94,7 +94,7 @@
                 <h1 class="text-lg sm:text-2xl font-bold text-slate-900 dark:text-white leading-tight">
                   Edu Vision
                 </h1>
-                <p class="text-xs text-slate-500 dark:text-slate-400 hidden sm:block">
+                <p class="text-xs text-slate-700 dark:text-slate-300 hidden sm:block">
                   Educación Accesible
                 </p>
                 <p class="text-xs text-slate-600 dark:text-slate-300 sm:hidden">
@@ -403,7 +403,7 @@
         >
           Bienvenido a Edu Vision
         </h1>
-        <p class="mx-auto mt-6 max-w-xl text-lg text-slate-400">
+        <p class="mx-auto mt-6 max-w-xl text-lg text-slate-700 dark:text-slate-300">
           Una plataforma diseñada para el aprendizaje inclusivo, accesible para
           todos los estudiantes. Personaliza tu experiencia y accede a nuestras
           herramientas educativas adaptadas.
@@ -416,13 +416,14 @@
       >
         <button
           class="group flex flex-col items-center gap-3 rounded-lg bg-button p-6 text-center transition-all hover:bg-slate-700"
+          aria-label="Activar modo de alto contraste"
         >
           <div
             class="flex h-12 w-12 items-center justify-center rounded-full bg-primary/20 transition-colors group-hover:bg-primary"
           >
             <span
               class="material-symbols-outlined text-2xl text-primary group-hover:text-white"
-              >contrast</span
+              aria-hidden="true">contrast</span
             >
           </div>
           <span class="font-semibold text-white">Modo de Alto Contraste</span>
@@ -430,13 +431,14 @@
 
         <button
           class="group flex flex-col items-center gap-3 rounded-lg bg-button p-6 text-center transition-all hover:bg-slate-700"
+          aria-label="Abrir configuración de lector de pantalla"
         >
           <div
             class="flex h-12 w-12 items-center justify-center rounded-full bg-primary/20 transition-colors group-hover:bg-primary"
           >
             <span
               class="material-symbols-outlined text-2xl text-primary group-hover:text-white"
-              >hearing_disabled</span
+              aria-hidden="true">hearing_disabled</span
             >
           </div>
           <span class="font-semibold text-white">Lector de Pantalla</span>
@@ -444,13 +446,14 @@
 
         <button
           class="group flex flex-col items-center gap-3 rounded-lg bg-button p-6 text-center transition-all hover:bg-slate-700"
+          aria-label="Abrir configuración de tipografía"
         >
           <div
             class="flex h-12 w-12 items-center justify-center rounded-full bg-primary/20 transition-colors group-hover:bg-primary"
           >
             <span
               class="material-symbols-outlined text-2xl text-primary group-hover:text-white"
-              >text_fields</span
+              aria-hidden="true">text_fields</span
             >
           </div>
           <span class="font-semibold text-white"
@@ -460,13 +463,14 @@
 
         <button
           class="group flex flex-col items-center gap-3 rounded-lg bg-button p-6 text-center transition-all hover:bg-slate-700"
+          aria-label="Abrir panel de accesibilidad"
         >
           <div
             class="flex h-12 w-12 items-center justify-center rounded-full bg-primary/20 transition-colors group-hover:bg-primary"
           >
             <span
               class="material-symbols-outlined text-2xl text-primary group-hover:text-white"
-              >accessibility_new</span
+              aria-hidden="true">accessibility_new</span
             >
           </div>
           <span class="font-semibold text-white">Panel de Accesibilidad</span>
@@ -1385,7 +1389,7 @@
         </svg>
         <h1 id="subir-recurso-heading" class="text-xl font-bold text-gray-900 dark:text-white">Centro de Aprendizaje Inclusivo</h1>
       </div>
-      <button id="btnVolverDashboard" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition">
+      <button id="btnVolverDashboard" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition" aria-label="Volver al dashboard">
         ← Volver al Dashboard
       </button>
     </div>
@@ -1838,12 +1842,10 @@
             <!-- Toggle Alto Contraste -->
             <div class="flex items-center justify-between">
               <div>
-                <label for="switchContraste" class="font-semibold text-slate-900 dark:text-white cursor-pointer">
-                  Alto Contraste
-                </label>
+                <span class="font-semibold text-slate-900 dark:text-white">Alto Contraste</span>
                 <p class="text-sm text-slate-500 dark:text-slate-400">Aumenta el contraste visual</p>
               </div>
-              <label class="relative inline-flex items-center cursor-pointer">
+              <label class="relative inline-flex items-center cursor-pointer" for="switchContraste">
                 <input type="checkbox" id="switchContraste" class="absolute opacity-0 w-0 h-0 peer" onchange="toggleContrasteAlto()" aria-label="Activar alto contraste">
                 <span class="relative w-14 h-8 bg-slate-300 dark:bg-slate-600 rounded-full peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/50 peer-checked:bg-primary transition-colors duration-200 ease-in-out cursor-pointer">
                   <span class="absolute top-1 left-1 w-6 h-6 bg-white rounded-full transition-transform duration-200 ease-in-out peer-checked:translate-x-6 shadow-md"></span>
@@ -1854,12 +1856,10 @@
             <!-- Toggle Reducir Movimiento -->
             <div class="flex items-center justify-between">
               <div>
-                <label for="switchMovimiento" class="font-semibold text-slate-900 dark:text-white cursor-pointer">
-                  Reducir Movimiento
-                </label>
+                <span class="font-semibold text-slate-900 dark:text-white">Reducir Movimiento</span>
                 <p class="text-sm text-slate-500 dark:text-slate-400">Minimiza animaciones</p>
               </div>
-              <label class="relative inline-flex items-center cursor-pointer">
+              <label class="relative inline-flex items-center cursor-pointer" for="switchMovimiento">
                 <input type="checkbox" id="switchMovimiento" class="absolute opacity-0 w-0 h-0 peer" onchange="toggleReducirMovimiento()" aria-label="Activar reducir movimiento">
                 <span class="relative w-14 h-8 bg-slate-300 dark:bg-slate-600 rounded-full peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/50 peer-checked:bg-primary transition-colors duration-200 ease-in-out cursor-pointer">
                   <span class="absolute top-1 left-1 w-6 h-6 bg-white rounded-full transition-transform duration-200 ease-in-out peer-checked:translate-x-6 shadow-md"></span>
@@ -1870,12 +1870,10 @@
             <!-- Toggle Subrayar Enlaces -->
             <div class="flex items-center justify-between">
               <div>
-                <label for="switchEnlaces" class="font-semibold text-slate-900 dark:text-white cursor-pointer">
-                  Subrayar Enlaces
-                </label>
+                <span class="font-semibold text-slate-900 dark:text-white">Subrayar Enlaces</span>
                 <p class="text-sm text-slate-500 dark:text-slate-400">Destaca todos los enlaces</p>
               </div>
-              <label class="relative inline-flex items-center cursor-pointer">
+              <label class="relative inline-flex items-center cursor-pointer" for="switchEnlaces">
                 <input type="checkbox" id="switchEnlaces" class="absolute opacity-0 w-0 h-0 peer" onchange="toggleSubrayarEnlaces()" aria-label="Activar subrayar enlaces">
                 <span class="relative w-14 h-8 bg-slate-300 dark:bg-slate-600 rounded-full peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/50 peer-checked:bg-primary transition-colors duration-200 ease-in-out cursor-pointer">
                   <span class="absolute top-1 left-1 w-6 h-6 bg-white rounded-full transition-transform duration-200 ease-in-out peer-checked:translate-x-6 shadow-md"></span>
@@ -1886,12 +1884,10 @@
             <!-- Toggle Enfoque Mejorado -->
             <div class="flex items-center justify-between">
               <div>
-                <label for="switchEnfoque" class="font-semibold text-slate-900 dark:text-white cursor-pointer">
-                  Enfoque Mejorado
-                </label>
+                <span class="font-semibold text-slate-900 dark:text-white">Enfoque Mejorado</span>
                 <p class="text-sm text-slate-500 dark:text-slate-400">Resalta el elemento activo</p>
               </div>
-              <label class="relative inline-flex items-center cursor-pointer">
+              <label class="relative inline-flex items-center cursor-pointer" for="switchEnfoque">
                 <input type="checkbox" id="switchEnfoque" class="absolute opacity-0 w-0 h-0 peer" onchange="toggleEnfoqueMejorado()" aria-label="Activar enfoque mejorado">
                 <span class="relative w-14 h-8 bg-slate-300 dark:bg-slate-600 rounded-full peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/50 peer-checked:bg-primary transition-colors duration-200 ease-in-out cursor-pointer">
                   <span class="absolute top-1 left-1 w-6 h-6 bg-white rounded-full transition-transform duration-200 ease-in-out peer-checked:translate-x-6 shadow-md"></span>
@@ -1909,15 +1905,19 @@
           </h2>
           
           <div class="flex items-center gap-4 mb-4">
+            <label for="rangoTamanoTexto" class="sr-only">Ajustar tamaño de texto</label>
             <button onclick="ajustarTamanoTexto(false)" 
-                    class="px-4 py-2 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 rounded-lg font-bold text-xl transition-colors focus:outline-none focus:ring-2 focus:ring-primary">
+                    class="px-4 py-2 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 rounded-lg font-bold text-xl transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
+                    aria-label="Disminuir tamaño de texto">
               A-
             </button>
             <input type="range" id="rangoTamanoTexto" min="1" max="5" value="3" step="1" 
                    oninput="cambiarTamanoTextoRango(this.value)" 
+                   aria-label="Rango de tamaño de texto"
                    class="flex-1 h-3 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary">
             <button onclick="ajustarTamanoTexto(true)" 
-                    class="px-4 py-2 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 rounded-lg font-bold text-xl transition-colors focus:outline-none focus:ring-2 focus:ring-primary">
+                    class="px-4 py-2 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 rounded-lg font-bold text-xl transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
+                    aria-label="Aumentar tamaño de texto">
               A+
             </button>
           </div>
@@ -1933,13 +1933,15 @@
     <!-- Botones de Acción -->
     <div class="mt-8 flex flex-wrap gap-4 justify-center">
       <button onclick="restablecerAjustes()" 
-              class="flex items-center gap-2 px-6 py-3 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-900 dark:text-white rounded-lg font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-primary">
-        <span class="material-symbols-outlined">restart_alt</span>
+              class="flex items-center gap-2 px-6 py-3 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-900 dark:text-white rounded-lg font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
+              aria-label="Restablecer todos los ajustes de accesibilidad">
+        <span class="material-symbols-outlined" aria-hidden="true">restart_alt</span>
         Restablecer Todo
       </button>
       <button onclick="guardarPreferencias()" 
-              class="flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary/90 text-white rounded-lg font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-primary">
-        <span class="material-symbols-outlined">save</span>
+              class="flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary/90 text-white rounded-lg font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
+              aria-label="Guardar cambios en las preferencias de accesibilidad">
+        <span class="material-symbols-outlined" aria-hidden="true">save</span>
         Guardar Cambios
       </button>
     </div>
@@ -3479,7 +3481,7 @@
             </div>
             <div class="flex items-center justify-between">
               <label for="volumenLector" class="text-sm text-gray-400">Volumen:</label>
-              <input type="range" id="volumenLector" min="0" max="1" step="0.1" value="1" class="w-32">
+              <input type="range" id="volumenLector" min="0" max="1" step="0.1" value="1" class="w-32" aria-label="Ajustar volumen del lector de pantalla">
             </div>
           </div>
         </div>
