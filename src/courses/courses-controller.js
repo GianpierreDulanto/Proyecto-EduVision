@@ -2380,42 +2380,22 @@ export class CoursesController {
       btn.classList.remove('border-primary', 'border-green-500', 'border-red-500', 'bg-green-900', 'bg-red-900');
     });
 
-    // Marcar la seleccionada
+    // Marcar solo la seleccionada (sin indicar si es correcta o incorrecta)
     const seleccionada = container.querySelector(`[data-opcion-id="${opcionId}"]`);
     if (seleccionada) {
-      if (esCorrecta) {
-        seleccionada.classList.add('border-green-500', 'bg-green-900');
-        const circle = seleccionada.querySelector('span:first-child');
-        circle.innerHTML = '<span class="material-symbols-outlined text-green-500">check_circle</span>';
-      } else {
-        seleccionada.classList.add('border-red-500', 'bg-red-900');
-        const circle = seleccionada.querySelector('span:first-child');
-        circle.innerHTML = '<span class="material-symbols-outlined text-red-500">cancel</span>';
-        
-        // Resaltar la correcta
-        const correcta = container.querySelector('[data-es-correcta="true"]');
-        if (correcta) {
-          correcta.classList.add('border-green-500', 'bg-green-900');
-          const correctCircle = correcta.querySelector('span:first-child');
-          correctCircle.innerHTML = '<span class="material-symbols-outlined text-green-500">check_circle</span>';
-        }
-      }
+      // Solo marcar visualmente que fue seleccionada, sin mostrar si es correcta
+      seleccionada.classList.add('border-primary', 'bg-slate-600');
+      const circle = seleccionada.querySelector('span:first-child');
+      circle.innerHTML = '<span class="material-symbols-outlined text-primary">radio_button_checked</span>';
     }
 
-    // Mostrar feedback
+    // NO mostrar feedback durante el examen
     const feedback = document.getElementById('feedbackExamen');
     if (feedback) {
-      feedback.classList.remove('hidden');
-      if (esCorrecta) {
-        feedback.className = 'mb-4 p-4 rounded-lg bg-green-900/50 border border-green-500';
-        feedback.innerHTML = '<p class="text-green-400 font-medium">✓ ¡Correcto!</p>';
-      } else {
-        feedback.className = 'mb-4 p-4 rounded-lg bg-red-900/50 border border-red-500';
-        feedback.innerHTML = '<p class="text-red-400 font-medium">✗ Incorrecto. La respuesta correcta está resaltada.</p>';
-      }
+      feedback.classList.add('hidden');
     }
 
-    // Actualizar estado
+    // Actualizar estado (sin mostrar si es correcta)
     let puntaje = parseInt(container.dataset.puntaje || '0');
     if (esCorrecta) puntaje++;
     container.dataset.puntaje = puntaje;
@@ -2580,11 +2560,14 @@ export class CoursesController {
             <div class="bg-slate-700/50 rounded-lg p-4 mb-6 text-left">
               <h3 class="text-white font-semibold mb-2">Resumen:</h3>
               <ul class="text-slate-300 text-sm space-y-1">
-                <li>• Preguntas correctas: <span class="text-green-400 font-semibold">${puntaje}</span></li>
-                <li>• Preguntas incorrectas: <span class="text-red-400 font-semibold">${preguntas.length - puntaje}</span></li>
                 <li>• Total de preguntas: ${preguntas.length}</li>
                 <li>• Calificación mínima: ${calificacionMinima}%</li>
+                <li>• Tu puntuación: ${porcentaje}%</li>
               </ul>
+              <p class="text-slate-400 text-xs mt-3 italic">
+                Las respuestas correctas no se muestran para mantener la integridad del examen. 
+                Revisa el material del curso para mejorar tu comprensión.
+              </p>
             </div>
 
             <button 
@@ -2876,42 +2859,22 @@ export class CoursesController {
       btn.classList.remove('border-primary', 'border-green-500', 'border-red-500', 'bg-green-900', 'bg-red-900');
     });
 
-    // Marcar la seleccionada
+    // Marcar solo la seleccionada (sin indicar si es correcta o incorrecta)
     const seleccionada = modal.querySelector(`[data-opcion-id="${opcionId}"]`);
     if (seleccionada) {
-      if (esCorrecta) {
-        seleccionada.classList.add('border-green-500', 'bg-green-900');
-        const circle = seleccionada.querySelector('span:first-child');
-        circle.innerHTML = '<span class="material-symbols-outlined text-green-500">check_circle</span>';
-      } else {
-        seleccionada.classList.add('border-red-500', 'bg-red-900');
-        const circle = seleccionada.querySelector('span:first-child');
-        circle.innerHTML = '<span class="material-symbols-outlined text-red-500">cancel</span>';
-        
-        // Resaltar la correcta
-        const correcta = modal.querySelector('[data-es-correcta="true"]');
-        if (correcta) {
-          correcta.classList.add('border-green-500', 'bg-green-900');
-          const correctCircle = correcta.querySelector('span:first-child');
-          correctCircle.innerHTML = '<span class="material-symbols-outlined text-green-500">check_circle</span>';
-        }
-      }
+      // Solo marcar visualmente que fue seleccionada, sin mostrar si es correcta
+      seleccionada.classList.add('border-primary', 'bg-slate-600');
+      const circle = seleccionada.querySelector('span:first-child');
+      circle.innerHTML = '<span class="material-symbols-outlined text-primary">radio_button_checked</span>';
     }
 
-    // Mostrar feedback
+    // NO mostrar feedback durante el quiz
     const feedback = document.getElementById('feedbackQuiz');
     if (feedback) {
-      feedback.classList.remove('hidden');
-      if (esCorrecta) {
-        feedback.className = 'mb-4 p-4 rounded-lg bg-green-900/50 border border-green-500';
-        feedback.innerHTML = '<p class="text-green-400 font-medium">✓ ¡Correcto!</p>';
-      } else {
-        feedback.className = 'mb-4 p-4 rounded-lg bg-red-900/50 border border-red-500';
-        feedback.innerHTML = '<p class="text-red-400 font-medium">✗ Incorrecto. La respuesta correcta está resaltada.</p>';
-      }
+      feedback.classList.add('hidden');
     }
 
-    // Actualizar estado
+    // Actualizar estado (sin mostrar si es correcta)
     let puntaje = parseInt(modal.dataset.puntaje || '0');
     if (esCorrecta) puntaje++;
     modal.dataset.puntaje = puntaje;
@@ -3044,11 +3007,14 @@ export class CoursesController {
             <div class="bg-slate-700/50 rounded-lg p-4 mb-6 text-left">
               <h3 class="text-white font-semibold mb-2">Resumen:</h3>
               <ul class="text-slate-300 text-sm space-y-1">
-                <li>• Preguntas correctas: <span class="text-green-400 font-semibold">${puntaje}</span></li>
-                <li>• Preguntas incorrectas: <span class="text-red-400 font-semibold">${preguntas.length - puntaje}</span></li>
                 <li>• Total de preguntas: ${preguntas.length}</li>
                 <li>• Calificación mínima: ${calificacionMinima}%</li>
+                <li>• Tu puntuación: ${porcentaje}%</li>
               </ul>
+              <p class="text-slate-400 text-xs mt-3 italic">
+                Las respuestas correctas no se muestran para mantener la integridad del cuestionario. 
+                Revisa el material del curso para mejorar tu comprensión.
+              </p>
             </div>
 
             <button 

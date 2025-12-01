@@ -2,6 +2,7 @@
 // Gestión de sesión de usuario con autenticación real
 
 import { login as apiLogin, register as apiRegister } from '../api/api.js';
+import API from '../api/api.js';
 import { showNotification } from '../utils/helpers.js';
 
 export class SessionManager {
@@ -662,14 +663,63 @@ export class SessionManager {
       perfilRol.textContent = roles[this.user.rol] || this.user.rol;
     }
 
-    // Ocultar estadísticas (Cursos, Progreso, Calificación) - Solo para alumnos
+    // Ocultar estadísticas (Cursos, Progreso) - Solo para alumnos
     const estadisticasSection = document.getElementById('estadisticasPerfil');
     if (estadisticasSection) {
       if (this.user.rol === 'alumno') {
         estadisticasSection.classList.remove('hidden');
+        // Cargar estadísticas del alumno
+        this.loadAlumnoEstadisticas();
       } else {
         // Ocultar para docentes y administradores
         estadisticasSection.classList.add('hidden');
+      }
+    }
+  }
+
+  /**
+   * Cargar estadísticas del alumno para el perfil
+   * Usa la misma lógica que el dashboard: porcentaje de cursos completados
+   */
+  async loadAlumnoEstadisticas() {
+    if (!this.user || this.user.rol !== 'alumno' || !this.user.id_alumno) return;
+
+    try {
+      // Obtener cursos del alumno
+      const cursos = await API.getAlumnoCursos(this.user.id_alumno);
+      const totalCursos = cursos && Array.isArray(cursos) ? cursos.length : 0;
+
+      // Calcular progreso usando la misma lógica que el dashboard
+      // Progreso = (cursos completados / total cursos) * 100
+      let progresoPorcentaje = 0;
+      if (cursos && Array.isArray(cursos) && cursos.length > 0) {
+        // Contar cursos completados (donde finalizado === true o 1)
+        const cursosCompletados = cursos.filter(c => c.finalizado === true || c.finalizado === 1).length;
+        
+        // Calcular porcentaje igual que en StudentController
+        if (totalCursos > 0) {
+          progresoPorcentaje = Math.round((cursosCompletados / totalCursos) * 100);
+        }
+      }
+
+      // Actualizar UI
+      const perfilTotalCursos = document.getElementById('perfil-total-cursos');
+      const perfilProgreso = document.getElementById('perfil-progreso');
+
+      if (perfilTotalCursos) {
+        perfilTotalCursos.textContent = totalCursos;
+      }
+      if (perfilProgreso) {
+        // Asegurar que siempre sea un número válido
+        const progresoFinal = isNaN(progresoPorcentaje) ? 0 : progresoPorcentaje;
+        perfilProgreso.textContent = `${progresoFinal}%`;
+      }
+    } catch (error) {
+      console.error('Error al cargar estadísticas del alumno:', error);
+      // Asegurar que se muestre 0% en caso de error
+      const perfilProgreso = document.getElementById('perfil-progreso');
+      if (perfilProgreso) {
+        perfilProgreso.textContent = '0%';
       }
     }
   }
